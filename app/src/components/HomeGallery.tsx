@@ -22,6 +22,7 @@ const UI = {
     tn: "Dikokwane tse nne tsa dingwalo tsa Aforika Borwa — di tsosolositswe. Tobetsa kanegelo go simolola.",
   },
   comingSoon: { en: "Community Archive — coming soon", tn: "Polokelo ya Setšhaba — e e tla" },
+  about: { en: "About the Sources →", tn: "Ka ga Metswedi →" },
   language: { en: "EN", tn: "TSW" },
 };
 
@@ -29,10 +30,12 @@ export function HomeGallery({
   lang,
   onToggleLang,
   onOpen,
+  onAbout,
 }: {
   lang: Lang;
   onToggleLang: () => void;
   onOpen: (id: string) => void;
+  onAbout: () => void;
 }) {
   return (
     <View style={styles.root}>
@@ -57,6 +60,10 @@ export function HomeGallery({
           <View style={styles.comingSoon}>
             <Text style={styles.comingSoonText}>{UI.comingSoon[lang]}</Text>
           </View>
+
+          <Pressable style={styles.aboutBtn} onPress={onAbout}>
+            <Text style={styles.aboutBtnText}>{UI.about[lang]}</Text>
+          </Pressable>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -147,4 +154,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   comingSoonText: { color: colors.muted, fontSize: type.small },
+  aboutBtn: { alignItems: "center", paddingVertical: spacing.lg },
+  aboutBtnText: { color: colors.gold, fontSize: type.body, fontWeight: "600" },
 });
