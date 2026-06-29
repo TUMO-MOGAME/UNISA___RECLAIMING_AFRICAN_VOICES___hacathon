@@ -32,14 +32,14 @@ to phases in [docs/00-project-plan.md](../docs/00-project-plan.md). Mark de-scop
 
 ## Phase 2 — Community Archive + offline (4–6 Jul)
 
-- [ ] T022 `ConsentSheet` (POPIA) — blocks recording until opt-in + private/public choice
-- [ ] T023 `services/recorder` (expo-av) → local file + metadata
-- [ ] T024 WatermelonDB schema + models (recordings) + local list UI
-- [ ] T025 Erasure: delete recording (local) — one tap
-- [ ] T026 ArchiveScreen (record · list · play · delete)
-- [ ] T027 (stretch) Supabase tables + **RLS** + upload on consent/online
-- [ ] T028 (stretch) `services/lelapa.ts` — Vulavula transcribe + store transcript
-- [ ] T029 (stretch) WatermelonDB ↔ Supabase sync
+- [x] T022 `ConsentSheet` (POPIA) — blocks recording until opt-in + private/public choice
+- [x] T023 Recorder via **expo-audio** (SDK 56) → permission + record/stop + uri
+- [~] T024 Local list UI done (session state); WatermelonDB persistence still TODO (survive reload)
+- [x] T025 Erasure: delete recording — one tap
+- [x] T026 ArchiveScreen (record · list · play · delete · rename)
+- [ ] T027 (stretch) Supabase tables + **RLS** + upload on consent/online ← needs key
+- [ ] T028 (stretch) `services/lelapa.ts` — Vulavula transcribe + store transcript ← needs key
+- [ ] T029 (stretch) WatermelonDB ↔ Supabase sync ← needs key
 
 ## Phase 3 — Polish + submit (7–9 Jul)
 

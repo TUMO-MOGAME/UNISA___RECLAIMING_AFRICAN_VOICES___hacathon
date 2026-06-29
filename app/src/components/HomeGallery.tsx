@@ -21,7 +21,11 @@ const UI = {
     en: "Four pillars of South African letters — brought to life. Tap a story to begin.",
     tn: "Dikokwane tse nne tsa dingwalo tsa Aforika Borwa — di tsosolositswe. Tobetsa kanegelo go simolola.",
   },
-  comingSoon: { en: "Community Archive — coming soon", tn: "Polokelo ya Setšhaba — e e tla" },
+  archive: { en: "🎙️  Community Archive", tn: "🎙️  Polokelo ya Setšhaba" },
+  archiveHint: {
+    en: "Record & preserve your own family's stories",
+    tn: "Gatisa o boloke dikanegelo tsa lelapa la gago",
+  },
   about: { en: "About the Sources →", tn: "Ka ga Metswedi →" },
   language: { en: "EN", tn: "TSW" },
 };
@@ -31,11 +35,13 @@ export function HomeGallery({
   onToggleLang,
   onOpen,
   onAbout,
+  onArchive,
 }: {
   lang: Lang;
   onToggleLang: () => void;
   onOpen: (id: string) => void;
   onAbout: () => void;
+  onArchive: () => void;
 }) {
   return (
     <View style={styles.root}>
@@ -57,9 +63,10 @@ export function HomeGallery({
             <PillarCard key={m.id} module={m} lang={lang} onPress={() => onOpen(m.id)} />
           ))}
 
-          <View style={styles.comingSoon}>
-            <Text style={styles.comingSoonText}>{UI.comingSoon[lang]}</Text>
-          </View>
+          <Pressable style={styles.archiveCard} onPress={onArchive}>
+            <Text style={styles.archiveTitle}>{UI.archive[lang]}</Text>
+            <Text style={styles.archiveHint}>{UI.archiveHint[lang]}</Text>
+          </Pressable>
 
           <Pressable style={styles.aboutBtn} onPress={onAbout}>
             <Text style={styles.aboutBtnText}>{UI.about[lang]}</Text>
@@ -145,15 +152,15 @@ const styles = StyleSheet.create({
   cardTitle: { color: colors.sand, fontSize: type.title, fontWeight: "700", marginTop: 2 },
   cardBlurb: { color: colors.muted, fontSize: type.small, lineHeight: 20, marginTop: spacing.sm },
   cardAudience: { color: colors.ember, fontSize: type.small, marginTop: spacing.sm, fontWeight: "600" },
-  comingSoon: {
+  archiveCard: {
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: colors.card,
-    borderStyle: "dashed",
+    borderColor: colors.ember,
     borderRadius: radius.lg,
     padding: spacing.lg,
-    alignItems: "center",
   },
-  comingSoonText: { color: colors.muted, fontSize: type.small },
+  archiveTitle: { color: colors.sand, fontSize: type.title, fontWeight: "700" },
+  archiveHint: { color: colors.muted, fontSize: type.small, marginTop: 4 },
   aboutBtn: { alignItems: "center", paddingVertical: spacing.lg },
   aboutBtnText: { color: colors.gold, fontSize: type.body, fontWeight: "600" },
 });

@@ -4,17 +4,18 @@ import { View, StyleSheet } from "react-native";
 import { HomeGallery } from "./src/components/HomeGallery";
 import { CinematicReader } from "./src/components/CinematicReader";
 import { AboutSourcesScreen } from "./src/components/AboutSourcesScreen";
+import { ArchiveScreen } from "./src/components/ArchiveScreen";
 import { moduleById } from "./src/content";
 import { Lang } from "./src/content/types";
 import { colors } from "./src/theme/tokens";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
-// Phase 2 adds the "archive" route (Community Archive). See specs/tasks.md.
 
 type Route =
   | { name: "home" }
   | { name: "reader"; id: string }
-  | { name: "about" };
+  | { name: "about" }
+  | { name: "archive" };
 
 export default function App() {
   const [lang, setLang] = useState<Lang>("en");
@@ -36,12 +37,15 @@ export default function App() {
         />
       ) : route.name === "about" ? (
         <AboutSourcesScreen lang={lang} onBack={home} />
+      ) : route.name === "archive" ? (
+        <ArchiveScreen lang={lang} onBack={home} />
       ) : (
         <HomeGallery
           lang={lang}
           onToggleLang={toggleLang}
           onOpen={(id) => setRoute({ name: "reader", id })}
           onAbout={() => setRoute({ name: "about" })}
+          onArchive={() => setRoute({ name: "archive" })}
         />
       )}
     </View>
