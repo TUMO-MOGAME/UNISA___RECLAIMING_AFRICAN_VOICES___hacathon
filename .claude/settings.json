@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/FrameFlow/**)",
+      "Bash(npx --yes create-expo-app@latest app --template blank-typescript)",
+      "Read(//c/Users/tumom/.claude/skills/design-system/**)",
+      "Edit(/.claude/skills/humanities-grounding/**)",
+      "Edit(/.claude/skills/pollinations-visuals/**)",
+      "Edit(/.claude/skills/popia-compliance/**)",
+      "Edit(/.claude/skills/setswana-i18n/**)"
+    ]
+  }
+}

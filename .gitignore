@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+app/node_modules/
+
+# expo / react native
+app/.expo/
+app/dist/
+app/web-build/
+*.orig.*
+.expo-shared/
+
+# native
+app/ios/
+app/android/
+*.apk
+*.aab
+*.ipa
+
+# env & secrets — never commit keys
+.env
+.env.local
+app/.env
+app/.env.local
+*.pem
+*.key
+
+# misc
+.DS_Store
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+coverage/
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# keep the hackathon source PDFs as reference (tracked on purpose)
