@@ -2,7 +2,7 @@
 
 ## Goal
 
-Ship a **demo-ready Lentswe prototype by the concept deadline (9 July 2026, 16:00)** and, if selected
+Ship a **demo-ready Maloba prototype by the concept deadline (9 July 2026, 16:00)** and, if selected
 as a finalist, polish it for the **showcase on 16 July 2026**. The hackathon accepts a "functional
 prototype or clearly presented working concept" + a 2–3 min video + a written narrative.
 
@@ -36,7 +36,7 @@ Gemini calls (pre-generate instead).
 
 ## Definition of "concept-ready" (what 9 July looks like)
 
-A judge can: open Lentswe → see a striking home gallery of the four pillars → enter *Ityala Lamawele*
+A judge can: open Maloba → see a striking home gallery of the four pillars → enter *Ityala Lamawele*
 → watch the *inkundla* scene render cinematically → switch to Child Mode and to Setswana → open the
 Community Archive → hit "Record", see a clear POPIA consent screen, record a short clip, and see it
 saved with the option to delete it. The "About the sources" screen credits Plaatje, Mqhayi, Mutwa,

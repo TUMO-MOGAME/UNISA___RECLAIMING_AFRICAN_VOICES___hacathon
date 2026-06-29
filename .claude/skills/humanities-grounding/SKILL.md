@@ -1,11 +1,11 @@
 ---
 name: humanities-grounding
-description: Lentswe's integrity rule for ALL literary/historical content. Use WHENEVER writing or editing module content, scene text, child-mode simplifications, translations, image prompts, the concept narrative, or anything stating a fact about Mhudi, Ityala Lamawele, Indaba My Children, Vilakazi, or any African history/custom/law. The rule: truth only — no invented heritage. Humanities depth is 30% of the score; getting history wrong is a harm, not a bug.
+description: Maloba's integrity rule for ALL literary/historical content. Use WHENEVER writing or editing module content, scene text, child-mode simplifications, translations, image prompts, the concept narrative, or anything stating a fact about Mhudi, Ityala Lamawele, Indaba My Children, Vilakazi, or any African history/custom/law. The rule: truth only — no invented heritage. Humanities depth is 30% of the score; getting history wrong is a harm, not a bug.
 ---
 
 # Humanities Grounding — truth only, no invented heritage
 
-This is the project's non-negotiable rule. Lentswe is about real people's history. Fabrication is a
+This is the project's non-negotiable rule. Maloba is about real people's history. Fabrication is a
 harm, not just a bug. (See [AGENTS.md](../../../AGENTS.md) §2 and
 [docs/04-humanities-sources.md](../../../docs/04-humanities-sources.md).)
 

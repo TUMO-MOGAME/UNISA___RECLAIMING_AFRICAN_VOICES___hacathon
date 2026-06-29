@@ -1,16 +1,16 @@
 <div align="center">
 
-# Lentswe · *Mantswe a Afrika*
+# Maloba · *Mantswe a maloba*
 
 **Reclaiming African Voices — a cinematic, multilingual, offline-first heritage storytelling app.**
 
-*Lentswe* is Setswana for **"voice / word."**
+*Maloba* is Setswana for **"yesterday"** — and the tagline *Mantswe a maloba* means **"Voices of Yesterday."**
 
 </div>
 
 ---
 
-Lentswe brings South Africa's foundational indigenous literature to life as an interactive, cinematic
+Maloba brings South Africa's foundational indigenous literature to life as an interactive, cinematic
 graphic novel — and invites communities to add their own voices to the archive. Built for the
 **Advancing African Digital Humanities Ideation Hub (AADHIH) "Reclaiming African Voices" hackathon**
 (UNISA · BaobabX Academy).
@@ -18,7 +18,7 @@ graphic novel — and invites communities to add their own voices to the archive
 ## Why it matters
 
 African histories, laws, and cosmologies have too often survived only through fragile oral tradition
-or been filtered through colonial archives. Lentswe digitises four pillars of South African letters —
+or been filtered through colonial archives. Maloba digitises four pillars of South African letters —
 not as dry summaries, but as living, visual, multilingual stories — and gives ordinary people the
 tools to record and own their families' histories.
 

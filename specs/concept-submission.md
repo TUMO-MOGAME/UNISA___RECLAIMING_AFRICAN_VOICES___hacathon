@@ -1,10 +1,12 @@
-# Concept Submission — Lentswe (DRAFT)
+# Concept Submission — Maloba (DRAFT)
 
 > The hackathon requires a **written narrative** covering: the problem/gap addressed, the communities or
 > narratives centred, and the project's relevance to African digital humanities. This is the working
 > draft — refine before the **9 July 2026 16:00** deadline. Keep it grounded (no invented claims).
 
-## Project: **Lentswe** — *Mantswe a Afrika* (Voices of Africa)
+## Project: **Maloba** — *Mantswe a maloba* (Voices of Yesterday)
+
+*Maloba* is Setswana for **"yesterday"** — the app brings yesterday's voices to life today.
 
 A cinematic, multilingual, offline-first app that brings South Africa's foundational indigenous
 literature to life — and invites communities to add their own voices to the archive.
@@ -24,7 +26,7 @@ follow:
   still largely *outside* the formal record, and the tools to capture them rarely work in indigenous
   languages, offline, or on cheap phones.
 
-Lentswe closes both: it makes the canonical texts **vivid, multilingual, and free**, and it gives
+Maloba closes both: it makes the canonical texts **vivid, multilingual, and free**, and it gives
 communities a **POPIA-compliant tool to record and own** their own oral histories.
 
 ## 2. The communities and narratives centred
@@ -40,7 +42,7 @@ communities a **POPIA-compliant tool to record and own** their own oral historie
 
 ## 3. Relevance to African digital humanities
 
-Lentswe is digital humanities done **on African terms**: technology is **subordinate to the texts**, not
+Maloba is digital humanities done **on African terms**: technology is **subordinate to the texts**, not
 the other way around. It reinterprets the canon through an African lens, democratises the archive,
 treats indigenous languages as first-class, and embeds **decolonial + ethical practice** (community
 ownership, consent, the right to erasure) into the architecture. Because it runs entirely on free-tier
@@ -49,7 +51,7 @@ not a throwaway prototype.
 
 ## 4. How it works (one paragraph)
 
-Open Lentswe and choose a pillar of South African letters. Each scene is rendered as a cinematic image
+Open Maloba and choose a pillar of South African letters. Each scene is rendered as a cinematic image
 (generated live, free, by Pollinations.ai) with the text overlaid; toggle **Child/Adult** reading
 levels (Gemini adapts tone, never facts) and **Setswana/English**. Reading works **offline**. In the
 **Community Archive**, record an elder's story — after a clear **POPIA consent** step — keep it private
@@ -57,7 +59,7 @@ or share it, have it transcribed in your language, and delete it anytime.
 
 ## 5. Rubric alignment (why it scores)
 
-| Criterion | Weight | Lentswe's claim |
+| Criterion | Weight | Maloba's claim |
 |-----------|-------:|-----------------|
 | Humanities Depth | 30% | Four real foundational texts, critically framed; tech serves the humanities |
 | Community Impact | 25% | Community Archive: users become owners of their own recorded histories |

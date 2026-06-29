@@ -1,6 +1,6 @@
 # 04 — Humanities Sources (the heart of the project)
 
-This is where the 30% **Humanities Depth** is won or lost. Lentswe refuses generic "African history"
+This is where the 30% **Humanities Depth** is won or lost. Maloba refuses generic "African history"
 summaries. Every module is anchored in a **specific, real, foundational South African text** authored
 by an indigenous cultural custodian. The technology is in service of *these* works.
 
@@ -61,7 +61,7 @@ by an indigenous cultural custodian. The technology is in service of *these* wor
   first published volume of Zulu poetry.
 - **Why it matters here:** a **meta-narrative on preservation itself** — how African language adapted
   to the printing press, and by extension how it must now adapt to the digital interface (exactly what
-  Lentswe does).
+  Maloba does).
 - **Module focus:** audio-visual praise-poetry readings; the journey from oral to written word.
 - **Audience:** literature enthusiasts; language-preservation advocates.
 

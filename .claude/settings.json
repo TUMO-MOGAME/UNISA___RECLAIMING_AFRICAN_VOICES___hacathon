@@ -7,7 +7,9 @@
       "Edit(/.claude/skills/humanities-grounding/**)",
       "Edit(/.claude/skills/pollinations-visuals/**)",
       "Edit(/.claude/skills/popia-compliance/**)",
-      "Edit(/.claude/skills/setswana-i18n/**)"
+      "Edit(/.claude/skills/setswana-i18n/**)",
+      "Read(//c/Users/tumom/.claude/projects/c--UNISA---RECLAIMING-AFRICAN-VOICES---hacathon/memory/**)",
+      "Bash(rm -f project-lentswe.md)"
     ]
   }
 }

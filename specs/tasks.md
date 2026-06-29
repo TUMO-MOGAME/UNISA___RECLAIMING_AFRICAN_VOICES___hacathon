@@ -1,4 +1,4 @@
-# Tasks — Lentswe backlog
+# Tasks — Maloba backlog
 
 `[ ]` todo · `[~]` in progress · `[x]` done. Keep this in sync with [STATUS.md](../STATUS.md). Tasks map
 to phases in [docs/00-project-plan.md](../docs/00-project-plan.md). Mark de-scopes in STATUS.md.
@@ -18,17 +18,17 @@ to phases in [docs/00-project-plan.md](../docs/00-project-plan.md). Mark de-scop
 
 ## Phase 1 — Story core (1–3 Jul)
 
-- [ ] T011 `content/types.ts` + content registry `content/index.ts`
-- [ ] T012 `CinematicReader` (bg image + scrim + overlaid text + scene nav)
-- [ ] T013 HomeGallery screen (four pillars, hero images, blurbs)
-- [ ] T014 ModuleScreen + navigation (expo-router or simple stack)
-- [ ] T015 i18n layer + `LanguageToggle` (Setswana + English)
-- [ ] T016 `ModeToggle` (Child/Adult) wired to scene `text`/`childText`
-- [ ] T017 `services/gemini.ts` — author-time Child + translation drafts (cached into content)
-- [ ] T018 `content/ityala-lamawele.ts` (virtual *inkundla*, grounded)
-- [ ] T019 `content/indaba.ts` ("Myth & Origin", grounded; handle hard material with care)
-- [ ] T020 "About the Sources" screen (credit authors + references)
-- [ ] T021 Offline read verified (airplane mode) + images cached
+- [x] T011 `content/types.ts` + content registry `content/index.ts`
+- [x] T012 `CinematicReader` (bg image + scrim + overlaid text + scene nav + back)
+- [x] T013 HomeGallery screen (pillar cards, hero images, blurbs, language toggle)
+- [x] T014 Navigation (lightweight in-app state; gallery ↔ reader). Router lib optional later.
+- [~] T015 i18n layer + `LanguageToggle` — toggle works app-wide; dedicated `i18n/` strings file still TODO
+- [x] T016 `ModeToggle` (Child/Adult) wired to scene `text`/`childText`
+- [ ] T017 `services/gemini.ts` — author-time Child + translation drafts (cached into content) ← needs key
+- [x] T018 `content/ityala-lamawele.ts` (virtual *inkundla*, grounded — 2 scenes)
+- [x] T019 `content/indaba.ts` (Ninavanhu-Ma / preservation, grounded — 2 scenes)
+- [ ] T020 "About the Sources" screen (credit authors + references) ← next
+- [ ] T021 Offline read verified (airplane mode) + images cached (expo-image)
 
 ## Phase 2 — Community Archive + offline (4–6 Jul)
 

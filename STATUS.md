@@ -1,4 +1,4 @@
-# STATUS — Lentswe live board
+# STATUS — Maloba live board
 
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
 > of "done."
@@ -13,24 +13,25 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
 |------|--------|
 | Project scaffold (docs, governance, .claude) | ✅ done |
 | Expo app initialized (SDK 56) + web bundle green | ✅ done |
-| First module (*Mhudi*) renders in CinematicReader w/ Pollinations image | ✅ done |
-| NativeWind wiring | ⬜ next (T006) |
+| HomeGallery + navigation across 3 grounded pillars | ✅ done |
+| Cinematic Reader: Child/Adult + EN/Setswana + scene nav + back | ✅ done |
+| NativeWind wiring | ⬜ optional (T006) |
 
 ## ⏭️ Next action
 
-1. Run it: `cd app && npm run web` (or `npm run start` → Expo Go) — see the *Mhudi* scene, toggle
-   Child/Adult + EN/TSW, page between the two scenes.
-2. **Get the free API keys** into `app/.env` (Gemini, Lelapa, Supabase) — see `app/.env.example`.
-3. T006: wire NativeWind (babel/metro/tailwind), verify web↔Expo Go parity.
-4. Phase 1: HomeGallery + add *Ityala Lamawele* and *Indaba, My Children* modules (grounded).
-5. **Have a Setswana speaker review** the `tn` draft text in `app/src/content/mhudi.ts`.
+1. Run it: `cd app && npm run web` (or `npm run start` → Expo Go) — browse the gallery, open *Mhudi* /
+   *Ityala Lamawele* / *Indaba*, toggle Child/Adult + EN/TSW, page between scenes, back to gallery.
+2. T020: "About the Sources" screen (credits + references — earns Humanities Depth + ethics).
+3. **Review the Setswana** `tn` drafts in `app/src/content/*.ts` (you're the authority).
+4. When keys arrive: `services/gemini.ts` (T017), then Phase 2 Community Archive (POPIA + recorder).
+5. Optional: add the 4th pillar (Vilakazi) + wire NativeWind.
 
 ## 🗓️ Timeline (today: 2026-06-29)
 
 | Phase | What | Target window | Status |
 |-------|------|---------------|--------|
 | **0. Scaffold** | Governance + docs + Expo boots + 1 module renders | 29–30 Jun | ✅ done |
-| **1. Story core** | 3 literary modules · cinematic Reader · Child/Adult (Gemini) · ST/EN toggle | 1–3 Jul | ⬜ not started |
+| **1. Story core** | 3 literary modules · cinematic Reader · Child/Adult · ST/EN toggle · gallery | 1–3 Jul | 🟡 mostly done (early) |
 | **2. Community + offline** | Oral-history recorder · POPIA consent · Supabase · offline cache | 4–6 Jul | ⬜ not started |
 | **3. Polish + submit** | Accessibility pass · intro narration · demo video · written narrative | 7–9 Jul | ⬜ not started |
 | **🏁 Submit concept** | Prototype + 2–3 min video + narrative | **9 Jul 16:00** | ⬜ |
@@ -57,8 +58,8 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
 - **Tight timeline:** ~10 days to concept (not the 4 weeks the blueprint assumed). Phase 1 (story core)
   is the never-cut spine; Community Archive is the highest-value differentiator but cut to "record →
   consent → local save" first, add cloud sync only if time allows.
-- Name **Lentswe** chosen (Setswana "voice"); alternatives if we reconsider: *Ngwao* (heritage),
-  *Setso* (tradition), *Dinaane* (folktales).
+- Name **Maloba** chosen (Setswana "yesterday" — bringing yesterday's voices to life). Tagline
+  *Mantswe a maloba* = "Voices of Yesterday".
 - Decide demo target for the video: web (easiest to screen-record) vs Expo Go on a phone.
 
 ## 🗒️ Log
@@ -66,3 +67,6 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
 - **2026-06-29** — Project kicked off. Read hackathon brief + rubric + architectural blueprint PDF +
   FrameFlow reference. Created governance scaffold, docs set, .claude skills, specs, and initialized
   the Expo app with a first cinematic literary module.
+- **2026-06-29** — Renamed project **Lentswe → Maloba** ("yesterday"; tagline *Mantswe a maloba*).
+  Added two more grounded pillars (*Ityala Lamawele*, *Indaba, My Children*) and a HomeGallery with
+  gallery↔reader navigation + app-wide language. tsc + web bundle green.

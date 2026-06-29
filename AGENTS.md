@@ -1,4 +1,4 @@
-# AGENTS.md — how we work on Lentswe
+# AGENTS.md — how we work on Maloba
 
 The shared contract for every contributor (human or AI). Read this and **[STATUS.md](STATUS.md)** at the
 start of every session. The rules are tool-agnostic — they apply whether you're in Claude Code, an IDE,
@@ -8,7 +8,7 @@ or anything else.
 
 ## 1. What we're building & why it must win
 
-Lentswe is judged against the **Reclaiming African Voices rubric** (see
+Maloba is judged against the **Reclaiming African Voices rubric** (see
 [docs/06-judging-criteria.md](docs/06-judging-criteria.md)). The weighting decides our priorities:
 
 | Criterion | Weight | What it means for our choices |

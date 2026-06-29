@@ -2,7 +2,7 @@
 
 POPIA (Protection of Personal Information Act) compliance is **mandatory** in the hackathon rules and
 code of conduct — and it scores under Sustainability/Ethics (10%) and Community Impact (25%). Because
-Lentswe's Community Archive captures **voice recordings**, and **a person's voice, recollections, and
+Maloba's Community Archive captures **voice recordings**, and **a person's voice, recollections, and
 opinions are "personal information" under POPIA**, ethical data governance is a core feature, not an
 afterthought.
 

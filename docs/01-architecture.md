@@ -2,13 +2,13 @@
 
 ## One codebase, three targets
 
-Lentswe is a single **Expo / React Native** app that compiles to **web, Android, and iOS** from one
+Maloba is a single **Expo / React Native** app that compiles to **web, Android, and iOS** from one
 TypeScript codebase. This is the core accessibility + sustainability bet: a judge can open it in a
 browser, and a community member can run it on a cheap Android phone, with no separate builds.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     Lentswe (Expo app)                        │
+│                     Maloba (Expo app)                        │
 │  web · Android · iOS — one codebase, NativeWind styling       │
 ├──────────────────────────────────────────────────────────────┤
 │  UI layer                                                     │

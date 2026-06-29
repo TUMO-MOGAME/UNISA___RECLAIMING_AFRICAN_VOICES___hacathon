@@ -27,10 +27,19 @@ const UI = {
   },
 };
 
-export function CinematicReader({ module }: { module: Module }) {
+export function CinematicReader({
+  module,
+  lang,
+  onLangChange,
+  onBack,
+}: {
+  module: Module;
+  lang: Lang;
+  onLangChange: (l: Lang) => void;
+  onBack?: () => void;
+}) {
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<Mode>("adult");
-  const [lang, setLang] = useState<Lang>("en");
 
   const scene = module.scenes[index];
   const imageUri = useMemo(
@@ -49,11 +58,18 @@ export function CinematicReader({ module }: { module: Module }) {
       <SafeAreaView style={styles.safe}>
         {/* Top bar: title + language + mode toggles */}
         <View style={styles.topBar}>
-          <View style={{ flexShrink: 1 }}>
-            <Text style={styles.kicker}>
-              {module.title} · {module.author}
-            </Text>
-            <Text style={styles.sceneTitle}>{scene.title[lang]}</Text>
+          <View style={styles.titleWrap}>
+            {onBack && (
+              <Pressable onPress={onBack} style={styles.backBtn} hitSlop={10}>
+                <Text style={styles.backText}>‹</Text>
+              </Pressable>
+            )}
+            <View style={{ flexShrink: 1 }}>
+              <Text style={styles.kicker}>
+                {module.title} · {module.author}
+              </Text>
+              <Text style={styles.sceneTitle}>{scene.title[lang]}</Text>
+            </View>
           </View>
           <View style={styles.toggles}>
             <Toggle
@@ -62,7 +78,7 @@ export function CinematicReader({ module }: { module: Module }) {
                 { key: "tn", label: "TSW" },
               ]}
               value={lang}
-              onChange={(v) => setLang(v as Lang)}
+              onChange={(v) => onLangChange(v as Lang)}
             />
             <Toggle
               options={[
@@ -171,6 +187,16 @@ const styles = StyleSheet.create({
   },
   safe: { flex: 1, padding: spacing.lg, justifyContent: "space-between" },
   topBar: { flexDirection: "row", justifyContent: "space-between", gap: spacing.md },
+  titleWrap: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexShrink: 1 },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.pill,
+    backgroundColor: colors.scrimStrong,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backText: { color: colors.sand, fontSize: 24, lineHeight: 26, marginTop: -2 },
   kicker: {
     color: colors.gold,
     fontSize: type.small,

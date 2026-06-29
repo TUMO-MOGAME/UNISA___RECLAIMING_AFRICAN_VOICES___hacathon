@@ -1,6 +1,6 @@
 ---
 name: popia-compliance
-description: Lentswe's POPIA data-protection guardrails. Use WHENEVER building or editing anything that records audio, collects personal info, uploads to Supabase, transcribes via Lelapa, or stores/deletes user data. POPIA compliance is mandatory in the hackathon rules and scores under Community Impact + Sustainability. A person's voice IS personal information. No PII feature ships without all four safeguards.
+description: Maloba's POPIA data-protection guardrails. Use WHENEVER building or editing anything that records audio, collects personal info, uploads to Supabase, transcribes via Lelapa, or stores/deletes user data. POPIA compliance is mandatory in the hackathon rules and scores under Community Impact + Sustainability. A person's voice IS personal information. No PII feature ships without all four safeguards.
 ---
 
 # POPIA Compliance — build the guardrails WITH the feature

@@ -1,4 +1,4 @@
-# 06 — Judging Criteria & How Lentswe Maps to Each
+# 06 — Judging Criteria & How Maloba Maps to Each
 
 Total: **100 points**. Submissions are scored on this rubric (and an AI pre-rater); the top 50 advance
 to the Red Horizon Metaverse finals. Design and demo decisions should trace to a row here.

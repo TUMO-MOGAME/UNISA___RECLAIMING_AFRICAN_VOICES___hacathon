@@ -1,6 +1,6 @@
-# CLAUDE.md — Claude Code context for Lentswe
+# CLAUDE.md — Claude Code context for Maloba
 
-**Lentswe** (Setswana: *"voice / word"*) is a cinematic, multilingual, offline-first app that brings
+**Maloba** (Setswana: *"yesterday"*) is a cinematic, multilingual, offline-first app that brings
 South Africa's foundational indigenous literature to life — built for the **AADHIH "Reclaiming African
 Voices" hackathon** (UNISA / BaobabX Academy). This file is the entry point for any Claude Code
 session on this project.
@@ -17,7 +17,7 @@ session on this project.
 
 ## Project one-liner
 
-Lentswe turns the works of **Sol Plaatje (*Mhudi*)**, **S.E.K. Mqhayi (*Ityala Lamawele*)**,
+Maloba turns the works of **Sol Plaatje (*Mhudi*)**, **S.E.K. Mqhayi (*Ityala Lamawele*)**,
 **Credo Mutwa (*Indaba, My Children*)** and **B.W. Vilakazi** into an interactive, cinematic graphic
 novel — with AI-generated visuals, dual Child/Adult reading modes, Setswana + English (and other SA
 languages), a community oral-history archive, and full POPIA compliance. It runs on **one Expo

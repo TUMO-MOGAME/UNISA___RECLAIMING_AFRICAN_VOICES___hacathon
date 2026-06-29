@@ -1,6 +1,6 @@
 ---
 name: pollinations-visuals
-description: How Lentswe generates cinematic scene images with Pollinations.ai (free, key-less, URL-based). Use WHENEVER building or editing the Reader/SceneImage components, writing image prompts, wiring the pollinations service, or anything to do with generating/caching/falling-back scene visuals. Keeps the "cinematic graphic novel" look working within free-tier rate limits.
+description: How Maloba generates cinematic scene images with Pollinations.ai (free, key-less, URL-based). Use WHENEVER building or editing the Reader/SceneImage components, writing image prompts, wiring the pollinations service, or anything to do with generating/caching/falling-back scene visuals. Keeps the "cinematic graphic novel" look working within free-tier rate limits.
 ---
 
 # Pollinations Visuals — cinematic, free, key-less

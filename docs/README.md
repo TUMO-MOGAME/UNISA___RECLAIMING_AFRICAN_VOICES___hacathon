@@ -1,4 +1,4 @@
-# docs/ — Lentswe documentation index
+# docs/ — Maloba documentation index
 
 Read in order, or jump to what you need. Governance lives at the repo root
 ([CLAUDE.md](../CLAUDE.md), [AGENTS.md](../AGENTS.md), [STATUS.md](../STATUS.md)).
@@ -11,7 +11,7 @@ Read in order, or jump to what you need. Governance lives at the repo root
 | 03 | [AI Pipeline](03-ai-pipeline.md) | Gemini · Pollinations · ElevenLabs · Lelapa; caching/quota |
 | 04 | [Humanities Sources](04-humanities-sources.md) | The four pillars — the heart of the project |
 | 05 | [POPIA Compliance](05-popia-compliance.md) | Consent, transparency, RLS, erasure — mandatory |
-| 06 | [Judging Criteria](06-judging-criteria.md) | The rubric + exactly how Lentswe maps to each row |
+| 06 | [Judging Criteria](06-judging-criteria.md) | The rubric + exactly how Maloba maps to each row |
 | 07 | [Accessibility](07-accessibility.md) | Offline, low-data, multilingual, varying abilities |
 | 08 | [Content Pipeline](08-content-pipeline.md) | Module data shape, authoring flow, dependency commands |
 | 09 | [Research Summary](09-research-summary.md) | Literary + technical + POPIA references |

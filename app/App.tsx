@@ -1,31 +1,38 @@
+import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { HomeGallery } from "./src/components/HomeGallery";
 import { CinematicReader } from "./src/components/CinematicReader";
 import { moduleById } from "./src/content";
-import { colors, spacing, type } from "./src/theme/tokens";
+import { Lang } from "./src/content/types";
+import { colors } from "./src/theme/tokens";
 
-// Phase 0 spine: the first literary pillar (Mhudi) rendered in the cinematic Reader.
-// Phase 1 wraps this in a HomeGallery + navigation across all four pillars (specs/tasks.md).
+// Phase 1 spine: HomeGallery → tap a pillar → CinematicReader → back.
+// Lightweight in-app navigation (no router dependency yet); language is shared app-wide.
+// Phase 2 adds the Community Archive + an "About the Sources" screen (specs/tasks.md).
 
 export default function App() {
-  const mhudi = moduleById("mhudi");
+  const [lang, setLang] = useState<Lang>("en");
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const openModule = openId ? moduleById(openId) : null;
 
   return (
     <View style={styles.app}>
       <StatusBar style="light" />
-      <View style={styles.brandBar}>
-        <SafeAreaView>
-          <Text style={styles.brand}>
-            Lentswe <Text style={styles.brandSub}>· Mantswe a Afrika</Text>
-          </Text>
-        </SafeAreaView>
-      </View>
-      {mhudi ? (
-        <CinematicReader module={mhudi} />
+      {openModule ? (
+        <CinematicReader
+          module={openModule}
+          lang={lang}
+          onLangChange={setLang}
+          onBack={() => setOpenId(null)}
+        />
       ) : (
-        <SafeAreaView style={styles.center}>
-          <Text style={styles.fallback}>No module loaded.</Text>
-        </SafeAreaView>
+        <HomeGallery
+          lang={lang}
+          onToggleLang={() => setLang((l) => (l === "en" ? "tn" : "en"))}
+          onOpen={(id) => setOpenId(id)}
+        />
       )}
     </View>
   );
@@ -33,15 +40,4 @@ export default function App() {
 
 const styles = StyleSheet.create({
   app: { flex: 1, backgroundColor: colors.night },
-  brandBar: { backgroundColor: colors.night, paddingHorizontal: spacing.lg },
-  brand: {
-    color: colors.gold,
-    fontSize: type.title,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    paddingVertical: spacing.sm,
-  },
-  brandSub: { color: colors.muted, fontSize: type.small, fontWeight: "500" },
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  fallback: { color: colors.sand },
 });
