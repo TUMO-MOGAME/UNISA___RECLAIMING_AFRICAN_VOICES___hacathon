@@ -29,6 +29,20 @@ export const colors = {
   lineStrong: "rgba(244,238,225,0.32)",
   glowEmber: "rgba(217,106,28,0.22)",
   glowGold: "rgba(235,164,60,0.14)",
+
+  // ── Dark editorial world (V2 "Ubuntu Heritage" redesign) ──────────────────────────────
+  // Every screen now lives on a deep-navy ground with near-black cards and hairline borders.
+  bg: "#0B1826", // page background (deep navy) — top of the app gradient
+  bgDeep: "#0A1420", // bottom of the page gradient (darkest)
+  bgTop: "#10202F", // top of the page gradient (slightly lifted navy)
+  surface: "#0A0A0A", // near-black card surface on the dark ground
+  surface2: "#12161C", // slightly lifted dark surface (insets, stat chips)
+  hairline: "rgba(255,255,255,0.14)", // card/border hairline on dark
+  hairlineSoft: "rgba(255,255,255,0.08)",
+  orangeDeep: "#B4530F", // pressed / deep orange
+  cream: "#F4EEE1", // primary text on dark (alias of sand)
+  creamDim: "rgba(244,238,225,0.86)", // slightly dimmed body text on dark
+  live: "#3FBF6A", // "anchored / live" status green
 };
 
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, xxl: 48 };
@@ -50,6 +64,13 @@ export const fonts = {
   bodyMedium: "Barlow_500Medium",
   bodySemi: "Barlow_600SemiBold",
   bodyBold: "Barlow_700Bold",
+  // Literary serif voice (Fraunces — an optical serif) — the V2 redesign's signature. Used for work
+  // titles, blurbs, taglines and long-form reading passages so the humanities content reads like
+  // literature, not UI. Anton/Barlow stay the app's chrome.
+  serifBody: "Fraunces_400Regular", // long reading passages (Reader, bios, province/city prose)
+  serif: "Fraunces_500Medium", // work + card titles
+  serifSemi: "Fraunces_600SemiBold", // strong serif headings (names, sheet titles)
+  serifItalic: "Fraunces_400Regular_Italic", // blurbs, taglines, subtitles
 };
 
 // Standard motion durations (ms) — keep transitions consistent and calm.

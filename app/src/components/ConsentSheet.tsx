@@ -3,6 +3,7 @@ import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from "react-nati
 import { Lang } from "../content/types";
 import { t } from "../i18n";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
+import { Icon } from "../ui";
 
 // POPIA consent gate — MUST appear before the microphone is ever activated.
 // See .claude/skills/popia-compliance + docs/05-popia-compliance.md.
@@ -46,7 +47,10 @@ export function ConsentSheet({
             <Text style={styles.question}>{t(UI.question, lang)}</Text>
 
             <Pressable style={styles.choice} onPress={() => onConsent("private")}>
-              <Text style={styles.choiceTitle}>🔒 {t(UI.private, lang)}</Text>
+              <View style={styles.choiceTitleRow}>
+                <Icon.Lock size={15} color={colors.gold} />
+                <Text style={styles.choiceTitle}>{t(UI.private, lang)}</Text>
+              </View>
               <Text style={styles.choiceHint}>{t(UI.privateHint, lang)}</Text>
             </Pressable>
 
@@ -54,7 +58,10 @@ export function ConsentSheet({
               style={[styles.choice, styles.choicePublic]}
               onPress={() => onConsent("public")}
             >
-              <Text style={styles.choiceTitle}>🌍 {t(UI.public, lang)}</Text>
+              <View style={styles.choiceTitleRow}>
+                <Icon.Users size={15} color={colors.gold} />
+                <Text style={styles.choiceTitle}>{t(UI.public, lang)}</Text>
+              </View>
               <Text style={styles.choiceHint}>{t(UI.publicHint, lang)}</Text>
             </Pressable>
 
@@ -71,17 +78,20 @@ export function ConsentSheet({
 const styles = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.scrimStrong, justifyContent: "flex-end" },
   sheet: {
-    backgroundColor: colors.ink,
+    backgroundColor: "#0D0D0D",
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
     padding: spacing.lg,
     maxHeight: "85%",
   },
   title: { color: colors.gold, fontFamily: fonts.displaySemi, fontSize: type.title + 2 },
   body: { color: colors.sand, fontFamily: fonts.body, fontSize: type.body, lineHeight: 26, marginTop: spacing.md },
   question: { color: colors.muted, fontFamily: fonts.bodySemi, fontSize: type.small, marginTop: spacing.lg, marginBottom: spacing.sm, textTransform: "uppercase", letterSpacing: 1 },
-  choice: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginTop: spacing.sm },
+  choice: { backgroundColor: "rgba(255,255,255,0.06)", borderRadius: radius.md, padding: spacing.md, marginTop: spacing.sm },
   choicePublic: { borderWidth: 1, borderColor: colors.gold },
+  choiceTitleRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   choiceTitle: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.body },
   choiceHint: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, marginTop: 2 },
   cancel: { alignItems: "center", paddingVertical: spacing.lg, marginTop: spacing.sm },

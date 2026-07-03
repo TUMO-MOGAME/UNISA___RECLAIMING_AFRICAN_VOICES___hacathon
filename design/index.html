@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ubuntu Heritage — UI Redesign Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     UBUNTU HERITAGE — UI Redesign Lab   ·   the whole journey
+     Brand palette locked to the AADHIH "Reclaiming African Voices"
+     brief: deep navy + burnt orange + gold on warm cream.
+     Direction: cinematic editorial archive.
+     All content grounded in the real app data (no invented facts).
+     ============================================================ */
+  :root {
+    --paper:#F4EEE1; --paper-card:#FFFFFF; --paper-2:#EFE7D6;
+    --line:rgba(21,41,63,0.12);
+    --navy:#16293F; --navy-deep:#0E1C2E; --card:#1E344C;
+    --orange:#D96A1C; --orange-dk:#B4530F; --gold:#EBA43C;
+    --slate:#5D6B79; --sand:#F4EEE1; --muted:#9FB0C0;
+    --shadow-lg:0 24px 60px -20px rgba(14,28,46,0.45);
+    --shadow-md:0 14px 32px -14px rgba(14,28,46,0.30);
+    --shadow-sm:0 6px 16px -8px rgba(14,28,46,0.20);
+    --font-display:'Anton',system-ui,sans-serif;
+    --font-serif:'Fraunces',Georgia,serif;
+    --font-body:'Barlow',system-ui,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:var(--font-body);
+    background:
+      radial-gradient(1200px 700px at 12% -5%, rgba(217,106,28,0.16), transparent 60%),
+      radial-gradient(1000px 800px at 100% 0%, rgba(235,164,60,0.12), transparent 55%),
+      linear-gradient(160deg,#10202f 0%,#0b1826 55%,#0a1420 100%);
+    color:var(--sand); min-height:100vh; -webkit-font-smoothing:antialiased;
+    padding:clamp(20px,4vw,56px); overflow-x:hidden;
+  }
+  body::after {
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:0.045; z-index:9999;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Lab header ---------- */
+  .lab-head { max-width:1180px; margin:0 auto 12px; }
+  .eyebrow {
+    font-weight:700; font-size:11px; letter-spacing:0.32em; text-transform:uppercase;
+    color:var(--gold); display:flex; align-items:center; gap:10px; margin-bottom:16px;
+  }
+  .eyebrow::before { content:""; width:26px; height:2px; background:var(--orange); }
+  .lab-title {
+    font-family:var(--font-display); font-size:clamp(44px,7vw,84px); line-height:0.9;
+    text-transform:uppercase; letter-spacing:0.01em;
+  }
+  .lab-title em { font-style:normal; color:transparent; -webkit-text-stroke:1.5px var(--gold); }
+  .lab-sub { margin-top:18px; color:var(--muted); font-size:15px; line-height:1.65; max-width:64ch; }
+  .lab-sub b { color:var(--sand); font-weight:600; }
+
+  .meta-strip {
+    display:flex; flex-wrap:wrap; gap:28px; margin-top:26px; padding-top:24px;
+    border-top:1px solid rgba(255,255,255,0.1);
+  }
+  .swatches { display:flex; gap:8px; }
+  .sw { width:40px; height:40px; border-radius:9px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12); position:relative; }
+  .sw span { position:absolute; bottom:-17px; left:0; font-size:8.5px; letter-spacing:0.06em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+  .type-list { display:flex; gap:26px; align-items:baseline; flex-wrap:wrap; }
+  .type-item .k { display:block; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+  .type-item .d { font-family:var(--font-display); font-size:24px; text-transform:uppercase; }
+  .type-item .s { font-family:var(--font-serif); font-size:22px; font-style:italic; }
+  .type-item .b { font-family:var(--font-body); font-size:18px; font-weight:500; }
+
+  /* ---------- Filmstrip of screens ---------- */
+  .strip {
+    max-width:1180px; margin:44px auto 0;
+    display:flex; gap:44px; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+  }
+  .frame-wrap { display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .screen-label { text-align:center; }
+  .screen-label .n {
+    font-family:var(--font-display); font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold);
+  }
+  .screen-label .t { font-size:12px; color:var(--muted); margin-top:3px; max-width:30ch; line-height:1.4; }
+
+  /* ---------- Phone frame ---------- */
+  .phone {
+    width:372px; background:var(--paper); border-radius:44px; padding:11px; position:relative;
+    box-shadow:var(--shadow-lg), 0 0 0 2px rgba(255,255,255,0.06), inset 0 0 0 1px rgba(14,28,46,0.5);
+  }
+  .phone::before { content:""; position:absolute; left:-3px; top:120px; width:3px; height:58px; border-radius:3px; background:rgba(255,255,255,0.12); }
+  .screen {
+    background:var(--paper); border-radius:34px; overflow:hidden; height:760px; overflow-y:auto;
+    position:relative; scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar { display:none; }
+  .screen.dark { background:var(--navy-deep); }
+  .notch { position:absolute; top:11px; left:50%; transform:translateX(-50%); width:108px; height:24px; background:var(--navy-deep); border-radius:0 0 15px 15px; z-index:20; }
+  .screen.dark .notch { background:#060d16; }
+
+  .statusbar { position:relative; z-index:15; display:flex; align-items:center; justify-content:space-between; padding:13px 22px 4px; font-size:12px; font-weight:700; color:var(--navy); }
+  .screen.dark .statusbar { color:var(--sand); }
+  .statusbar .dots { display:flex; gap:4px; }
+  .statusbar .dots i { width:5px; height:5px; border-radius:50%; background:currentColor; opacity:0.55; }
+
+  /* warm paper wash */
+  .paper-wash::before {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(560px 300px at 82% -60px, rgba(235,164,60,0.22), transparent 70%),
+      radial-gradient(460px 260px at -10% 140px, rgba(217,106,28,0.09), transparent 70%);
+  }
+
+  /* ===== shared bits ===== */
+  .topbar { position:relative; z-index:5; display:flex; align-items:center; justify-content:space-between; padding:6px 22px 8px; }
+  .brandmark { display:flex; align-items:center; gap:10px; }
+  .emblem { width:30px; height:30px; position:relative; display:grid; place-items:center; }
+  .emblem .ring { position:absolute; inset:0; border-radius:50%; border:2px solid var(--gold); }
+  .emblem .core { width:15px; height:15px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#f4b45a,var(--orange)); }
+  .emblem .rays { position:absolute; inset:-5px; border-radius:50%;
+    background:conic-gradient(from 0deg,transparent 0 8deg,rgba(235,164,60,0.5) 9deg 10deg,transparent 11deg 30deg);
+    -webkit-mask:radial-gradient(circle,transparent 60%,#000 62%); mask:radial-gradient(circle,transparent 60%,#000 62%); }
+  .brandmark .name { font-family:var(--font-display); font-size:16px; line-height:0.94; color:var(--navy); text-transform:uppercase; letter-spacing:0.03em; max-width:120px; }
+  .brand-logo { height:42px; width:auto; display:block; }
+
+  /* ===== Launch / splash — wordmark over a dramatic SA image ===== */
+  .screen.launch { background:#0d0b0a; display:flex; flex-direction:column; }
+  .launch-bg { position:absolute; inset:0; z-index:0; background:url('launch-bg.jpg') center/cover no-repeat; animation:kb 34s ease-in-out infinite alternate; }
+  .launch-scrim { position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(70% 50% at 50% 48%, rgba(10,8,6,0.72), transparent 78%),
+      linear-gradient(180deg, rgba(10,8,6,0.55) 0%, rgba(10,8,6,0.28) 40%, rgba(10,8,6,0.66) 74%, rgba(10,8,6,0.95) 100%); }
+  .launch-inner { position:relative; z-index:2; margin:auto; display:flex; flex-direction:column; align-items:center; padding:0 24px; text-align:center; }
+  .launch-wordmark { display:flex; flex-direction:column; align-items:center; line-height:0.84; margin-top:16px; }
+  .launch-wordmark span { font-family:var(--font-display); text-transform:uppercase; color:var(--sand); font-size:62px; letter-spacing:0.02em; text-shadow:0 4px 26px rgba(0,0,0,0.65); }
+  .lw-country { font-family:var(--font-body); font-weight:700; font-size:14px; letter-spacing:0.42em; text-transform:uppercase; color:var(--gold); margin-top:16px; padding-left:0.42em; text-shadow:0 2px 14px rgba(0,0,0,0.7); }
+  .lw-rule { width:60px; height:2px; background:var(--orange); border-radius:2px; margin:18px 0 0; }
+  .launch-tag { color:var(--sand); font-family:var(--font-serif); font-style:italic; font-size:15px; margin-top:16px; opacity:0.92; text-shadow:0 2px 12px rgba(0,0,0,0.7); }
+  .launch-kicker { color:rgba(235,164,60,0.85); font-size:10px; letter-spacing:0.28em; text-transform:uppercase; font-weight:700; display:flex; align-items:center; gap:10px; text-shadow:0 2px 12px rgba(0,0,0,0.7); }
+  .launch-kicker::before, .launch-kicker::after { content:""; width:20px; height:1px; background:rgba(235,164,60,0.55); }
+  .lang-pill { display:flex; align-items:center; gap:6px; background:var(--paper-card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:11.5px; font-weight:600; color:var(--navy); box-shadow:var(--shadow-sm); cursor:pointer; }
+  .lang-pill .chev { color:var(--slate); font-size:9px; }
+  .lang-pill.on-dark { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:var(--sand); }
+
+  /* ===================== HOME ===================== */
+  .hero { position:relative; z-index:2; margin:6px 16px 4px; height:412px; border-radius:26px; overflow:hidden; box-shadow:var(--shadow-md); background:#23324a; }
+  .savanna { position:absolute; inset:0; }
+  .savanna .sky {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(120% 90% at 70% 14%, #f6c66b 0%, #e08a2b 24%, #b33521 42%, transparent 60%),
+      linear-gradient(180deg,#3a2a1e 0%,#241a2c 45%,#101a2b 100%);
+    animation:kb 26s ease-in-out infinite alternate;
+  }
+  @keyframes kb { from { transform:scale(1); } to { transform:scale(1.08); } }
+  .savanna .scrim {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(60% 40% at 50% 96%, rgba(14,28,46,0.9), transparent 70%),
+      linear-gradient(180deg, transparent 52%, rgba(14,28,46,0.55) 76%, rgba(14,28,46,0.98) 100%);
+  }
+  .savanna .sun { position:absolute; top:52px; right:58px; width:88px; height:88px; border-radius:50%;
+    background:radial-gradient(circle at 50% 45%,#ffe6a8,#f6b64a 55%,rgba(246,182,74,0) 72%); }
+  .savanna .horizon {
+    position:absolute; left:0; right:0; bottom:120px; height:88px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='372' height='88' preserveAspectRatio='none'%3E%3Cpath d='M0 88 L0 58 Q40 53 70 56 T140 48 L150 32 Q152 28 156 32 L162 48 Q210 44 250 50 L258 28 Q262 22 266 28 L274 50 Q330 46 372 54 L372 88 Z' fill='%230e1c2e'/%3E%3C/svg%3E") bottom/cover no-repeat;
+  }
+  .hero .frame { position:absolute; inset:12px; border-radius:18px; border:1px solid rgba(244,238,225,0.30); pointer-events:none; }
+  .hero .index { position:absolute; top:14px; left:22px; font-family:var(--font-display); font-size:15px; letter-spacing:0.2em; color:var(--gold); }
+  .hero .badge { position:absolute; top:17px; right:22px; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--sand); font-weight:700; background:rgba(217,106,28,0.92); padding:5px 10px; border-radius:999px; }
+  .hero .caption { position:absolute; left:24px; right:24px; bottom:22px; z-index:2; }
+  .hero .kick { font-size:10.5px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); margin-bottom:7px; }
+  .hero h2 { font-family:var(--font-display); font-size:44px; line-height:0.9; text-transform:uppercase; color:var(--sand); }
+  .hero .blurb { font-family:var(--font-serif); font-style:italic; font-size:14px; color:rgba(244,238,225,0.9); line-height:1.5; margin-top:9px; max-width:32ch; }
+  .cta { display:inline-flex; align-items:center; gap:9px; margin-top:15px; background:var(--orange); color:#fff; font-weight:700; font-size:12.5px; letter-spacing:0.05em; padding:11px 19px; border-radius:999px; box-shadow:0 10px 24px -8px rgba(217,106,28,0.7); cursor:pointer; }
+  .cta .arw { transition:transform 0.25s; }
+  .cta:hover .arw { transform:translateX(4px); }
+
+  .masthead { position:relative; z-index:2; text-align:center; padding:20px 24px 4px; }
+  .masthead .rule { display:flex; align-items:center; justify-content:center; gap:11px; margin-bottom:9px; }
+  .masthead .rule i { height:1px; width:32px; background:var(--orange); opacity:0.55; }
+  .masthead .rule span { font-size:10px; font-weight:700; letter-spacing:0.26em; text-transform:uppercase; color:var(--orange); }
+  .masthead .tag { font-family:var(--font-serif); font-style:italic; font-size:15px; color:var(--slate); }
+
+  .section-head { padding:24px 24px 12px; position:relative; z-index:2; }
+  .section-head .label { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:16px; text-transform:uppercase; letter-spacing:0.05em; color:var(--navy); }
+  .section-head .label::before { content:""; width:15px; height:3px; border-radius:2px; background:var(--orange); }
+  .section-head .sub { color:var(--slate); font-size:12.5px; line-height:1.5; margin-top:7px; max-width:42ch; }
+
+  .pillars { padding:0 20px; display:grid; gap:12px; position:relative; z-index:2; }
+  .pcard { display:flex; gap:14px; align-items:center; background:var(--paper-card); border:1px solid var(--line); border-radius:20px; padding:13px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .22s, box-shadow .22s; }
+  .pcard:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+  .pcard .num { font-family:var(--font-display); font-size:21px; color:var(--orange); width:24px; text-align:center; flex:none; }
+  .pcard .thumb { width:60px; height:78px; border-radius:12px; flex:none; overflow:hidden; position:relative; box-shadow:inset 0 0 0 1px rgba(14,28,46,0.15); }
+  .thumb .g::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(14,28,46,0.5)); }
+  .g { position:absolute; inset:0; }
+  .g-mhudi   { background:radial-gradient(120% 80% at 60% 10%,#f6c66b,#d97b26 45%,#3a2340 100%); }
+  .g-ityala  { background:radial-gradient(120% 80% at 40% 15%,#eab04a,#b45a1f 50%,#1c2a44 100%); }
+  .g-indaba  { background:radial-gradient(120% 90% at 55% 20%,#7fb0c9,#2b5a73 45%,#141d33 100%); }
+  .g-vilakazi{ background:radial-gradient(120% 80% at 50% 12%,#f2b06a,#a34d2a 50%,#241a2c 100%); }
+  .g-atlas1  { background:radial-gradient(120% 80% at 55% 15%,#eec06a,#c06a26 45%,#2a2030 100%); }
+  .g-atlas2  { background:radial-gradient(120% 80% at 45% 20%,#e79b5a,#8f4a2c 50%,#1a2436 100%); }
+  .g-atlas3  { background:radial-gradient(120% 90% at 50% 18%,#cdaf7e,#7a6046 50%,#1d2333 100%); }
+  .pcard .body { flex:1; min-width:0; }
+  .pcard .title { font-family:var(--font-serif); font-weight:500; font-size:18px; color:var(--navy); line-height:1.12; }
+  .pcard .meta { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--orange); margin-top:5px; }
+  .pcard .desc { font-size:12px; color:var(--slate); line-height:1.42; margin-top:5px; }
+  .pcard .chev { color:var(--slate); font-size:21px; flex:none; }
+
+  .atlas-grid { padding:2px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:11px; position:relative; z-index:2; }
+  .achip { border-radius:17px; overflow:hidden; position:relative; height:116px; cursor:pointer; box-shadow:var(--shadow-sm); display:flex; align-items:flex-end; padding:12px; transition:transform .22s; }
+  .achip:hover { transform:translateY(-3px); }
+  .achip::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 28%,rgba(14,28,46,0.85)); }
+  .achip .star { position:absolute; top:11px; left:12px; z-index:2; color:var(--gold); font-size:12px; }
+  .achip .tt { position:relative; z-index:2; }
+  .achip .tt .h { font-family:var(--font-serif); font-weight:500; color:#fff; font-size:14.5px; line-height:1.1; }
+  .achip .tt .s { color:rgba(244,238,225,0.75); font-size:10px; margin-top:3px; }
+
+  .archive { margin:20px 20px 0; position:relative; z-index:2; background:linear-gradient(145deg,#1d3450 0%,#16293F 45%,#0e1c2e 100%); border-radius:22px; padding:19px; overflow:hidden; display:flex; align-items:center; gap:15px; box-shadow:var(--shadow-md); cursor:pointer; }
+  .archive::before { content:""; position:absolute; top:-40px; right:-30px; width:150px; height:150px; background:radial-gradient(circle,rgba(235,164,60,0.28),transparent 65%); }
+  .archive::after { content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.14'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .archive .mic { width:52px; height:52px; border-radius:15px; flex:none; position:relative; z-index:2; display:grid; place-items:center; font-size:23px; background:rgba(217,106,28,0.18); box-shadow:inset 0 0 0 1px rgba(235,164,60,0.4); }
+  .archive .txt { position:relative; z-index:2; flex:1; }
+  .archive .txt .h { font-family:var(--font-display); font-size:19px; text-transform:uppercase; color:var(--sand); letter-spacing:0.02em; }
+  .archive .txt .s { color:var(--muted); font-size:12px; margin-top:3px; line-height:1.4; }
+  .archive .go { position:relative; z-index:2; color:var(--gold); font-size:25px; flex:none; }
+
+  .foot { position:relative; z-index:2; padding:22px 20px 38px; display:grid; gap:15px; justify-items:center; }
+  .ledger { display:inline-flex; align-items:center; gap:9px; border:1px solid var(--navy); border-radius:999px; padding:10px 19px; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); cursor:pointer; transition:background .2s,color .2s; }
+  .ledger:hover { background:var(--navy); color:var(--sand); }
+  .live { width:7px; height:7px; border-radius:50%; background:#3fbf6a; box-shadow:0 0 0 3px rgba(63,191,106,0.25); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 6px rgba(63,191,106,0); } }
+  .about-link { font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--slate); cursor:pointer; }
+  .about-link:hover { color:var(--orange); }
+
+  /* ===================== READER ===================== */
+  .reader-art { position:absolute; inset:0; z-index:0; }
+  .reader-art .sky {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(130% 80% at 62% 8%, #f3b45a 0%, #cf7a2c 26%, #7a3a2a 46%, transparent 62%),
+      linear-gradient(180deg,#2c2016 0%,#1a1622 48%,#0c1420 100%);
+    animation:kb 30s ease-in-out infinite alternate;
+  }
+  .reader-art .figures {
+    position:absolute; left:0; right:0; bottom:38%; height:120px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='372' height='120' preserveAspectRatio='xMidYMax meet'%3E%3Cg fill='%230b1420'%3E%3Cpath d='M120 120 q6 -60 14 -66 q3 -18 10 -18 q7 0 9 18 q9 8 13 66 z'/%3E%3Cpath d='M150 120 q4 -52 12 -58 q2 -14 8 -14 q6 0 8 14 q9 8 12 58 z'/%3E%3C/g%3E%3C/svg%3E") bottom center no-repeat;
+    opacity:0.9;
+  }
+  .reader-scrim { position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(14,11,7,0.74) 0%, rgba(14,11,7,0.28) 42%, rgba(14,11,7,0.92) 100%); }
+  .reader-body { position:relative; z-index:5; display:flex; flex-direction:column; height:100%; padding:6px 20px 22px; }
+  .reader-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+  .reader-titlewrap { display:flex; gap:10px; align-items:flex-start; flex-shrink:1; }
+  .back-btn { width:34px; height:34px; border-radius:999px; background:rgba(6,13,22,0.7); display:grid; place-items:center; color:var(--sand); font-size:22px; flex:none; cursor:pointer; }
+  .reader-kick { color:var(--gold); font-family:var(--font-body); font-weight:600; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; }
+  .reader-scene { color:var(--sand); font-family:var(--font-serif); font-weight:500; font-size:25px; line-height:1.05; margin-top:3px; }
+  .reader-controls { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex:none; }
+  .seg { display:flex; background:rgba(6,13,22,0.72); border-radius:999px; padding:3px; }
+  .seg button { border:none; background:none; color:var(--muted); font-family:var(--font-body); font-weight:600; font-size:11px; padding:6px 12px; border-radius:999px; cursor:pointer; }
+  .seg button.active { background:var(--gold); color:var(--navy-deep); }
+  .listen { display:flex; align-items:center; gap:6px; background:rgba(6,13,22,0.72); border:1px solid var(--gold); border-radius:999px; padding:7px 13px; color:var(--sand); font-weight:600; font-size:11px; cursor:pointer; }
+
+  .reader-text { margin:auto 0; padding:14px 0; }
+  .reader-text .passage { color:var(--sand); font-family:var(--font-serif); font-weight:400; font-size:18.5px; line-height:1.62; }
+  .reader-text .passage .drop { float:left; font-family:var(--font-display); font-size:56px; line-height:0.8; color:var(--gold); margin:4px 10px 0 0; }
+  .reader-note { color:var(--muted); font-size:11.5px; font-style:italic; margin-top:16px; line-height:1.5; }
+  .reader-source { color:var(--muted); font-size:11.5px; margin-top:6px; }
+  .reader-source b { color:var(--gold); font-weight:600; font-style:normal; }
+  .reader-archive-cta { display:inline-flex; align-self:flex-start; margin-top:16px; gap:8px; align-items:center; border:1px solid var(--gold); border-radius:999px; padding:9px 15px; color:var(--gold); font-weight:600; font-size:11.5px; cursor:pointer; }
+
+  .reader-nav { display:flex; align-items:center; justify-content:space-between; padding-top:12px; }
+  .nav-btn { background:rgba(6,13,22,0.72); border-radius:999px; padding:10px 18px; color:var(--sand); font-weight:600; font-size:13px; cursor:pointer; }
+  .nav-btn.disabled { opacity:0.35; }
+  .nav-progress { color:var(--muted); font-size:12px; letter-spacing:0.08em; }
+
+  /* ===================== ARCHIVE ===================== */
+  .scr-head { position:relative; z-index:2; padding:8px 22px 4px; }
+  .scr-head .top { display:flex; align-items:center; gap:12px; }
+  .scr-head .kicker { color:var(--orange); font-weight:700; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; }
+  .scr-head h1 { font-family:var(--font-display); font-size:34px; text-transform:uppercase; color:var(--navy); line-height:1; margin-top:3px; }
+  .back-dark { width:34px; height:34px; border-radius:999px; border:1px solid var(--line); background:var(--paper-card); display:grid; place-items:center; color:var(--navy); font-size:20px; flex:none; cursor:pointer; box-shadow:var(--shadow-sm); }
+  .scr-intro { position:relative; z-index:2; padding:12px 22px 0; color:var(--slate); font-size:14px; line-height:1.55; font-family:var(--font-serif); }
+  .record-btn { position:relative; z-index:2; margin:20px 22px 0; background:var(--orange); border-radius:999px; padding:16px; text-align:center; color:#fff; font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; box-shadow:0 12px 26px -10px rgba(217,106,28,0.7); display:flex; align-items:center; justify-content:center; gap:9px; }
+  .record-btn .rec-dot { width:11px; height:11px; border-radius:50%; background:#fff; }
+  .rec-card { position:relative; z-index:2; margin:16px 22px 0; background:var(--paper-card); border:1px solid var(--line); border-radius:18px; padding:15px; box-shadow:var(--shadow-sm); }
+  .rec-card .rc-top { display:flex; align-items:center; justify-content:space-between; }
+  .badge-priv { display:inline-flex; gap:5px; align-items:center; font-size:10.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--navy); }
+  .rc-date { color:var(--slate); font-size:11px; }
+  .rc-title { font-family:var(--font-serif); font-weight:500; font-size:17px; color:var(--navy); margin-top:11px; padding-bottom:7px; border-bottom:1px dashed var(--line); }
+  .rc-actions { display:flex; gap:9px; margin-top:13px; }
+  .play-btn { background:var(--navy); color:var(--paper); border-radius:999px; padding:8px 18px; font-size:12px; font-weight:600; cursor:pointer; }
+  .del-btn { border:1px solid var(--slate); color:var(--slate); border-radius:999px; padding:8px 18px; font-size:12px; font-weight:600; cursor:pointer; }
+  .waveform { display:flex; align-items:center; gap:3px; height:26px; margin-top:12px; }
+  .waveform i { width:3px; background:var(--gold); border-radius:2px; opacity:0.7; }
+
+  /* consent sheet overlay */
+  .sheet-backdrop { position:absolute; inset:0; z-index:30; background:rgba(6,13,22,0.62); display:flex; align-items:flex-end; }
+  .sheet { width:100%; background:var(--navy); border-radius:24px 24px 34px 34px; padding:22px 20px 30px; box-shadow:0 -20px 50px -20px rgba(0,0,0,0.6); }
+  .sheet .grip { width:40px; height:4px; border-radius:2px; background:rgba(255,255,255,0.22); margin:0 auto 16px; }
+  .sheet h3 { font-family:var(--font-serif); font-weight:600; font-size:23px; color:var(--gold); }
+  .sheet p { color:var(--sand); font-size:13px; line-height:1.6; margin-top:11px; }
+  .sheet .qlabel { color:var(--muted); font-size:10.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-top:20px; margin-bottom:9px; }
+  .choice { background:var(--card); border-radius:14px; padding:14px; margin-top:9px; cursor:pointer; }
+  .choice.pub { border:1px solid var(--gold); }
+  .choice .ch { color:var(--sand); font-weight:600; font-size:14px; }
+  .choice .cs { color:var(--muted); font-size:11.5px; margin-top:2px; }
+  .sheet .notnow { text-align:center; color:var(--muted); font-size:13px; padding:15px 0 0; cursor:pointer; }
+  .popia-tag { display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+
+  /* ===================== HERITAGE ===================== */
+  .h-intro { position:relative; z-index:2; padding:12px 22px 0; color:var(--slate); font-size:13.5px; line-height:1.55; font-family:var(--font-serif); }
+  .h-card { position:relative; z-index:2; margin:15px 22px 0; background:var(--paper-card); border:1px solid var(--line); border-radius:18px; padding:16px; box-shadow:var(--shadow-sm); }
+  .h-card .h-title { font-family:var(--font-serif); font-weight:600; font-size:19px; color:var(--navy); }
+  .h-card .h-meta { color:var(--orange); font-size:10.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-top:3px; }
+  .field-label { color:var(--slate); font-weight:700; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; margin-top:13px; }
+  .mono { font-family:'Barlow',monospace; font-variant-numeric:tabular-nums; color:var(--navy); font-size:12.5px; font-weight:500; margin-top:2px; letter-spacing:0.02em; word-break:break-all; }
+  .verify-btn { display:inline-flex; align-items:center; gap:7px; margin-top:14px; background:var(--orange); color:#fff; border-radius:999px; padding:9px 16px; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+  .anchored-row { display:flex; align-items:center; gap:8px; margin-top:13px; }
+  .chain-chip { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#2f8f52; }
+  .popia-card { position:relative; z-index:2; margin:18px 22px 34px; background:var(--navy); border-radius:18px; padding:17px; display:flex; gap:13px; align-items:flex-start; box-shadow:var(--shadow-md); overflow:hidden; }
+  .popia-card::after { content:""; position:absolute; inset:0; opacity:0.4; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.12'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .popia-card .lock { font-size:20px; position:relative; z-index:2; }
+  .popia-card p { position:relative; z-index:2; color:var(--muted); font-size:12px; line-height:1.55; font-style:italic; }
+
+  /* ===================== PROVINCES (grid) ===================== */
+  .prov-grid { padding:2px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative; z-index:2; }
+  .prov-card { position:relative; height:150px; border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:flex-end; padding:13px; transition:transform .22s; }
+  .prov-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+  .prov-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .prov-card::after { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(14,28,46,0.05) 25%, rgba(14,28,46,0.55) 62%, rgba(14,28,46,0.92) 100%); }
+  .prov-card .pc-in { position:relative; z-index:2; }
+  .prov-card .pc-name { font-family:var(--font-serif); font-weight:600; color:#fff; font-size:16px; line-height:1.04; }
+  .prov-card .pc-cap { color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-top:5px; }
+  .prov-card .pc-count { position:absolute; top:11px; right:11px; z-index:2; background:rgba(217,106,28,0.94); color:#fff; font-size:9px; font-weight:700; padding:3px 8px; border-radius:999px; letter-spacing:0.03em; }
+
+  /* ===================== PROVINCE DETAIL ===================== */
+  .prov-hero { position:relative; height:172px; margin:6px 16px 0; border-radius:22px; overflow:hidden; box-shadow:var(--shadow-md); }
+  .prov-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; animation:kb 32s ease-in-out infinite alternate; }
+  .prov-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,28,46,0.1) 25%, rgba(14,28,46,0.55) 62%, rgba(14,28,46,0.94) 100%); }
+  .prov-hero .ph-in { position:absolute; left:18px; right:18px; bottom:14px; z-index:2; }
+  .prov-hero .ph-kick { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; }
+  .prov-hero .ph-name { font-family:var(--font-display); font-size:34px; text-transform:uppercase; color:#fff; line-height:0.92; margin-top:4px; }
+  .prov-mini { display:flex; gap:9px; padding:14px 22px 0; position:relative; z-index:2; }
+  .prov-mini .pm { flex:1; background:var(--paper-card); border:1px solid var(--line); border-radius:12px; padding:10px 8px; text-align:center; box-shadow:var(--shadow-sm); }
+  .prov-mini .pm .v { font-family:var(--font-serif); font-weight:600; font-size:14px; color:var(--navy); line-height:1.1; }
+  .prov-mini .pm .l { font-size:8.5px; color:var(--slate); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+  .city-row { display:flex; gap:13px; align-items:center; background:var(--paper-card); border:1px solid var(--line); border-radius:16px; padding:11px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .2s, box-shadow .2s; }
+  .city-row:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+  .city-row img { width:60px; height:60px; border-radius:12px; object-fit:cover; flex:none; }
+  .city-row .cr-b { flex:1; min-width:0; }
+  .city-row .cr-name { font-family:var(--font-serif); font-weight:600; font-size:16px; color:var(--navy); line-height:1.1; }
+  .city-row .cr-meta { color:var(--orange); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+  .city-row .cr-blurb { color:var(--slate); font-size:12px; line-height:1.4; margin-top:4px; }
+
+  /* ===================== CITY DETAIL ===================== */
+  .city-hero { position:relative; height:216px; margin:6px 16px 0; border-radius:22px; overflow:hidden; box-shadow:var(--shadow-md); }
+  .city-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; animation:kb 30s ease-in-out infinite alternate; }
+  .city-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,28,46,0.1) 25%, rgba(14,28,46,0.55) 60%, rgba(14,28,46,0.96) 100%); }
+  .city-hero .ch-in { position:absolute; left:18px; right:18px; bottom:15px; z-index:2; }
+  .city-hero .ch-kick { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; }
+  .city-hero .ch-name { font-family:var(--font-display); font-size:40px; text-transform:uppercase; color:#fff; line-height:0.9; margin-top:4px; }
+  .city-hero .ch-sub { color:rgba(244,238,225,0.88); font-family:var(--font-serif); font-style:italic; font-size:13.5px; margin-top:5px; }
+  .city-hero .ch-est { position:absolute; top:14px; left:16px; z-index:2; background:rgba(15,10,6,0.6); border:1px solid rgba(235,164,60,0.5); color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
+  .city-back { position:absolute; top:12px; right:16px; z-index:3; }
+
+  .city-band { margin:18px 20px 0; background:linear-gradient(135deg,#1d3450 0%,#16293F 45%,#0e1c2e 100%); border-radius:16px; padding:15px 16px; position:relative; z-index:2; overflow:hidden; }
+  .city-band::after { content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.12'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .city-band .cb-label { color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase; position:relative; z-index:2; }
+  .city-band .cb-text { color:var(--sand); font-family:var(--font-serif); font-size:13.5px; line-height:1.55; margin-top:7px; position:relative; z-index:2; }
+
+  .city-para { padding:0 22px; color:var(--slate); font-size:13.5px; line-height:1.62; position:relative; z-index:2; }
+
+  /* leaders timeline */
+  .timeline { padding:4px 22px 0; position:relative; z-index:2; }
+  .tl-item { display:flex; gap:13px; }
+  .tl-rail { display:flex; flex-direction:column; align-items:center; flex:none; }
+  .tl-dot { width:12px; height:12px; border-radius:50%; background:var(--orange); box-shadow:0 0 0 3px rgba(217,106,28,0.18); margin-top:3px; }
+  .tl-dot.past { background:var(--slate); box-shadow:0 0 0 3px rgba(93,107,121,0.16); }
+  .tl-dot.now { background:#3fbf6a; box-shadow:0 0 0 3px rgba(63,191,106,0.22); }
+  .tl-line { width:2px; flex:1; background:var(--line); margin:2px 0; }
+  .tl-body { flex:1; padding-bottom:15px; }
+  .tl-when { color:var(--orange); font-size:10.5px; font-weight:700; letter-spacing:0.05em; }
+  .tl-when.muted { color:var(--slate); }
+  .tl-name { font-family:var(--font-serif); font-weight:600; color:var(--navy); font-size:15px; margin-top:1px; line-height:1.15; }
+  .tl-role { color:var(--slate); font-size:11.5px; margin-top:2px; line-height:1.4; }
+
+  /* by the numbers */
+  .stat-grid { padding:2px 22px 0; display:grid; grid-template-columns:1fr 1fr; gap:11px; position:relative; z-index:2; }
+  .stat-tile { background:var(--paper-card); border:1px solid var(--line); border-radius:14px; padding:13px; box-shadow:var(--shadow-sm); }
+  .stat-val { font-family:var(--font-display); font-size:25px; color:var(--navy); line-height:1; }
+  .stat-label { color:var(--slate); font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; margin-top:6px; }
+  .stat-verify { display:inline-block; margin-top:7px; font-size:8px; color:var(--orange); border:1px solid rgba(217,106,28,0.4); border-radius:999px; padding:1px 6px; letter-spacing:0.05em; text-transform:uppercase; font-weight:700; }
+  .stat-cited { display:inline-block; margin-top:7px; font-size:8px; color:#2f8f52; border:1px solid rgba(47,143,82,0.4); border-radius:999px; padding:1px 6px; letter-spacing:0.05em; text-transform:uppercase; font-weight:700; }
+
+  .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:2px 22px 0; position:relative; z-index:2; }
+  .lm-chip { background:var(--paper-2); border:1px solid var(--line); border-radius:999px; padding:7px 13px; font-size:12px; color:var(--navy); font-weight:500; }
+
+  .src-note { margin:16px 22px 30px; padding:13px 15px; background:rgba(217,106,28,0.06); border-left:3px solid var(--orange); border-radius:0 10px 10px 0; position:relative; z-index:2; }
+  .src-note .sn-h { display:flex; align-items:center; gap:7px; font-size:9.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--orange); }
+  .src-note .sn-t { color:var(--slate); font-size:11.5px; line-height:1.55; margin-top:6px; }
+
+  .city-archive { margin:18px 22px 0; display:flex; align-items:center; gap:12px; background:var(--navy); border-radius:16px; padding:14px 15px; cursor:pointer; position:relative; z-index:2; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .city-archive .ca-mic { width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center; background:rgba(217,106,28,0.18); box-shadow:inset 0 0 0 1px rgba(235,164,60,0.4); color:var(--gold); }
+  .city-archive .ca-h { color:var(--sand); font-family:var(--font-body); font-weight:700; font-size:14px; }
+  .city-archive .ca-s { color:var(--muted); font-size:11px; margin-top:2px; }
+
+  /* Home — "The Nine Provinces" horizontal strip */
+  .prov-strip { display:flex; gap:11px; overflow-x:auto; padding:2px 20px 4px; position:relative; z-index:2; scrollbar-width:none; }
+  .prov-strip::-webkit-scrollbar { display:none; }
+  .prov-mini-card { flex:none; width:118px; height:146px; border-radius:16px; overflow:hidden; position:relative; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .2s; }
+  .prov-mini-card:hover { transform:translateY(-3px); }
+  .prov-mini-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .prov-mini-card::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 38%, rgba(14,28,46,0.92)); }
+  .prov-mini-card .n { position:absolute; left:11px; right:11px; bottom:10px; z-index:2; color:#fff; font-family:var(--font-serif); font-weight:600; font-size:13.5px; line-height:1.05; }
+  .prov-all { flex:none; width:118px; height:146px; border-radius:16px; background:linear-gradient(160deg,#1d3450,#0e1c2e); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; box-shadow:var(--shadow-sm); }
+  .prov-all .c { color:var(--gold); font-family:var(--font-display); font-size:34px; line-height:1; }
+  .prov-all .t { color:var(--sand); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+
+  /* Home — pure black & white, zebra-inspired. Pure #000 ground, pure #fff type. */
+  .screen.home-dark { background:#000; }
+  .home-dark .statusbar { color:#fff; }
+  .home-dark .brandmark .name { color:#fff; }
+  .home-dark .lang-pill { background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.22); color:#fff; box-shadow:none; }
+  .home-dark .lang-pill .chev { color:rgba(255,255,255,0.6); }
+  .home-dark .hero h2 { color:#fff; }
+  .home-dark .hero .blurb { color:rgba(255,255,255,0.9); }
+  .home-dark .masthead .tag { color:rgba(255,255,255,0.6); }
+  .home-dark .section-head .label { color:#fff; }
+  .home-dark .section-head .sub { color:rgba(255,255,255,0.55); }
+  .home-dark .pcard { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .home-dark .pcard:hover { background:rgba(255,255,255,0.09); box-shadow:none; }
+  .home-dark .pcard .title { color:#fff; }
+  .home-dark .pcard .desc { color:rgba(255,255,255,0.58); }
+  .home-dark .pcard .chev { color:rgba(255,255,255,0.5); }
+  .home-dark .archive { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); }
+  .home-dark .archive .txt .h { color:#fff; }
+  .home-dark .archive .txt .s { color:rgba(255,255,255,0.6); }
+  .home-dark .prov-all { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); }
+  .home-dark .ledger { border-color:rgba(255,255,255,0.32); color:#fff; }
+  .home-dark .ledger:hover { background:#fff; color:#000; }
+  .home-dark .about-link { color:rgba(255,255,255,0.55); }
+  .home-dark .about-link:hover { color:#fff; }
+  /* B&W base, brand accent kept for EMPHASIS. Imagery goes grayscale so the gold/orange on the
+     things that matter — the mission line, author credits, primary actions — leaps off the page. */
+  .home-dark .savanna { filter:grayscale(1) contrast(1.05); }
+  .home-dark .prov-mini-card img, .home-dark .achip .g, .home-dark .pcard .thumb .g { filter:grayscale(1) contrast(1.04); }
+  .home-dark .achip .tt .s { color:rgba(255,255,255,0.72); }
+  /* Make the mission line unmistakable — brighter, fuller gold. */
+  .home-dark .masthead .rule span { color:var(--gold); }
+  .home-dark .masthead .rule i { background:var(--gold); opacity:0.7; }
+
+  /* ===================== PRESIDENTS ===================== */
+  .pres-list { padding:2px 20px 34px; display:grid; gap:11px; position:relative; z-index:2; }
+  .pres-row { display:flex; gap:14px; align-items:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:12px; cursor:pointer; transition:transform .2s, background .2s; }
+  .pres-row:hover { transform:translateY(-2px); background:rgba(255,255,255,0.08); }
+  .pres-portrait { width:58px; height:70px; border-radius:10px; flex:none; display:grid; place-items:center; background:linear-gradient(160deg,#1c1c1c,#040404); border:1px solid rgba(235,164,60,0.5); position:relative; }
+  .pres-portrait .mono { font-family:var(--font-display); font-size:23px; color:var(--gold); }
+  .pres-portrait .pnum { position:absolute; top:3px; left:5px; font-size:8.5px; color:rgba(255,255,255,0.4); font-weight:700; }
+  .pres-b { flex:1; min-width:0; }
+  .pres-name { font-family:var(--font-serif); font-weight:600; font-size:16.5px; color:#fff; line-height:1.1; }
+  .pres-term { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+  .pres-role { color:rgba(255,255,255,0.58); font-size:12px; line-height:1.4; margin-top:4px; }
+  /* pre-1994 era — neutral grey, documented not celebrated */
+  .pres-portrait.hist { border-color:rgba(255,255,255,0.22); background:linear-gradient(160deg,#161616,#050505); }
+  .pres-portrait.hist .mono { color:rgba(255,255,255,0.66); font-size:19px; }
+  .pres-term.hist { color:rgba(255,255,255,0.5); }
+
+  .pres-hero { position:relative; margin:6px 16px 0; border-radius:22px; overflow:hidden; background:radial-gradient(120% 90% at 50% 18%, #242424 0%, #0a0a0a 58%, #000 100%); border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 20px 24px; }
+  .pres-hero .big-mono { font-family:var(--font-display); font-size:82px; color:transparent; -webkit-text-stroke:2px var(--gold); line-height:0.9; }
+  .pres-hero .ph-name2 { font-family:var(--font-display); font-size:32px; color:#fff; text-transform:uppercase; margin-top:14px; text-align:center; letter-spacing:0.01em; }
+  .pres-hero .ph-clan { color:rgba(255,255,255,0.6); font-family:var(--font-serif); font-style:italic; font-size:14px; margin-top:6px; }
+  .pres-hero .ph-term2 { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-top:13px; border:1px solid rgba(235,164,60,0.5); border-radius:999px; padding:5px 13px; }
+  .p-back { position:absolute; top:14px; right:16px; z-index:3; }
+
+  .quote { margin:20px 22px 0; padding-left:14px; border-left:3px solid var(--gold); position:relative; z-index:2; }
+  .quote .q-text { font-family:var(--font-serif); font-style:italic; font-size:18px; line-height:1.42; color:#fff; }
+  .quote .q-attr { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:11px; }
+
+  .fam-row { display:flex; flex-wrap:wrap; gap:8px; padding:2px 22px 0; position:relative; z-index:2; }
+  .fam-chip { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:9px 13px; }
+  .fam-chip .fc-rel { font-size:8.5px; color:var(--gold); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+  .fam-chip .fc-name { color:#fff; font-size:13px; margin-top:2px; }
+
+  .know-list { padding:2px 22px 0; display:grid; gap:9px; position:relative; z-index:2; }
+  .kn { display:flex; gap:9px; color:rgba(255,255,255,0.82); font-size:13px; line-height:1.45; }
+  .kn svg { color:var(--gold); flex:none; margin-top:2px; }
+
+  .pres-strip { display:flex; gap:11px; overflow-x:auto; padding:2px 20px 4px; position:relative; z-index:2; scrollbar-width:none; }
+  .pres-strip::-webkit-scrollbar { display:none; }
+  .pres-mini { flex:none; width:104px; border-radius:16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:13px 10px; text-align:center; cursor:pointer; transition:transform .2s; }
+  .pres-mini:hover { transform:translateY(-3px); }
+  .pres-mini .pm-mono { width:48px; height:48px; margin:0 auto; border-radius:50%; border:1px solid rgba(235,164,60,0.5); display:grid; place-items:center; font-family:var(--font-display); font-size:18px; color:var(--gold); background:#0c0c0c; }
+  .pres-mini .pm-name { color:#fff; font-size:11.5px; font-weight:600; margin-top:9px; line-height:1.15; }
+  .pres-mini .pm-yr { color:rgba(255,255,255,0.5); font-size:9.5px; margin-top:3px; }
+
+  /* ===== Shared B&W theme for the remaining screens (Archive · Heritage · Provinces · City) =====
+     Same system as Home: pure #000, white type, grayscale imagery, gold/orange kept ONLY for
+     emphasis (mission, author, primary actions, live status). */
+  .screen.bw { background:#000; }
+  .bw .statusbar { color:#fff; }
+  .bw img { filter:grayscale(1) contrast(1.04); }
+  .bw .back-dark { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:#fff; box-shadow:none; }
+  /* headers */
+  .bw .scr-head h1 { color:#fff; }
+  .bw .scr-intro, .bw .h-intro, .bw .city-para { color:rgba(255,255,255,0.62); }
+  .bw .section-head .label { color:#fff; }
+  .bw .section-head .sub { color:rgba(255,255,255,0.55); }
+  /* Province detail */
+  .bw .prov-card { box-shadow:none; }
+  .bw .prov-mini .pm { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .prov-mini .pm .v { color:#fff; }
+  .bw .prov-mini .pm .l { color:rgba(255,255,255,0.55); }
+  .bw .city-row { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .city-row .cr-name { color:#fff; }
+  .bw .city-row .cr-blurb { color:rgba(255,255,255,0.6); }
+  /* City detail */
+  .bw .city-band { background:rgba(255,255,255,0.04); border:1px solid rgba(235,164,60,0.3); }
+  .bw .city-band .cb-text { color:rgba(255,255,255,0.85); }
+  .bw .tl-line { background:rgba(255,255,255,0.15); }
+  .bw .tl-name { color:#fff; }
+  .bw .tl-role { color:rgba(255,255,255,0.58); }
+  .bw .tl-when.muted { color:rgba(255,255,255,0.5); }
+  .bw .tl-dot.past { background:rgba(255,255,255,0.4); box-shadow:0 0 0 3px rgba(255,255,255,0.1); }
+  .bw .stat-tile { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .stat-val { color:#fff; }
+  .bw .stat-label { color:rgba(255,255,255,0.55); }
+  .bw .lm-chip { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); color:#fff; }
+  .bw .city-archive { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .city-archive .ca-h { color:#fff; }
+  .bw .city-archive .ca-s { color:rgba(255,255,255,0.6); }
+  .bw .src-note .sn-t { color:rgba(255,255,255,0.62); }
+  /* Archive */
+  .bw .rec-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .badge-priv { color:#fff; }
+  .bw .rc-date { color:rgba(255,255,255,0.5); }
+  .bw .rc-title { color:#fff; border-bottom-color:rgba(255,255,255,0.14); }
+  .bw .play-btn { background:#fff; color:#000; }
+  .bw .del-btn { border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.7); }
+  .bw .sheet { background:#0d0d0d; }
+  .bw .choice { background:rgba(255,255,255,0.06); }
+  /* Heritage */
+  .bw .h-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .h-card .h-title { color:#fff; }
+  .bw .field-label { color:rgba(255,255,255,0.5); }
+  .bw .mono { color:rgba(255,255,255,0.85); }
+  .bw .popia-card { background:#0a0a0a; border:1px solid rgba(255,255,255,0.12); box-shadow:none; }
+  .bw .popia-card p { color:rgba(255,255,255,0.6); }
+
+  /* Lab — the journey map */
+  .flowmap { max-width:1180px; margin:36px auto 0; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:18px; padding:22px 24px; }
+  .fm-title { font-family:var(--font-display); font-size:14px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+  .fm-title::before { content:""; width:22px; height:2px; background:var(--orange); }
+  .fm-rows { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .fm-node { border-radius:12px; padding:11px 17px; font-weight:700; font-size:14px; white-space:nowrap; }
+  .fm-node.entry { background:rgba(235,164,60,0.14); color:var(--gold); border:1px solid rgba(235,164,60,0.4); }
+  .fm-node.home { background:var(--orange); color:#fff; }
+  .fm-arrow { color:var(--muted); display:flex; align-items:center; }
+  .fm-branches { display:flex; flex-direction:column; gap:8px; flex:1; min-width:280px; }
+  .fm-branch { display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:9px 14px; }
+  .fm-branch.prov { border-color:rgba(235,164,60,0.45); background:rgba(235,164,60,0.08); }
+  .fm-branch .b-name { color:var(--sand); font-weight:600; font-size:13.5px; }
+  .fm-branch .b-desc { color:var(--muted); font-size:11.5px; }
+  .fm-sub { color:var(--muted); font-size:12px; margin-top:16px; font-style:italic; display:flex; align-items:center; gap:8px; }
+
+  /* Lucide icons (inline SVG, ISC-licensed) — one consistent set, no emoji. lucide.dev */
+  .ico { display:inline-block; vertical-align:-0.16em; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+  /* reveal */
+  .reveal { opacity:0; transform:translateY(14px); animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise { to { opacity:1; transform:none; } }
+
+  .foot-note { text-align:center; color:var(--muted); font-size:12px; margin-top:44px; letter-spacing:0.03em; }
+  .foot-note b { color:var(--sand); }
+</style>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="lab-head">
+    <div class="eyebrow">Redesign Lab · v2 · the whole journey</div>
+    <h1 class="lab-title">Ubuntu <em>Heritage</em></h1>
+    <p class="lab-sub">
+      A cinematic editorial pass across the whole app. Same locked brand — deep
+      navy + burnt orange + gold on warm cream, <b>Anton + Barlow</b> — now joined by
+      <b>Fraunces</b> (an optical serif) to give the literature its own literary voice.
+      Every screen below uses the <b>real, grounded app content</b>. Nothing invented.
+    </p>
+    <div class="meta-strip">
+      <div class="swatches">
+        <div class="sw" style="background:#F4EEE1"><span>Paper</span></div>
+        <div class="sw" style="background:#16293F"><span>Navy</span></div>
+        <div class="sw" style="background:#D96A1C"><span>Orange</span></div>
+        <div class="sw" style="background:#EBA43C"><span>Gold</span></div>
+        <div class="sw" style="background:#5D6B79"><span>Slate</span></div>
+      </div>
+      <div class="type-list">
+        <div class="type-item"><span class="k">Display · Anton</span><span class="d">Ubuntu</span></div>
+        <div class="type-item"><span class="k">Serif · Fraunces</span><span class="s">Voices of yesterday</span></div>
+        <div class="type-item"><span class="k">Body · Barlow</span><span class="b">Read, heard &amp; kept alive</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ JOURNEY MAP ============ -->
+  <section class="flowmap">
+    <div class="fm-title">The journey</div>
+    <div class="fm-rows">
+      <div class="fm-node entry">Launch</div>
+      <div class="fm-arrow"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+      <div class="fm-node home">Home</div>
+      <div class="fm-arrow"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+      <div class="fm-branches">
+        <div class="fm-branch"><span class="b-name">Reader</span><span class="b-desc">Child / Adult · 11 languages · Listen (TTS) · cited source</span></div>
+        <div class="fm-branch prov"><span class="b-name">The Nine Provinces</span><span class="b-desc">→ Province → City history: origins · leaders · by-the-numbers</span></div>
+        <div class="fm-branch prov"><span class="b-name">The Presidents</span><span class="b-desc">→ each president: life · struggle · family · legacy</span></div>
+        <div class="fm-branch"><span class="b-name">Community Archive</span><span class="b-desc">POPIA consent → record → keep private or share</span></div>
+        <div class="fm-branch"><span class="b-name">Heritage Ledger</span><span class="b-desc">on-chain provenance · Solana devnet</span></div>
+        <div class="fm-branch"><span class="b-name">About the Sources</span><span class="b-desc">credits &amp; citations</span></div>
+      </div>
+    </div>
+    <div class="fm-sub"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Every city loops back to the literature (Kimberley → Mhudi · Soweto → 1976) and to the Community Archive.</div>
+  </section>
+
+  <!-- ============ FILMSTRIP ============ -->
+  <div class="strip">
+
+    <!-- ========== 0 · LAUNCH ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen launch">
+          <div class="launch-bg"></div>
+          <div class="launch-scrim"></div>
+          <div class="statusbar" style="color:#F4EEE1"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="launch-inner">
+            <div class="launch-kicker" style="margin-bottom:20px">Reclaiming African Voices</div>
+            <div class="launch-wordmark"><span>Ubuntu</span><span>Heritage</span></div>
+            <div class="lw-country">South Africa</div>
+            <div class="lw-rule"></div>
+            <div class="launch-tag">Mantswe a maloba — Voices of Yesterday</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">00 · Launch</div><div class="t">Wordmark over a dramatic South African image</div></div>
+    </div>
+
+    <!-- ========== 1 · HOME ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen home-dark">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="topbar reveal" style="animation-delay:.05s">
+            <div class="brandmark"><div class="name">Ubuntu Heritage</div></div>
+            <div class="lang-pill"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> Setswana <span class="chev"><svg class="ico" width="11" height="11" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+          </div>
+
+          <div class="hero reveal" style="animation-delay:.12s">
+            <div class="savanna"><div class="sky"></div><div class="sun"></div><div class="horizon"></div><div class="scrim"></div></div>
+            <div class="frame"></div>
+            <div class="index">01</div>
+            <div class="badge">Featured</div>
+            <div class="caption">
+              <div class="kick">Sol T. Plaatje · 1930</div>
+              <h2>Mhudi</h2>
+              <p class="blurb">The first English novel by a Black South African — overturning the colonial pastoral myth.</p>
+              <div class="cta">Simolola go bala <span class="arw"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+            </div>
+          </div>
+
+          <div class="masthead reveal" style="animation-delay:.18s">
+            <div class="rule"><i></i><span>Reclaiming African Voices</span><i></i></div>
+            <div class="tag">Mantswe a maloba — Voices of Yesterday</div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.22s">
+            <div class="label">The Four Pillars</div>
+            <div class="sub">Foundational works of South African literature — read, heard, and kept alive.</div>
+          </div>
+          <div class="pillars">
+            <div class="pcard reveal" style="animation-delay:.26s">
+              <div class="num">02</div><div class="thumb"><div class="g g-ityala"></div></div>
+              <div class="body"><div class="title">Ityala Lamawele</div><div class="meta">S.E.K. Mqhayi · 1914</div><div class="desc">Twin brothers dispute succession before the inkundla — a defence of pre-colonial law.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+            <div class="pcard reveal" style="animation-delay:.30s">
+              <div class="num">03</div><div class="thumb"><div class="g g-indaba"></div></div>
+              <div class="body"><div class="title">Indaba, My Children</div><div class="meta">Credo Mutwa · 1964</div><div class="desc">A sweeping Zulu cosmology set down before it could be lost.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+            <div class="pcard reveal" style="animation-delay:.34s">
+              <div class="num">04</div><div class="thumb"><div class="g g-vilakazi"></div></div>
+              <div class="body"><div class="title">Inkondlo kaZulu</div><div class="meta">B.W. Vilakazi · 1935</div><div class="desc">The first published volume of Zulu poetry — oral genius carried onto the page.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.38s">
+            <div class="label">Cultural Atlas</div>
+            <div class="sub">The history, customs and heroes behind the literature — grounded and cited.</div>
+          </div>
+          <div class="atlas-grid">
+            <div class="achip reveal" style="animation-delay:.42s"><div class="g g-atlas1"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Unsung Heroes</div><div class="s">Galeshewe · Nyabela · 1976</div></div></div>
+            <div class="achip reveal" style="animation-delay:.46s"><div class="g g-atlas2"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Rites of Passage</div><div class="s">Marriage · lobola · umabo</div></div></div>
+            <div class="achip reveal" style="animation-delay:.50s"><div class="g g-atlas3"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Peopling of SA</div><div class="s">Khoisan → Bantu</div></div></div>
+            <div class="achip reveal" style="animation-delay:.54s"><div class="g g-mhudi"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Your story</div><div class="s">Record a family memory</div></div></div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.55s">
+            <div class="label">The Nine Provinces</div>
+            <div class="sub">Explore the land — its cities, founders, and the people who shaped them.</div>
+          </div>
+          <div class="prov-strip reveal" style="animation-delay:.57s">
+            <div class="prov-mini-card"><img src="landing-bg.jpg" alt=""><div class="n">Western Cape</div></div>
+            <div class="prov-mini-card"><img src="pexels-sizwe-shabalala-1225168-2464890.jpg" alt=""><div class="n">Gauteng</div></div>
+            <div class="prov-mini-card"><img src="pexels-jann-bader-411133784-17176393.jpg" alt=""><div class="n">Northern Cape</div></div>
+            <div class="prov-mini-card"><img src="pexels-ygtphoto-13422789.jpg" alt=""><div class="n">KwaZulu-Natal</div></div>
+            <div class="prov-all"><div class="c">9</div><div class="t">All provinces</div><svg class="ico" width="16" height="16" viewBox="0 0 24 24" style="color:var(--gold)"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.58s">
+            <div class="label">The Presidents</div>
+            <div class="sub">Five leaders of a free South Africa — their lives, struggles and legacies.</div>
+          </div>
+          <div class="pres-strip reveal" style="animation-delay:.60s">
+            <div class="pres-mini"><div class="pm-mono">NM</div><div class="pm-name">Mandela</div><div class="pm-yr">1994–99</div></div>
+            <div class="pres-mini"><div class="pm-mono">TM</div><div class="pm-name">Mbeki</div><div class="pm-yr">1999–08</div></div>
+            <div class="pres-mini"><div class="pm-mono">KM</div><div class="pm-name">Motlanthe</div><div class="pm-yr">2008–09</div></div>
+            <div class="pres-mini"><div class="pm-mono">JZ</div><div class="pm-name">Zuma</div><div class="pm-yr">2009–18</div></div>
+            <div class="pres-mini"><div class="pm-mono">CR</div><div class="pm-name">Ramaphosa</div><div class="pm-yr">2018–</div></div>
+          </div>
+
+          <div class="archive reveal" style="animation-delay:.62s">
+            <div class="mic"><svg class="ico" width="24" height="24" viewBox="0 0 24 24" style="color:var(--gold)"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div class="txt"><div class="h">Community Archive</div><div class="s">Record &amp; preserve your family's own stories</div></div>
+            <div class="go"><svg class="ico" width="22" height="22" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+
+          <div class="foot">
+            <div class="ledger reveal" style="animation-delay:.62s"><span class="live"></span><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Heritage Ledger · on-chain</div>
+            <div class="about-link reveal" style="animation-delay:.66s">About the Sources <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">01 · Home</div><div class="t">Cinematic hero + Four Pillars + Cultural Atlas</div></div>
+    </div>
+
+    <!-- ========== 2 · READER ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen dark">
+          <div class="reader-art"><div class="sky"></div><div class="figures"></div></div>
+          <div class="reader-scrim"></div>
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="reader-body">
+            <div class="reader-top">
+              <div class="reader-titlewrap">
+                <div class="back-btn"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div>
+                <div>
+                  <div class="reader-kick">Mhudi · Sol T. Plaatje</div>
+                  <div class="reader-scene">The Forest Home</div>
+                </div>
+              </div>
+              <div class="reader-controls">
+                <div class="lang-pill on-dark"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> EN <span class="chev"><svg class="ico" width="11" height="11" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+                <div class="seg"><button class="active">Adult</button><button>Child</button></div>
+                <div class="listen"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen</div>
+              </div>
+            </div>
+
+            <div class="reader-text">
+              <p class="passage"><span class="drop">A</span>fter the Matabele attack scattered the Barolong and destroyed the town of Kunana, Mhudi and Ra-Thaga met as survivors in the wilderness. Far from elders and the obligations of the village, they built a home of their own and named it Re-Nosi — 'We-are-alone.'</p>
+              <p class="reader-note">AI image — artistic interpretation, not a historical photo.</p>
+              <p class="reader-source"><b>Source:</b> Plaatje, Mhudi (1930), ch. 5 'The Forest Home' — the sanctuary Re-Nosi.</p>
+              <div class="reader-archive-cta"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Record your family's version <svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+            </div>
+
+            <div class="reader-nav">
+              <div class="nav-btn disabled"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Back</div>
+              <div class="nav-progress">1 / 2</div>
+              <div class="nav-btn">Next <svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">02 · Reader</div><div class="t">Child/Adult · 11 languages · Listen (TTS) · cited source</div></div>
+    </div>
+
+    <!-- ========== 3 · ARCHIVE + CONSENT ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">Your voice, your history</div><h1>Community<br>Archive</h1></div></div>
+          </div>
+          <p class="scr-intro">Record an elder's story, a memory, or a tradition in your own words. Your voice, your history — kept on your terms.</p>
+          <div class="record-btn"><span class="rec-dot"></span> Record a story</div>
+
+          <div class="rec-card">
+            <div class="rc-top"><span class="badge-priv"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private</span><span class="rc-date">3 Jul 2026, 14:20</span></div>
+            <div class="rc-title">Grandmother's story of Kunana</div>
+            <div class="waveform">
+              <i style="height:40%"></i><i style="height:70%"></i><i style="height:100%"></i><i style="height:55%"></i><i style="height:85%"></i><i style="height:35%"></i><i style="height:65%"></i><i style="height:95%"></i><i style="height:45%"></i><i style="height:75%"></i><i style="height:30%"></i><i style="height:60%"></i><i style="height:90%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:40%"></i><i style="height:80%"></i><i style="height:55%"></i>
+            </div>
+            <div class="rc-actions"><div class="play-btn"><svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg> Play</div><div class="del-btn"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Delete</div></div>
+          </div>
+
+          <!-- POPIA consent sheet risen over the screen -->
+          <div class="sheet-backdrop">
+            <div class="sheet">
+              <div class="grip"></div>
+              <h3>Before you record</h3>
+              <p>Your story is personal information. Under South Africa's POPIA, your voice is protected — so we only record it with your clear consent. Your recording is saved on this device. You can delete it at any time.</p>
+              <div class="qlabel">How should this recording be kept?</div>
+              <div class="choice"><div class="ch"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Keep private</div><div class="cs">Only you can access it.</div></div>
+              <div class="choice pub"><div class="ch"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Share with community</div><div class="cs">Add your voice to the archive.</div></div>
+              <div class="notnow">Not now</div>
+              <div class="popia-tag"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> POPIA-compliant consent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">03 · Archive + Consent</div><div class="t">POPIA consent gate before the mic ever opens</div></div>
+    </div>
+
+    <!-- ========== 4 · HERITAGE LEDGER ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">On-chain provenance</div><h1>Heritage<br>Ledger</h1></div></div>
+          </div>
+          <p class="h-intro">Every foundational work here is fingerprinted (SHA-256 + IPFS content ID) and anchored on a public blockchain — tamper-evident, permanently verifiable, owned by the community.</p>
+
+          <div class="h-card">
+            <div class="h-title">Mhudi</div>
+            <div class="h-meta">Sol T. Plaatje · 1930</div>
+            <div class="field-label">IPFS content ID</div>
+            <div class="mono">QmS7yTdvrD…cjG6itZjDv</div>
+            <div class="field-label">SHA-256 fingerprint</div>
+            <div class="mono">70d0fd49ad…59eb6d43</div>
+            <div class="anchored-row">
+              <div class="verify-btn">Verify on Solana <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+              <span class="chain-chip"><span class="live"></span>Anchored · devnet</span>
+            </div>
+          </div>
+
+          <div class="h-card">
+            <div class="h-title">Ityala Lamawele</div>
+            <div class="h-meta">S.E.K. Mqhayi · 1914</div>
+            <div class="field-label">IPFS content ID</div>
+            <div class="mono">QmWN17Rxo1…MDmhgsRG</div>
+            <div class="field-label">SHA-256 fingerprint</div>
+            <div class="mono">b25017a431…fc076cc6</div>
+            <div class="anchored-row">
+              <div class="verify-btn">Verify on Solana <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+              <span class="chain-chip"><span class="live"></span>Anchored · devnet</span>
+            </div>
+          </div>
+
+          <div class="popia-card">
+            <span class="lock"><svg class="ico" width="20" height="20" viewBox="0 0 24 24" style="color:var(--gold)"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <p>Privacy first (POPIA): only public literary works and their hashes are placed on-chain. Community members' personal voice recordings are <b>never</b> put on the blockchain.</p>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">04 · Heritage Ledger</div><div class="t">Real Solana devnet anchors · POPIA-safe (hashes only)</div></div>
+    </div>
+
+    <!-- ========== 5 · PROVINCES ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">South Africa</div><h1>The Nine<br>Provinces</h1></div></div>
+          </div>
+          <p class="scr-intro">Nine provinces, hundreds of cities and towns — each with its own founders, leaders and living history. Tap a province to explore its famous places.</p>
+          <div class="prov-grid" style="padding-top:16px;padding-bottom:34px">
+            <div class="prov-card"><img src="pexels-sizwe-shabalala-1225168-2464890.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">Gauteng</div><div class="pc-cap">Johannesburg</div></div></div>
+            <div class="prov-card"><img src="landing-bg.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">Western Cape</div><div class="pc-cap">Cape Town</div></div></div>
+            <div class="prov-card"><img src="pexels-ygtphoto-13422789.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">KwaZulu-Natal</div><div class="pc-cap">Pietermaritzburg</div></div></div>
+            <div class="prov-card"><img src="pexels-khulani-36419398.jpg" alt=""><span class="pc-count">4 cities</span><div class="pc-in"><div class="pc-name">Eastern Cape</div><div class="pc-cap">Bhisho</div></div></div>
+            <div class="prov-card"><img src="pexels-jann-bader-411133784-17176393.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Northern Cape</div><div class="pc-cap">Kimberley</div></div></div>
+            <div class="prov-card"><img src="pexels-omar-photographer-686423191-33212386.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Free State</div><div class="pc-cap">Bloemfontein</div></div></div>
+            <div class="prov-card"><img src="pexels-gwejeofafrica-38223519.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Limpopo</div><div class="pc-cap">Polokwane</div></div></div>
+            <div class="prov-card"><img src="jennifer-latuperisa-andresen-Pg6dgmTaqtM-unsplash.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Mpumalanga</div><div class="pc-cap">Mbombela</div></div></div>
+            <div class="prov-card"><img src="pexels-kaybee-photography-664870201-33687401.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">North West</div><div class="pc-cap">Mahikeng</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">05 · Provinces</div><div class="t">Nine province cards → each opens its famous cities</div></div>
+    </div>
+
+    <!-- ========== 6 · PROVINCE DETAIL ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="prov-hero">
+            <img src="landing-bg.jpg" alt="Western Cape" />
+            <div class="city-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="ph-in">
+              <div class="ph-kick">Province</div>
+              <div class="ph-name">Western Cape</div>
+            </div>
+          </div>
+
+          <div class="prov-mini">
+            <div class="pm"><div class="v">Cape Town</div><div class="l">Capital</div></div>
+            <div class="pm"><div class="v">~7.4M</div><div class="l">People · 2022</div></div>
+            <div class="pm"><div class="v">Afr · Xho · Eng</div><div class="l">Top languages</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">About the province</div></div>
+          <p class="city-para">South Africa's nine provinces were drawn in 1994, at the end of apartheid — but the places within them are far older. The Western Cape's story runs from the Khoikhoi and San of the Cape, through the 1652 Dutch station, the wine-lands and the Overberg, to the cities of today.</p>
+
+          <div class="section-head"><div class="label">Famous cities</div><div class="sub">Tap a city for its full history, leaders and heritage.</div></div>
+          <div style="padding:0 20px 34px; display:grid; gap:11px;">
+            <div class="city-row"><img src="landing-bg.jpg" alt=""><div class="cr-b"><div class="cr-name">Cape Town</div><div class="cr-meta">Founded 1652</div><div class="cr-blurb">The Mother City — VOC station, Table Mountain, seat of Parliament.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="city-row"><img src="pexels-taryn-elliott-9385208.jpg" alt=""><div class="cr-b"><div class="cr-name">Stellenbosch</div><div class="cr-meta">Founded 1679</div><div class="cr-blurb">Second-oldest colonial town; the wine-lands and a major university.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="city-row"><img src="tobias-reich--7ZwuyDx2rI-unsplash.jpg" alt=""><div class="cr-b"><div class="cr-name">George</div><div class="cr-meta">Founded 1811</div><div class="cr-blurb">Garden Route town beneath the Outeniqua mountains.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">06 · Province detail</div><div class="t">Overview + stats + its famous cities</div></div>
+    </div>
+
+    <!-- ========== 7 · CITY DETAIL ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="city-hero">
+            <img src="landing-bg.jpg" alt="Cape Town" />
+            <div class="ch-est">Est. 1652</div>
+            <div class="city-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="ch-in">
+              <div class="ch-kick">Western Cape · City</div>
+              <div class="ch-name">Cape Town</div>
+              <div class="ch-sub">iKapa — 'the Mother City'</div>
+            </div>
+          </div>
+
+          <div class="city-band">
+            <div class="cb-label"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Before the city</div>
+            <div class="cb-text">Long before any harbour, the Cape was home to the Khoikhoi herders and San hunter-gatherers — among them the Goringhaiqua and Gorachouqua clans. Autshumato, a leader and interpreter, was among the first to broker with passing ships.</div>
+          </div>
+
+          <div class="section-head"><div class="label">How it came to be</div></div>
+          <p class="city-para">In 1652 the Dutch East India Company, under Jan van Riebeeck, set up a refreshment station to resupply ships on the spice route — the first colonial town in southern Africa. It grew at the meeting point, and collision, of Khoikhoi, European, and enslaved Southeast Asian and African peoples — a history still written into the city's languages, food and faiths.</p>
+
+          <div class="section-head"><div class="label">Those who led</div><div class="sub">Traditional and civic leaders, from when to when. (Illustrative — the full record is being sourced.)</div></div>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when muted">Until the 1650s</div><div class="tl-name">Khoikhoi &amp; San peoples</div><div class="tl-role">Indigenous inhabitants of the Cape Peninsula</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1652 – 1662</div><div class="tl-name">Jan van Riebeeck</div><div class="tl-role">VOC Commander · founding administrator</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when muted">1662 – 1910</div><div class="tl-name">VOC &amp; British governors</div><div class="tl-role">Colonial administration — see sources</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">2011 – 2018</div><div class="tl-name">Patricia de Lille</div><div class="tl-role">Executive Mayor</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot now"></div></div><div class="tl-body"><div class="tl-when">2021 – present</div><div class="tl-name">Geordin Hill-Lewis</div><div class="tl-role">Executive Mayor</div></div></div>
+          </div>
+
+          <div class="section-head"><div class="label">By the numbers</div></div>
+          <div class="stat-grid">
+            <div class="stat-tile"><div class="stat-val">1652</div><div class="stat-label">Founded (VOC)</div><span class="stat-cited">archives</span></div>
+            <div class="stat-tile"><div class="stat-val">~4.8M</div><div class="stat-label">Metro population</div><span class="stat-cited">Census 2022</span></div>
+            <div class="stat-tile"><div class="stat-val">~1,450</div><div class="stat-label">Public schools</div><span class="stat-verify">to verify</span></div>
+            <div class="stat-tile"><div class="stat-val">3</div><div class="stat-label">Universities</div><span class="stat-cited">public</span></div>
+            <div class="stat-tile"><div class="stat-val">1000+</div><div class="stat-label">Heritage sites</div><span class="stat-verify">to verify</span></div>
+            <div class="stat-tile"><div class="stat-val">—</div><div class="stat-label">Hospitals</div><span class="stat-verify">to verify</span></div>
+          </div>
+
+          <div class="section-head"><div class="label">Landmarks &amp; heritage</div></div>
+          <div class="chip-row">
+            <span class="lm-chip">Table Mountain</span>
+            <span class="lm-chip">Robben Island</span>
+            <span class="lm-chip">Castle of Good Hope</span>
+            <span class="lm-chip">District Six</span>
+            <span class="lm-chip">Bo-Kaap</span>
+            <span class="lm-chip">V&amp;A Waterfront</span>
+          </div>
+
+          <div class="city-archive">
+            <div class="ca-mic"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div style="flex:1"><div class="ca-h">Your Cape Town</div><div class="ca-s">Record a family memory of this place</div></div>
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--gold)"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          <div class="src-note">
+            <div class="sn-h"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> How we source this</div>
+            <div class="sn-t">Every date, name and figure traces to a public record — StatsSA Census 2022, the Dept. of Basic Education, and the City of Cape Town. Items marked <b>to verify</b> are placeholders pending a citation. Nothing is invented — including the Khoikhoi &amp; San history that predates the colonial founding.</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">07 · City detail</div><div class="t">Origins · leaders timeline · by-the-numbers · sources</div></div>
+    </div>
+
+    <!-- ========== 8 · PRESIDENTS ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">Democratic South Africa</div><h1>The<br>Presidents</h1></div></div>
+          </div>
+          <p class="scr-intro">Since the first free election in 1994, five presidents have led South Africa — each through a different chapter, from liberation to the work still unfinished.</p>
+          <div class="pres-list">
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">01</span><span class="mono">NM</span></div><div class="pres-b"><div class="pres-name">Nelson Mandela</div><div class="pres-term">1994 – 1999</div><div class="pres-role">Anti-apartheid icon; 27 years imprisoned; the first democratically-elected president.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">02</span><span class="mono">TM</span></div><div class="pres-b"><div class="pres-name">Thabo Mbeki</div><div class="pres-term">1999 – 2008</div><div class="pres-role">"I am an African"; the African Renaissance; a decade of economic growth.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">03</span><span class="mono">KM</span></div><div class="pres-b"><div class="pres-name">Kgalema Motlanthe</div><div class="pres-term">2008 – 2009</div><div class="pres-role">Caretaker president; trade unionist and Robben Island veteran.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">04</span><span class="mono">JZ</span></div><div class="pres-b"><div class="pres-name">Jacob Zuma</div><div class="pres-term">2009 – 2018</div><div class="pres-role">Umkhonto we Sizwe veteran; a presidency later marked by state-capture controversy.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">05</span><span class="mono">CR</span></div><div class="pres-b"><div class="pres-name">Cyril Ramaphosa</div><div class="pres-term">2018 – present</div><div class="pres-role">Founder of the mineworkers' union and chief negotiator of the 1996 Constitution.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+
+          <div class="section-head" style="margin-top:8px">
+            <div class="label">Before democracy</div>
+            <div class="sub">Leaders of the Union and the apartheid state, 1910–1994. Knowing this history is part of reclaiming the story — recorded honestly, neither erased nor celebrated.</div>
+          </div>
+          <div class="pres-list">
+            <div class="pres-row"><div class="pres-portrait hist"><span class="pnum">1910</span><span class="mono">LB</span></div><div class="pres-b"><div class="pres-name">Louis Botha</div><div class="pres-term hist">Prime Minister · 1910–1919</div><div class="pres-role">First Prime Minister of the Union; Boer general turned statesman.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JS</span></div><div class="pres-b"><div class="pres-name">Jan Smuts</div><div class="pres-term hist">Prime Minister · 1919–24 &amp; 1939–48</div><div class="pres-role">A global statesman abroad who upheld segregation at home.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JH</span></div><div class="pres-b"><div class="pres-name">J.B.M. Hertzog</div><div class="pres-term hist">Prime Minister · 1924–1939</div><div class="pres-role">Afrikaner nationalism; laws that stripped Black South Africans' rights.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">DM</span></div><div class="pres-b"><div class="pres-name">D.F. Malan</div><div class="pres-term hist">Prime Minister · 1948–1954</div><div class="pres-role">The National Party's 1948 victory — apartheid becomes law.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JGS</span></div><div class="pres-b"><div class="pres-name">J.G. Strijdom</div><div class="pres-term hist">Prime Minister · 1954–1958</div><div class="pres-role">Entrenched white-minority rule; removed Coloured voters from the roll.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">HV</span></div><div class="pres-b"><div class="pres-name">H.F. Verwoerd</div><div class="pres-term hist">Prime Minister · 1958–1966</div><div class="pres-role">The "architect of apartheid"; Bantu Education; assassinated in 1966.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">BV</span></div><div class="pres-b"><div class="pres-name">B.J. Vorster</div><div class="pres-term hist">Prime Minister · 1966–1978</div><div class="pres-role">A security state — detention without trial and hard repression.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">PW</span></div><div class="pres-b"><div class="pres-name">P.W. Botha</div><div class="pres-term hist">PM / State President · 1978–1989</div><div class="pres-role">"Die Groot Krokodil"; the states of emergency of the 1980s.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="pnum">1994</span><span class="mono">FW</span></div><div class="pres-b"><div class="pres-name">F.W. de Klerk</div><div class="pres-term hist">State President · 1989–1994</div><div class="pres-role">Unbanned the ANC, freed Mandela and negotiated apartheid's end; shared the 1993 Nobel Peace Prize.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">08 · Presidents</div><div class="t">The five democratic-era presidents → each opens a full life</div></div>
+    </div>
+
+    <!-- ========== 9 · PRESIDENT DETAIL ========== -->
+    <div class="frame-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="pres-hero">
+            <div class="p-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="big-mono">NM</div>
+            <div class="ph-name2">Nelson Mandela</div>
+            <div class="ph-clan">Madiba · Tata</div>
+            <div class="ph-term2">1st President · 1994 – 1999</div>
+          </div>
+
+          <div class="stat-grid" style="padding-top:16px">
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">1918</div><div class="stat-label">Born · Mvezo, E. Cape</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">2013</div><div class="stat-label">Died · Johannesburg</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">1994–99</div><div class="stat-label">In office</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">ANC</div><div class="stat-label">Party</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">The struggle</div></div>
+          <p class="city-para">Mandela joined the ANC in 1944 and helped found its Youth League. As apartheid hardened, he co-founded Umkhonto we Sizwe, the movement's armed wing. Convicted at the 1964 Rivonia Trial, he was sentenced to life and spent 27 years in prison — much of it on Robben Island. Released on 11 February 1990, he shared the 1993 Nobel Peace Prize with F.W. de Klerk and, in 1994, became South Africa's first democratically-elected president.</p>
+
+          <div class="section-head"><div class="label">A life</div></div>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1918</div><div class="tl-name">Born in Mvezo</div><div class="tl-role">Eastern Cape (Transkei); of the Thembu royal house</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1944</div><div class="tl-name">Joins the ANC</div><div class="tl-role">Co-founds the ANC Youth League</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1964</div><div class="tl-name">Rivonia Trial</div><div class="tl-role">Sentenced to life; imprisoned for 27 years</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1990</div><div class="tl-name">Released</div><div class="tl-role">Walks free on 11 February</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1994</div><div class="tl-name">Elected President</div><div class="tl-role">South Africa's first free election</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div></div><div class="tl-body"><div class="tl-when muted">2013</div><div class="tl-name">Dies in Johannesburg</div><div class="tl-role">Aged 95</div></div></div>
+          </div>
+
+          <div class="section-head"><div class="label">Family</div></div>
+          <div class="fam-row">
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Evelyn Mase · 1944–58</div></div>
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Winnie Madikizela-Mandela · 1958–96</div></div>
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Graça Machel · 1998</div></div>
+            <div class="fam-chip"><div class="fc-rel">Children</div><div class="fc-name">Six, across his marriages</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">What every South African should know</div></div>
+          <div class="know-list">
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>His clan name is <b style="color:#fff">Madiba</b>; he is affectionately called <b style="color:#fff">Tata</b> — father of the nation.</span></div>
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>He chose reconciliation over revenge — championing the Truth &amp; Reconciliation Commission.</span></div>
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>He served a single term by choice, stepping down to strengthen the young democracy.</span></div>
+          </div>
+
+          <div class="quote">
+            <div class="q-text">"It always seems impossible until it's done."</div>
+            <div class="q-attr">— Nelson Mandela</div>
+          </div>
+
+          <div class="city-archive" style="margin-top:20px">
+            <div class="ca-mic"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div style="flex:1"><div class="ca-h">Your memory of Madiba</div><div class="ca-s">Record where you were, what he meant to your family</div></div>
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--gold)"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          <div class="src-note">
+            <div class="sn-h"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> How we source this</div>
+            <div class="sn-t">Dates and facts trace to the public record — Mandela's <i>Long Walk to Freedom</i> and the Nelson Mandela Foundation. Hard chapters (imprisonment, divorce, the AIDS debate under later presidents) are told honestly, never sanitised.</div>
+          </div>
+        </div>
+      </div>
+      <div class="screen-label"><div class="n">09 · President detail</div><div class="t">Life · struggle · family · legacy · a quote · sources</div></div>
+    </div>
+
+  </div>
+
+  <p class="foot-note">Design sandbox · open <b>design/index.html</b> in a browser · delete the folder when done</p>
+</body>
+</html>

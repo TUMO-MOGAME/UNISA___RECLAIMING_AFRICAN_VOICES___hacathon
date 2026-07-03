@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
-import { colors, spacing, radius } from "../theme/tokens";
+import { spacing, radius } from "../theme/tokens";
 
 // Standard surface. `tone="light"` = white card on cream (default); `tone="navy"` = the brief's
 // dark call-to-action block. Consistent radius, border and depth everywhere. See src/ui/README.md.
@@ -22,6 +22,6 @@ export function Card({
 
 const styles = StyleSheet.create({
   base: { borderRadius: radius.lg, padding: spacing.lg, ...cardShadow },
-  light: { backgroundColor: colors.paperCard, borderWidth: 1, borderColor: colors.paperLine },
-  navy: { backgroundColor: colors.navy },
+  light: { backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)" },
+  navy: { backgroundColor: "#0A0A0A", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)" },
 });

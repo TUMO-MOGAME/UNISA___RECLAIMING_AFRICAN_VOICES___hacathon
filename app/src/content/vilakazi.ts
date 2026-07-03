@@ -40,8 +40,8 @@ export const vilakazi: Module = {
       id: "why-preservation",
       title: { en: "Why Preservation Matters", tn: "Goreng go Boloka go le Botlhokwa" },
       text: {
-        en: "Vilakazi's achievement was also a warning. A language not written, not taught, not renewed can fade. By moving the izimbongi from breath to book, he extended the life of Zulu letters — just as today that same heritage must move from book to screen. This is the lineage Maloba joins: another act of preservation, on the people's own terms.",
-        tn: "Katlego ya ga Vilakazi e ne gape e le tlhagiso. Puo e e sa kwalweng, e sa rutweng, e sa ntlafadiweng e ka nyelela. Ka go suta izimbongi go tswa mong wa mowa go ya bukeng, o ne a oketsa botshelo jwa dingwalo tsa Sezulu — fela jaaka gompieno boswa joo bo tshwanetse go suta go tswa bukeng go ya skrineng. Ke yone tatelano e Maloba e tsenang mo go yone.",
+        en: "Vilakazi's achievement was also a warning. A language not written, not taught, not renewed can fade. By moving the izimbongi from breath to book, he extended the life of Zulu letters — just as today that same heritage must move from book to screen. This is the lineage Ubuntu Heritage joins: another act of preservation, on the people's own terms.",
+        tn: "Katlego ya ga Vilakazi e ne gape e le tlhagiso. Puo e e sa kwalweng, e sa rutweng, e sa ntlafadiweng e ka nyelela. Ka go suta izimbongi go tswa mong wa mowa go ya bukeng, o ne a oketsa botshelo jwa dingwalo tsa Sezulu — fela jaaka gompieno boswa joo bo tshwanetse go suta go tswa bukeng go ya skrineng. Ke yone tatelano e Ubuntu Heritage e tsenang mo go yone.",
       },
       childText: {
         en: "Vilakazi showed something important: if we don't write down and share our languages, they can disappear. He helped Zulu poetry live on in books. Today, apps like this one help that same heritage live on screens — so it is never lost.",
@@ -50,7 +50,7 @@ export const vilakazi: Module = {
       imagePrompt:
         "An open book of Zulu poetry transforming into glowing light and a modern screen, bridging generations, a young person reading with wonder, warm hopeful cinematic light, painterly, 4k, artistic interpretation",
       seed: 2035,
-      sourceNote: "Vilakazi, Inkondlo kaZulu (1935) — preservation meta-narrative; adaptation of African letters to new media. (The link to Maloba's mission is our framing, not a claim about Vilakazi.)",
+      sourceNote: "Vilakazi, Inkondlo kaZulu (1935) — preservation meta-narrative; adaptation of African letters to new media. (The link to Ubuntu Heritage's mission is our framing, not a claim about Vilakazi.)",
     },
   ],
 };

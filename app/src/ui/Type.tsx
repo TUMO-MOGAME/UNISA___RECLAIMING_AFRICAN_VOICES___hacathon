@@ -9,8 +9,9 @@ import { colors, fonts, type } from "../theme/tokens";
 
 type Props = TextProps & { onDark?: boolean };
 
-const fg = (onDark?: boolean) => (onDark ? colors.sand : colors.navy);
-const fgMuted = (onDark?: boolean) => (onDark ? colors.muted : colors.slate);
+// B&W theme: primary type is pure white on black; muted is a neutral grey. (Both worlds are dark now.)
+const fg = (onDark?: boolean) => (onDark ? colors.sand : "#FFFFFF");
+const fgMuted = (onDark?: boolean) => (onDark ? colors.muted : "rgba(255,255,255,0.6)");
 
 /** Huge Anton headline / brand (uppercase). */
 export function Display({ onDark, style, ...p }: Props) {

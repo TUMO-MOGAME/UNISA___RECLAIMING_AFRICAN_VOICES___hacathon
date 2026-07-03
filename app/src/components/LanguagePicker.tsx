@@ -3,6 +3,7 @@ import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from "react-nati
 import { LANGUAGES, languageByCode } from "../i18n";
 import { Lang } from "../content/types";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
+import { Icon } from "../ui";
 
 // First-class language chooser for all 11 official SA languages (setswana-i18n skill: indigenous
 // languages are peers, not a "secondary" dropdown). Lists each language by its own name (endonym).
@@ -29,9 +30,10 @@ export function LanguagePicker({
         accessibilityRole="button"
         accessibilityLabel={`Language: ${meta.english}. Tap to change.`}
       >
-        <Text style={styles.triggerText}>
-          {compact ? lang.toUpperCase() : meta.endonym} ▾
-        </Text>
+        <View style={styles.triggerRow}>
+          <Text style={styles.triggerText}>{compact ? lang.toUpperCase() : meta.endonym}</Text>
+          <Icon.ChevronDown size={13} color="rgba(255,255,255,0.7)" />
+        </View>
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
@@ -55,14 +57,14 @@ export function LanguagePicker({
                       <Text style={styles.endonym}>{l.endonym}</Text>
                       <Text style={styles.english}>{l.english}</Text>
                     </View>
-                    {l.reviewedContent && <Text style={styles.reviewed}>✓</Text>}
-                    {active && <Text style={styles.check}>●</Text>}
+                    {l.reviewedContent && <Icon.Check size={14} color={colors.gold} strokeWidth={2.6} />}
+                    {active && <View style={styles.activeDot} />}
                   </Pressable>
                 );
               })}
             </ScrollView>
             <Text style={styles.footnote}>
-              ✓ full translation · others show English text for now, with native audio where available.
+              A tick marks a full translation · others show English text for now, with native audio where available.
             </Text>
           </View>
         </Pressable>
@@ -73,12 +75,16 @@ export function LanguagePicker({
 
 const styles = StyleSheet.create({
   trigger: {
-    backgroundColor: colors.card,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: radius.pill,
   },
-  triggerText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.small },
+  triggerText: { color: "#fff", fontFamily: fonts.bodySemi, fontSize: type.small },
+  triggerRow: { flexDirection: "row", alignItems: "center", gap: 5 },
+  activeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.ember },
   backdrop: {
     flex: 1,
     backgroundColor: colors.scrimStrong,
@@ -86,7 +92,9 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   sheet: {
-    backgroundColor: colors.ink,
+    backgroundColor: "#0D0D0D",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
     borderRadius: radius.lg,
     padding: spacing.lg,
   },
@@ -106,8 +114,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
   },
-  rowActive: { backgroundColor: colors.card },
-  endonym: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.body },
+  rowActive: { backgroundColor: "rgba(255,255,255,0.08)" },
+  endonym: { color: "#fff", fontFamily: fonts.bodySemi, fontSize: type.body },
   english: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, marginTop: 1 },
   reviewed: { color: colors.gold, fontSize: type.body, fontWeight: "800" },
   check: { color: colors.ember, fontSize: type.body },

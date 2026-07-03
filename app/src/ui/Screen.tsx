@@ -20,7 +20,8 @@ export function Screen({
   padded?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
 }) {
-  const bg = tone === "dark" ? colors.night : colors.paper;
+  // Both tones are now the pure-black B&W world; the warm top-wash keeps a hint of gold.
+  const bg = tone === "dark" ? "#000" : "#000";
   const pad = padded ? styles.padded : null;
 
   return (

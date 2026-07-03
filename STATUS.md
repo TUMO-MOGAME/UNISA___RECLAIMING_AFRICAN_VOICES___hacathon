@@ -123,6 +123,57 @@ _Last updated: 2026-07-02 — by Emma (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-03** — **In-app Lucide icons + UI audit/alignment + tsc fix.** Installed `lucide-react-native`
+  + `react-native-svg`; replaced **all emoji/unicode glyphs** across the app (Home, Reader, Archive,
+  Consent, Heritage, LanguagePicker, Provinces, Presidents) with a central `ui/Icon` set — mic, chevrons,
+  lock, users, play, square, volume, trash, check, clock, arrow-up-right, sparkles, link2. **Alignment
+  audit:** wrapped text-badges in `View` (province count, Est., stat pills) for clean centering, put all
+  icon+label buttons in `flexDirection:row + gap` rows, swapped baseline-inconsistent `‹ › ▾ ● ✦` glyphs
+  for centered SVGs. **Fixed a tsc stack-overflow**: lucide's ~1,500-icon barrel overflowed the type
+  checker — `ui/Icon.tsx` now loads lucide via `require()` typed to a tiny local `IconProps`, so tsc
+  never walks the barrel (runtime identical). Also refactored `App.tsx`'s route ternary → flat switch.
+  `tsc` clean (stable across repeated runs) · **32/32 tests** · `expo export --platform web` green.
+- **2026-07-03** — **B&W redesign lab + new features + app port (in progress).** In `design/` (throwaway
+  lab, `index.html`) redesigned the whole app to a **pure black & white + gold-for-emphasis** system,
+  zebra-inspired: black ground, white type, **colour photos**, gold/orange only on what matters
+  (mission line, authors, primary actions). 10 lab screens (Launch, Home, Reader, Archive+consent,
+  Heritage, Provinces grid/province/city, Presidents overview/detail). Added two grounded features:
+  **Provinces → City history** (`design/provinces-content.md`) and **The Presidents** incl. **pre-1994
+  heads of state** honestly framed (`design/presidents-content.md`) — all cited/flagged, controversies
+  neither sanitised nor sensationalised. All lab icons are **Lucide** (Emma's rule). **App port started
+  (staged, verified):** ✅ Launch (zebra + "UBUNTU HERITAGE" wordmark, `assets/brand/launch-bg.jpg`) ·
+  ✅ Home (B&W + gold, colour photos, logo→wordmark). tsc clean · tests pass · web export green.
+  **Port COMPLETE (all stages):** ✅ 1c — Reader/Archive/Heritage/About/ConsentSheet/LanguagePicker +
+  the UI kit (Screen/Type/Card/ScreenHeader) all → B&W + gold, colour photos; cross-platform (pure RN
+  StyleSheet, no web-only CSS). ✅ 2 — **Provinces feature** in-app (`content/provinces.ts` +
+  `ProvincesScreens.tsx`: grid → province → city; 3 provinces, flagship cities, real colour photos in
+  `assets/places/`; stats flagged cited/verify) + Home entry + nav. ✅ 3 — **Presidents feature**
+  (`content/presidents.ts` + `PresidentsScreens.tsx`: overview with democratic-5 gold + pre-1994 grey,
+  full detail w/ life timeline/family/quote/sources) + Home entry + nav. `tsc` clean · **32/32 tests** ·
+  `expo export --platform web` green. **Pending Emma:** verify the ‘to verify’ stats (StatsSA/DBE);
+  Setswana translations for the new features; optional in-app Lucide icons (emoji still in a few spots).
+- **2026-07-03** — **Rebrand: Maloba → Ubuntu Heritage (product UI + logo).** Emma supplied a new emblem
+  (sunburst of ndebele-patterned petals + rising sun over Table Mountain, rising from an open book) and
+  chose to rename the app **Maloba → "Ubuntu Heritage · South Africa."** Scope this pass = **product UI +
+  logo only** (docs/specs/narrative deferred; on-chain memos are immutable and keep the historical name).
+  Done: logo added at `app/assets/brand/logo.png` (downscaled 6.8MB→1.5MB); **LaunchScreen** now shows the
+  real logo on a warm-brown ground; **Home masthead** shows the logo on a gold-framed plate; renamed
+  `app.json` name, About intro, and the Vilakazi content self-reference. **Kept** the Setswana tagline
+  *Mantswe a maloba* ("voices of yesterday" — poetry, not the brand) and the `localize.test` "Maloba"=
+  yesterday fixture. Design lab (`design/`) fully rebranded incl. a new **00·Launch** screen; all lab
+  icons converted **emoji → Lucide** (Emma's standing rule). Verified: `tsc` clean · **32/32 tests** ·
+  `expo export --platform web` green. **Deferred (needs go-ahead):** rename in docs, README, specs, and
+  the judged `concept-submission.md`; a transparent-background emblem for non-plated placements.
+- **2026-07-03** — **UI redesign pass (design lab → ported to app).** Built a throwaway `design/`
+  sandbox (`index.html`) mocking the whole journey — Home, Reader, Archive+POPIA consent, Heritage
+  Ledger — in a "cinematic editorial archive" direction on the locked brand palette. Emma-facing;
+  delete the folder when done. **Ported the Home refinements into the real app:** added a **literary
+  serif voice** (Playfair Display — already installed; now loaded in `App.tsx` + `fonts.serif/serifSemi/
+  serifItalic` tokens) for work titles, blurbs and taglines; rebuilt the **Cultural Atlas as a 2-up
+  image grid** (`AtlasChip`) instead of list rows; serif Reader scene title + Heritage work titles; a
+  **live green status dot** on the on-chain Heritage Ledger button. Verified: `tsc` clean · **32/32
+  tests** · `expo export --platform web` green (Playfair weights bundle). Remaining lab screens
+  (Reader/Archive/Heritage full treatment) can follow once Emma signs off on the look.
 - **2026-07-03** — **Submission-package + Atlas visual parity.** (1) **Atlas hero art:** wired the 3
   Cultural Atlas modules into the Gemini image pipeline and made `gen:images` **idempotent** (skips the
   4 cached literary heroes → no wasted quota; `--force` to regenerate). Generated 3 new cinematic heroes

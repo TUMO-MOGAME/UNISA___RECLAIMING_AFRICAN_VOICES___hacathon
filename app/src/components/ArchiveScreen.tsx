@@ -11,7 +11,7 @@ import { Lang } from "../content/types";
 import { t } from "../i18n";
 import { ConsentSheet, Visibility } from "./ConsentSheet";
 import { PressScale } from "./Motion";
-import { Screen, ScreenHeader, Card, Body, Meta, Muted } from "../ui";
+import { Screen, ScreenHeader, Card, Body, Meta, Muted, Icon } from "../ui";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
@@ -33,14 +33,14 @@ const UI = {
     en: "Record an elder's story, a memory, or a tradition in your own words. Your voice, your history — kept on your terms.",
     tn: "Gatisa kanegelo ya motsofe, kgakologelo, kgotsa ngwao ka mafoko a gago. Lentswe la gago, hisitori ya gago — e bolokwa ka fa o batlang ka teng.",
   },
-  record: { en: "● Record a story", tn: "● Gatisa kanegelo" },
-  stop: { en: "■ Stop recording", tn: "■ Emisa go gatisa" },
+  record: { en: "Record a story", tn: "Gatisa kanegelo" },
+  stop: { en: "Stop recording", tn: "Emisa go gatisa" },
   recording: { en: "Recording…", tn: "E a gatisa…" },
   empty: { en: "No recordings yet. Tap “Record a story” to add the first voice.", tn: "Ga go na dikgatiso. Tobetsa “Gatisa kanegelo” go tsenya lentswe la ntlha." },
-  play: { en: "► Play", tn: "► Bapala" },
+  play: { en: "Play", tn: "Bapala" },
   del: { en: "Delete", tn: "Phimola" },
-  privateBadge: { en: "🔒 Private", tn: "🔒 Sephiri" },
-  publicBadge: { en: "🌍 Shared", tn: "🌍 E abetswe" },
+  privateBadge: { en: "Private", tn: "Sephiri" },
+  publicBadge: { en: "Shared", tn: "E abetswe" },
   placeholder: { en: "Untitled story", tn: "Kanegelo e e se nang setlhogo" },
   permDenied: { en: "Microphone permission is needed to record. You can enable it in settings.", tn: "Tetla ya microphone e a tlhokega go gatisa. O ka e tshwaya mo dithulaganyong." },
   unsupported: { en: "Recording isn't available on this device/browser. Try the app on a phone via Expo Go.", tn: "Go gatisa ga go a nna teng mo sedirisweng se. Leka app mo founong ka Expo Go." },
@@ -125,10 +125,12 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
 
       {isRecording ? (
         <Pressable style={[styles.recordBtn, styles.stopBtn]} onPress={stopRecording}>
+          <Icon.Square size={15} color={colors.orange} fill={colors.orange} />
           <Text style={styles.recordText}>{t(UI.stop, lang)}</Text>
         </Pressable>
       ) : (
         <PressScale style={styles.recordBtn} onPress={() => setConsentVisible(true)}>
+          <Icon.Mic size={18} color={colors.paper} />
           <Text style={styles.recordText}>{t(UI.record, lang)}</Text>
         </PressScale>
       )}
@@ -141,7 +143,10 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
         recordings.map((r) => (
           <Card key={r.id} style={styles.item}>
             <View style={styles.itemTop}>
-              <Meta>{r.visibility === "private" ? t(UI.privateBadge, lang) : t(UI.publicBadge, lang)}</Meta>
+              <View style={styles.badgeRow}>
+                {r.visibility === "private" ? <Icon.Lock size={12} color={colors.gold} /> : <Icon.Users size={12} color={colors.gold} />}
+                <Meta>{r.visibility === "private" ? t(UI.privateBadge, lang) : t(UI.publicBadge, lang)}</Meta>
+              </View>
               <Muted style={styles.date}>{r.createdAt}</Muted>
             </View>
             <TextInput
@@ -149,13 +154,15 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
               value={r.title}
               onChangeText={(txt) => rename(r.id, txt)}
               placeholder={t(UI.placeholder, lang)}
-              placeholderTextColor={colors.slate}
+              placeholderTextColor="rgba(255,255,255,0.4)"
             />
             <View style={styles.itemActions}>
               <Pressable style={styles.playBtn} onPress={() => play(r.uri)}>
+                <Icon.Play size={13} color="#000" fill="#000" />
                 <Text style={styles.playText}>{t(UI.play, lang)}</Text>
               </Pressable>
               <Pressable style={styles.delBtn} onPress={() => remove(r.id)}>
+                <Icon.Trash2 size={13} color="rgba(255,255,255,0.7)" />
                 <Text style={styles.delText}>{t(UI.del, lang)}</Text>
               </Pressable>
             </View>
@@ -179,9 +186,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.orange,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
   },
-  stopBtn: { backgroundColor: colors.paperCard, borderWidth: 2, borderColor: colors.orange },
+  stopBtn: { backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 2, borderColor: colors.orange },
   recordText: {
     color: colors.paper,
     fontFamily: fonts.bodyBold,
@@ -194,17 +204,18 @@ const styles = StyleSheet.create({
   empty: { marginTop: spacing.xl, textAlign: "center" },
   item: { marginTop: spacing.md, padding: spacing.md },
   itemTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   date: { fontSize: type.small },
   titleInput: {
-    color: colors.navy,
+    color: "#fff",
     fontFamily: fonts.bodySemi,
     fontSize: type.body,
     marginTop: spacing.sm,
     paddingVertical: spacing.xs,
   },
   itemActions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm },
-  playBtn: { backgroundColor: colors.navy, borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18 },
-  playText: { color: colors.paper, fontFamily: fonts.bodySemi, fontSize: type.small },
-  delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: colors.slate },
-  delText: { color: colors.slate, fontFamily: fonts.bodySemi, fontSize: type.small },
+  playBtn: { backgroundColor: "#fff", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, flexDirection: "row", alignItems: "center", gap: 6 },
+  playText: { color: "#000", fontFamily: fonts.bodySemi, fontSize: type.small },
+  delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: "rgba(255,255,255,0.3)", flexDirection: "row", alignItems: "center", gap: 6 },
+  delText: { color: "rgba(255,255,255,0.7)", fontFamily: fonts.bodySemi, fontSize: type.small },
 });

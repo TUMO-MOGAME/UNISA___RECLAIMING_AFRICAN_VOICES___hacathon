@@ -3,7 +3,7 @@ import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
 import { Lang } from "../content/types";
 import { t } from "../i18n";
 import { HERITAGE_ANCHORS, explorerUrl, explorerAddressUrl, shortHash } from "../content/heritage";
-import { Screen, ScreenHeader, Card, Body, Title, Meta, Muted } from "../ui";
+import { Screen, ScreenHeader, Card, Body, Title, Meta, Muted, Icon } from "../ui";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 
 // The Heritage Ledger — Maloba's on-chain provenance. Each foundational work is content-fingerprinted
@@ -40,7 +40,7 @@ export function HeritageLedgerScreen({ lang, onBack }: { lang: Lang; onBack: () 
         const anchored = a.tx !== "pending" && a.tx.length > 0;
         return (
           <Card key={a.id} style={styles.card}>
-            <Title>{a.title}</Title>
+            <Title style={styles.workTitle}>{a.title}</Title>
             <Meta style={styles.meta}>
               {a.author} · {a.year}
             </Meta>
@@ -54,19 +54,22 @@ export function HeritageLedgerScreen({ lang, onBack }: { lang: Lang; onBack: () 
             {a.mint !== "pending" && a.mint.length > 0 && (
               <>
                 <Text style={styles.fieldLabel}>{t(UI.certLabel, lang)}</Text>
-                <Pressable onPress={() => Linking.openURL(explorerAddressUrl(a.mint, a.cluster))}>
-                  <Text style={[styles.mono, styles.link]}>{shortHash(a.mint, 10, 8)}  ↗</Text>
+                <Pressable style={styles.linkRow} onPress={() => Linking.openURL(explorerAddressUrl(a.mint, a.cluster))}>
+                  <Text style={[styles.mono, styles.link]}>{shortHash(a.mint, 10, 8)}</Text>
+                  <Icon.ArrowUpRight size={12} color={colors.orange} />
                 </Pressable>
               </>
             )}
 
             {anchored ? (
               <Pressable style={styles.verifyBtn} onPress={() => Linking.openURL(explorerUrl(a.tx, a.cluster))}>
-                <Text style={styles.verifyText}>{t(UI.verify, lang)}  ↗</Text>
+                <Text style={styles.verifyText}>{t(UI.verify, lang)}</Text>
+                <Icon.ArrowUpRight size={13} color={colors.paper} />
               </Pressable>
             ) : (
               <View style={styles.pendingChip}>
-                <Text style={styles.pendingText}>◷ {t(UI.pending, lang)}</Text>
+                <Icon.Clock size={12} color="rgba(255,255,255,0.7)" />
+                <Text style={styles.pendingText}>{t(UI.pending, lang)}</Text>
               </View>
             )}
           </Card>
@@ -74,7 +77,7 @@ export function HeritageLedgerScreen({ lang, onBack }: { lang: Lang; onBack: () 
       })}
 
       <Card tone="navy" style={styles.popiaCard}>
-        <Text style={styles.popiaMark}>🔒</Text>
+        <Icon.Lock size={20} color={colors.gold} />
         <Muted onDark style={styles.popiaText}>
           {t(UI.popia, lang)}
         </Muted>
@@ -85,18 +88,20 @@ export function HeritageLedgerScreen({ lang, onBack }: { lang: Lang; onBack: () 
 
 const styles = StyleSheet.create({
   intro: { marginBottom: spacing.lg },
+  workTitle: { fontFamily: fonts.serifSemi, fontSize: type.title + 2 },
   card: { marginBottom: spacing.md },
   meta: { marginTop: 2 },
   fieldLabel: {
-    color: colors.slate,
+    color: "rgba(255,255,255,0.5)",
     fontFamily: fonts.bodyBold,
     fontSize: type.small - 1,
     letterSpacing: 1,
     textTransform: "uppercase",
     marginTop: spacing.md,
   },
-  mono: { color: colors.navy, fontFamily: fonts.bodyMedium, fontSize: type.small + 1, marginTop: 2 },
+  mono: { color: "rgba(255,255,255,0.85)", fontFamily: fonts.bodyMedium, fontSize: type.small + 1, marginTop: 2 },
   link: { color: colors.orange, fontFamily: fonts.bodySemi },
+  linkRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   verifyBtn: {
     alignSelf: "flex-start",
     marginTop: spacing.md,
@@ -104,6 +109,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingVertical: 8,
     paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   verifyText: {
     color: colors.paper,
@@ -116,12 +124,15 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: spacing.md,
     borderWidth: 1,
-    borderColor: colors.slate,
+    borderColor: "rgba(255,255,255,0.3)",
     borderRadius: radius.pill,
     paddingVertical: 7,
     paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
-  pendingText: { color: colors.slate, fontFamily: fonts.bodySemi, fontSize: type.small },
+  pendingText: { color: "rgba(255,255,255,0.7)", fontFamily: fonts.bodySemi, fontSize: type.small },
   popiaCard: { flexDirection: "row", gap: spacing.md, marginTop: spacing.lg, alignItems: "flex-start" },
   popiaMark: { fontSize: 22 },
   popiaText: { flex: 1, fontStyle: "italic", lineHeight: 20 },

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { colors, spacing, fonts } from "../theme/tokens";
+import { spacing, fonts } from "../theme/tokens";
 import { Kicker, Display } from "./Type";
 
 // Consistent page header — an orange back link, an optional kicker, and an Anton page title. Used by
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   wrap: { marginBottom: spacing.lg },
   back: { marginBottom: spacing.md },
   backText: {
-    color: colors.orange,
+    color: "rgba(255,255,255,0.65)",
     fontFamily: fonts.bodyBold,
     fontSize: 13,
     letterSpacing: 1.5,

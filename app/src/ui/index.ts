@@ -5,3 +5,4 @@ export { ScreenHeader } from "./ScreenHeader";
 export { Card, cardShadow } from "./Card";
 export { Rule } from "./Rule";
 export { Display, Title, Kicker, SectionLabel, Body, Meta, Muted } from "./Type";
+export { Icon } from "./Icon";

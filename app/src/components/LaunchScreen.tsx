@@ -1,121 +1,125 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, spacing, fonts, motion } from "../theme/tokens";
+import { colors, spacing, fonts } from "../theme/tokens";
 
-// Branded opening frame — the first thing a judge (and the demo video) sees. The wordmark fades up
-// over a baobab-dusk gradient, holds a beat, then the whole cover fades out to reveal the app.
-// Overlays the real UI (which renders underneath once fonts are ready), so there's no white flash.
+// Branded opening frame — the first thing a judge (and the demo video) sees. A dramatic
+// black-and-white South African image with the "UBUNTU HERITAGE" wordmark. TAP anywhere to enter the
+// app (a gentle auto-advance is the fallback so it never gets stuck). Uses ImageBackground so the photo
+// reliably fills on web + native.
 
 export function LaunchScreen({ onDone }: { onDone: () => void }) {
   const wordmark = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(12)).current;
+  const hint = useRef(new Animated.Value(0)).current;
   const cover = useRef(new Animated.Value(1)).current;
+  const done = useRef(false);
+
+  const finish = () => {
+    if (done.current) return;
+    done.current = true;
+    Animated.timing(cover, { toValue: 0, duration: 340, useNativeDriver: true }).start(() => onDone());
+  };
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(wordmark, {
-          toValue: 1,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rise, {
-          toValue: 0,
-          duration: 700,
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.delay(650),
-      Animated.timing(cover, {
-        toValue: 0,
-        duration: motion.slow,
-        useNativeDriver: true,
-      }),
-    ]).start(() => onDone());
-  }, [cover, rise, wordmark]);
+    Animated.parallel([
+      Animated.timing(wordmark, { toValue: 1, duration: 700, useNativeDriver: true }),
+      Animated.timing(rise, { toValue: 0, duration: 700, useNativeDriver: true }),
+    ]).start();
+    // Pulsing "tap to enter" hint.
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(hint, { toValue: 1, duration: 1100, delay: 900, useNativeDriver: true }),
+        Animated.timing(hint, { toValue: 0.35, duration: 1100, useNativeDriver: true }),
+      ])
+    ).start();
+    // Fallback auto-advance so a hands-free demo never stalls.
+    const timer = setTimeout(finish, 6000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Animated.View
-      style={[StyleSheet.absoluteFill, styles.root, { opacity: cover }]}
-      pointerEvents="none"
-    >
-      <LinearGradient
-        colors={[colors.navyDeep, colors.navy, colors.card]}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <LinearGradient
-        colors={[colors.glowEmber, "transparent"]}
-        style={styles.topGlow}
-        pointerEvents="none"
-      />
-      <Animated.View
-        style={{ opacity: wordmark, transform: [{ translateY: rise }], alignItems: "center" }}
-      >
-        {/* Rising-sun mark — same emblem as the home masthead, tying the cover to the app. */}
-        <View style={styles.emblem}>
-          <View style={styles.emblemRing} />
-          <View style={styles.emblemCore} />
-        </View>
-        <Text style={styles.kicker}>Reclaiming African Voices</Text>
-        <Text style={styles.brand}>Maloba</Text>
-        <View style={styles.rule} />
-        <Text style={styles.tagline}>Mantswe a maloba</Text>
-        <Text style={styles.sub}>Voices of Yesterday</Text>
-      </Animated.View>
+    <Animated.View style={[StyleSheet.absoluteFill, { opacity: cover }]}>
+      <Pressable style={StyleSheet.absoluteFill} onPress={finish} accessibilityRole="button" accessibilityLabel="Enter Ubuntu Heritage">
+        <ImageBackground
+          source={require("../../assets/brand/launch-bg.jpg")}
+          style={styles.bg}
+          resizeMode="cover"
+        >
+          {/* Light scrim — enough for legible type, but the zebra stays clearly visible. */}
+          <LinearGradient
+            colors={["rgba(8,6,4,0.45)", "rgba(8,6,4,0.05)", "rgba(8,6,4,0.35)", "rgba(8,6,4,0.9)"]}
+            locations={[0, 0.38, 0.7, 1]}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
+
+          <Animated.View style={{ opacity: wordmark, transform: [{ translateY: rise }], alignItems: "center" }}>
+            <Text style={styles.kicker}>Reclaiming African Voices</Text>
+            <Text style={styles.brandLine}>Ubuntu</Text>
+            <Text style={styles.brandLine}>Heritage</Text>
+            <Text style={styles.country}>South Africa</Text>
+            <View style={styles.rule} />
+            <Text style={styles.tagline}>Mantswe a maloba — Voices of Yesterday</Text>
+          </Animated.View>
+
+          <Animated.Text style={[styles.hint, { opacity: hint }]}>Tap to enter</Animated.Text>
+        </ImageBackground>
+      </Pressable>
     </Animated.View>
   );
 }
 
+const shadow = { textShadowColor: "rgba(0,0,0,0.75)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 16 };
+
 const styles = StyleSheet.create({
-  root: { alignItems: "center", justifyContent: "center" },
-  topGlow: { position: "absolute", top: 0, left: 0, right: 0, height: 260 },
-  emblem: { width: 52, height: 52, alignItems: "center", justifyContent: "center", marginBottom: spacing.lg },
-  emblemRing: {
-    position: "absolute",
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 2,
-    borderColor: colors.gold,
-  },
-  emblemCore: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.orange },
+  bg: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#0d0b0a" },
   kicker: {
     color: colors.gold,
     fontFamily: fonts.bodySemi,
     fontSize: 12,
     letterSpacing: 4,
     textTransform: "uppercase",
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
+    ...shadow,
   },
-  brand: {
+  brandLine: {
     color: colors.sand,
     fontFamily: fonts.display,
-    fontSize: 72,
-    letterSpacing: 2,
+    fontSize: 60,
+    lineHeight: 58,
+    letterSpacing: 1,
     textTransform: "uppercase",
+    ...shadow,
   },
-  rule: {
-    width: 56,
-    height: 3,
-    backgroundColor: colors.orange,
-    borderRadius: 2,
-    marginVertical: spacing.md,
+  country: {
+    color: colors.gold,
+    fontFamily: fonts.bodyBold,
+    fontSize: 14,
+    letterSpacing: 6,
+    textTransform: "uppercase",
+    marginTop: spacing.md,
+    ...shadow,
   },
+  rule: { width: 56, height: 2, backgroundColor: colors.orange, borderRadius: 2, marginTop: spacing.md },
   tagline: {
     color: colors.sand,
-    fontFamily: fonts.bodyMedium,
-    fontSize: 16,
+    fontFamily: fonts.serifItalic,
+    fontSize: 15,
+    marginTop: spacing.md,
+    opacity: 0.92,
+    ...shadow,
+  },
+  hint: {
+    position: "absolute",
+    bottom: 46,
+    alignSelf: "center",
+    color: colors.sand,
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
     letterSpacing: 3,
     textTransform: "uppercase",
-  },
-  sub: {
-    color: colors.muted,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    marginTop: spacing.xs,
-    fontStyle: "italic",
+    ...shadow,
   },
 });

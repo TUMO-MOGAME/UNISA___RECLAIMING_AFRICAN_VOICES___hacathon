@@ -17,6 +17,7 @@ import { SceneImage } from "./SceneImage";
 import { Fade } from "./Motion";
 import { LanguagePicker } from "./LanguagePicker";
 import { colors, spacing, radius, type, fonts, motion } from "../theme/tokens";
+import { Icon } from "../ui";
 
 // The cinematic Reader: full-bleed AI background + scrim + overlaid story text, with
 // Child/Adult and Setswana/English toggles and scene navigation. The Phase-0 demo spine.
@@ -25,10 +26,10 @@ const UI = {
   child: { en: "Child", tn: "Bana" },
   adult: { en: "Adult", tn: "Bagolo" },
   source: { en: "Source", tn: "Motswedi" },
-  prev: { en: "‹ Back", tn: "‹ Morago" },
-  next: { en: "Next ›", tn: "Pele ›" },
-  listen: { en: "🔊 Listen", tn: "🔊 Reetsa" }, // [REVIEW: Setswana — "reetsa" = listen]
-  stopListen: { en: "⏹ Stop", tn: "⏹ Emisa" },
+  prev: { en: "Back", tn: "Morago" },
+  next: { en: "Next", tn: "Pele" },
+  listen: { en: "Listen", tn: "Reetsa" }, // [REVIEW: Setswana — "reetsa" = listen]
+  stopListen: { en: "Stop", tn: "Emisa" },
   interpretation: {
     en: "AI image — artistic interpretation, not a historical photo.",
     tn: "Setshwantsho sa AI — kakanyo ya botaki, e seng senepe sa hisitori.",
@@ -89,7 +90,7 @@ export function CinematicReader({
           <View style={styles.titleWrap}>
             {onBack && (
               <Pressable onPress={onBack} style={styles.backBtn} hitSlop={10}>
-                <Text style={styles.backText}>‹</Text>
+                <Icon.ChevronLeft size={22} color={colors.sand} strokeWidth={2.4} />
               </Pressable>
             )}
             <View style={{ flexShrink: 1 }}>
@@ -115,6 +116,11 @@ export function CinematicReader({
               accessibilityRole="button"
               accessibilityLabel={tts.speaking ? t(UI.stopListen, lang) : t(UI.listen, lang)}
             >
+              {tts.speaking ? (
+                <Icon.Square size={12} color={colors.night} fill={colors.night} />
+              ) : (
+                <Icon.Volume2 size={14} color={colors.sand} />
+              )}
               <Text style={[styles.listenText, tts.speaking && styles.listenTextActive]}>
                 {tts.speaking ? t(UI.stopListen, lang) : t(UI.listen, lang)}
               </Text>
@@ -128,7 +134,10 @@ export function CinematicReader({
           contentContainerStyle={{ paddingBottom: spacing.lg }}
         >
           <Fade key={`${index}-${lang}-${mode}`} duration={motion.base}>
-          <Text style={styles.body}>{body}</Text>
+          <Text style={styles.body}>
+            <Text style={styles.dropCap}>{body.slice(0, 1)}</Text>
+            {body.slice(1)}
+          </Text>
           {bodyRes.status === "fallback" && (
             <Text style={styles.fallback}>
               Shown in English · a reviewed {languageByCode(lang).endonym} translation is coming.
@@ -145,7 +154,8 @@ export function CinematicReader({
           </Text>
           {module.archivePrompt && onArchive && (
             <Pressable style={styles.archiveCta} onPress={onArchive} accessibilityRole="button">
-              <Text style={styles.archiveCtaText}>🎙  {t(module.archivePrompt, lang)}</Text>
+              <Icon.Mic size={15} color={colors.gold} />
+              <Text style={styles.archiveCtaText}>{t(module.archivePrompt, lang)}</Text>
             </Pressable>
           )}
           </Fade>
@@ -155,6 +165,7 @@ export function CinematicReader({
         <View style={styles.nav}>
           <NavButton
             label={t(UI.prev, lang)}
+            dir="prev"
             disabled={index === 0}
             onPress={() => setIndex((i) => Math.max(0, i - 1))}
           />
@@ -163,6 +174,7 @@ export function CinematicReader({
           </Text>
           <NavButton
             label={t(UI.next, lang)}
+            dir="next"
             disabled={index === module.scenes.length - 1}
             onPress={() =>
               setIndex((i) => Math.min(module.scenes.length - 1, i + 1))
@@ -207,10 +219,12 @@ function NavButton({
   label,
   onPress,
   disabled,
+  dir,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  dir?: "prev" | "next";
 }) {
   return (
     <Pressable
@@ -218,13 +232,15 @@ function NavButton({
       disabled={disabled}
       style={[styles.navBtn, disabled && styles.navBtnDisabled]}
     >
+      {dir === "prev" && <Icon.ChevronLeft size={16} color={colors.sand} />}
       <Text style={styles.navBtnText}>{label}</Text>
+      {dir === "next" && <Icon.ChevronRight size={16} color={colors.sand} />}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.night },
+  root: { flex: 1, backgroundColor: "#000" },
   safe: { flex: 1, padding: spacing.lg, justifyContent: "space-between" },
   topBar: { flexDirection: "row", justifyContent: "space-between", gap: spacing.md },
   titleWrap: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexShrink: 1 },
@@ -244,7 +260,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: "uppercase",
   },
-  sceneTitle: { color: colors.sand, fontFamily: fonts.displaySemi, fontSize: type.title + 4, marginTop: 2 },
+  sceneTitle: { color: colors.sand, fontFamily: fonts.serif, fontSize: type.title + 5, lineHeight: type.title + 8, marginTop: 3 },
   toggles: { gap: spacing.sm, alignItems: "flex-end" },
   toggle: {
     flexDirection: "row",
@@ -263,12 +279,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: colors.gold,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   listenBtnActive: { backgroundColor: colors.gold, borderColor: colors.gold },
   listenText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.small },
   listenTextActive: { color: colors.night },
   textArea: { flexGrow: 0, maxHeight: "55%", marginVertical: spacing.lg },
-  body: { color: colors.sand, fontFamily: fonts.body, fontSize: type.body + 1, lineHeight: 29 },
+  body: { color: colors.sand, fontFamily: fonts.serifBody, fontSize: type.body + 1.5, lineHeight: 30 },
+  dropCap: { fontFamily: fonts.display, fontSize: 52, lineHeight: 30, color: colors.gold },
   fallback: {
     color: colors.gold,
     fontFamily: fonts.body,
@@ -288,6 +308,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     paddingVertical: 10,
     paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   archiveCtaText: { color: colors.gold, fontFamily: fonts.bodySemi, fontSize: type.small },
   nav: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
@@ -297,6 +320,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: radius.pill,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   navBtnDisabled: { opacity: 0.35 },
   navBtnText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.body },
