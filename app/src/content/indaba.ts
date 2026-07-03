@@ -1,4 +1,4 @@
-import { Module } from "./types";
+import type { Module } from "./types";
 
 // Grounded in Vusamazulu Credo Mutwa, *Indaba, My Children* (1964).
 // See docs/04-humanities-sources.md. Handle traditional material honestly + with context.

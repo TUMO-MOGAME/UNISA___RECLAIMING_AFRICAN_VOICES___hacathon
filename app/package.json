@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@expo-google-fonts/anton": "^0.4.2",
+    "@expo-google-fonts/barlow": "^0.4.1",
+    "@expo-google-fonts/playfair-display": "^0.4.2",
+    "@expo-google-fonts/spectral": "^0.4.1",
     "expo": "~56.0.12",
     "expo-audio": "~56.0.12",
+    "expo-font": "~56.0.7",
+    "expo-image": "~56.0.11",
+    "expo-linear-gradient": "~56.0.4",
+    "expo-speech": "~56.0.3",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -19,7 +27,11 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\"",
+    "gen:drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-draft-translations.mjs",
+    "gen:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-scene-images.mjs"
   },
   "private": true
 }

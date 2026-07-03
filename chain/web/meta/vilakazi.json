@@ -1,0 +1,29 @@
+{
+  "name": "Maloba · Inkondlo kaZulu",
+  "symbol": "MALOBA",
+  "description": "Heritage certificate — Inkondlo kaZulu by B.W. Vilakazi (1935). Maloba: Reclaiming African Voices. Provenance anchored on Solana; content fingerprinted (IPFS QmR3XckkF3ypBLAoPNcqPx1kcEa8EQByTq19mnyRv129Pf, SHA-256 73d5d595c190d021eda9725a7da026cf25e074a1bdd5a1f39dad8ebe2aeacae5).",
+  "image": "https://image.pollinations.ai/prompt/A%20Zulu%20imbongi%20praise%20poet%20performing%20oral%20poetry%20with%20raised%20staff%2C%20dignified%2C%20golden%20hour%2C%20cinematic%20photorealistic?model=flux&width=1024&height=1024&seed=44&nologo=true",
+  "external_url": "https://maloba.app",
+  "attributes": [
+    {
+      "trait_type": "Author",
+      "value": "B.W. Vilakazi"
+    },
+    {
+      "trait_type": "Year",
+      "value": "1935"
+    },
+    {
+      "trait_type": "IPFS CID",
+      "value": "QmR3XckkF3ypBLAoPNcqPx1kcEa8EQByTq19mnyRv129Pf"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "73d5d595c190d021eda9725a7da026cf25e074a1bdd5a1f39dad8ebe2aeacae5"
+    },
+    {
+      "trait_type": "Chain",
+      "value": "Solana devnet"
+    }
+  ]
+}

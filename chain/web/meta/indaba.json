@@ -1,0 +1,29 @@
+{
+  "name": "Maloba · Indaba, My Children",
+  "symbol": "MALOBA",
+  "description": "Heritage certificate — Indaba, My Children by Vusamazulu Credo Mutwa (1964). Maloba: Reclaiming African Voices. Provenance anchored on Solana; content fingerprinted (IPFS QmfXqrny67c4qZGEHUXrqtWaAUbLDeA5C9PTKgfQ7zDZja, SHA-256 763f1d913696315690d2c29b8c877b04dcc6d2ed2484110fea9ee1676b338a8c).",
+  "image": "https://image.pollinations.ai/prompt/African%20creation%20cosmology%2C%20the%20Tree%20of%20Life%20and%20the%20great%20Earth%20Mother%2C%20mystical%2C%20warm%20cinematic%20painterly?model=flux&width=1024&height=1024&seed=43&nologo=true",
+  "external_url": "https://maloba.app",
+  "attributes": [
+    {
+      "trait_type": "Author",
+      "value": "Vusamazulu Credo Mutwa"
+    },
+    {
+      "trait_type": "Year",
+      "value": "1964"
+    },
+    {
+      "trait_type": "IPFS CID",
+      "value": "QmfXqrny67c4qZGEHUXrqtWaAUbLDeA5C9PTKgfQ7zDZja"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "763f1d913696315690d2c29b8c877b04dcc6d2ed2484110fea9ee1676b338a8c"
+    },
+    {
+      "trait_type": "Chain",
+      "value": "Solana devnet"
+    }
+  ]
+}

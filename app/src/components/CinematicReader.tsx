@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,15 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Module, Lang, Mode } from "../content/types";
-import { sceneImageUrl } from "../services/pollinations";
+import { sceneImageSource } from "../content/images";
+import { useTts } from "../services/tts";
+import { t, resolveText, languageByCode } from "../i18n";
+import { draftText } from "../content/drafts";
+import { LinearGradient } from "expo-linear-gradient";
 import { SceneImage } from "./SceneImage";
-import { colors, spacing, radius, type } from "../theme/tokens";
+import { Fade } from "./Motion";
+import { LanguagePicker } from "./LanguagePicker";
+import { colors, spacing, radius, type, fonts, motion } from "../theme/tokens";
 
 // The cinematic Reader: full-bleed AI background + scrim + overlaid story text, with
 // Child/Adult and Setswana/English toggles and scene navigation. The Phase-0 demo spine.
@@ -21,6 +27,8 @@ const UI = {
   source: { en: "Source", tn: "Motswedi" },
   prev: { en: "‹ Back", tn: "‹ Morago" },
   next: { en: "Next ›", tn: "Pele ›" },
+  listen: { en: "🔊 Listen", tn: "🔊 Reetsa" }, // [REVIEW: Setswana — "reetsa" = listen]
+  stopListen: { en: "⏹ Stop", tn: "⏹ Emisa" },
   interpretation: {
     en: "AI image — artistic interpretation, not a historical photo.",
     tn: "Setshwantsho sa AI — kakanyo ya botaki, e seng senepe sa hisitori.",
@@ -32,28 +40,48 @@ export function CinematicReader({
   lang,
   onLangChange,
   onBack,
+  onArchive,
 }: {
   module: Module;
   lang: Lang;
   onLangChange: (l: Lang) => void;
   onBack?: () => void;
+  onArchive?: () => void;
 }) {
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<Mode>("adult");
+  const tts = useTts();
 
   const scene = module.scenes[index];
-  const imageUri = useMemo(
-    () => sceneImageUrl(scene.imagePrompt, { seed: scene.seed }),
-    [scene]
+  const imageSource = useMemo(
+    () => sceneImageSource(module.id, scene.id, scene.imagePrompt, { seed: scene.seed }),
+    [module.id, scene]
   );
 
-  const body = mode === "child" ? scene.childText[lang] : scene.text[lang];
+  // Resolve the passage in the chosen language: human-reviewed copy first, then a pre-generated
+  // machine draft (labelled), else an honest English fallback. `bodyRes.lang` is the language the
+  // text is ACTUALLY in — we narrate in that, never mislabelling it.
+  const field = mode === "child" ? "childText" : "text";
+  const bodyLoc = mode === "child" ? scene.childText : scene.text;
+  const bodyRes = resolveText(bodyLoc, lang, draftText(module.id, scene.id, field, lang));
+  const body = bodyRes.text;
+
+  // Stop narration when the text underneath it changes (scene, language, or reading level),
+  // so we never keep reading a passage that's no longer on screen.
+  useEffect(() => {
+    tts.stop();
+  }, [index, lang, mode]);
 
   return (
     <View style={styles.root}>
-      <SceneImage uri={imageUri} />
-      {/* scrim for text legibility (accessibility) */}
-      <View style={styles.scrim} pointerEvents="none" />
+      <SceneImage source={imageSource} kenBurns />
+      {/* cinematic scrim — legible at top (title) and bottom (nav), image breathes in the middle */}
+      <LinearGradient
+        colors={["rgba(14,11,7,0.72)", "rgba(14,11,7,0.28)", "rgba(14,11,7,0.9)"]}
+        locations={[0, 0.42, 1]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
 
       <SafeAreaView style={styles.safe}>
         {/* Top bar: title + language + mode toggles */}
@@ -68,45 +96,65 @@ export function CinematicReader({
               <Text style={styles.kicker}>
                 {module.title} · {module.author}
               </Text>
-              <Text style={styles.sceneTitle}>{scene.title[lang]}</Text>
+              <Text style={styles.sceneTitle}>{t(scene.title, lang)}</Text>
             </View>
           </View>
           <View style={styles.toggles}>
+            <LanguagePicker lang={lang} onChange={onLangChange} compact />
             <Toggle
               options={[
-                { key: "en", label: "EN" },
-                { key: "tn", label: "TSW" },
-              ]}
-              value={lang}
-              onChange={(v) => onLangChange(v as Lang)}
-            />
-            <Toggle
-              options={[
-                { key: "adult", label: UI.adult[lang] },
-                { key: "child", label: UI.child[lang] },
+                { key: "adult", label: t(UI.adult, lang) },
+                { key: "child", label: t(UI.child, lang) },
               ]}
               value={mode}
               onChange={(v) => setMode(v as Mode)}
             />
+            <Pressable
+              onPress={() => (tts.speaking ? tts.stop() : tts.speak(body, bodyRes.lang))}
+              style={[styles.listenBtn, tts.speaking && styles.listenBtnActive]}
+              accessibilityRole="button"
+              accessibilityLabel={tts.speaking ? t(UI.stopListen, lang) : t(UI.listen, lang)}
+            >
+              <Text style={[styles.listenText, tts.speaking && styles.listenTextActive]}>
+                {tts.speaking ? t(UI.stopListen, lang) : t(UI.listen, lang)}
+              </Text>
+            </Pressable>
           </View>
         </View>
 
-        {/* Story text */}
+        {/* Story text — cross-fades when the scene, language, or reading level changes */}
         <ScrollView
           style={styles.textArea}
           contentContainerStyle={{ paddingBottom: spacing.lg }}
         >
+          <Fade key={`${index}-${lang}-${mode}`} duration={motion.base}>
           <Text style={styles.body}>{body}</Text>
-          <Text style={styles.interp}>{UI.interpretation[lang]}</Text>
+          {bodyRes.status === "fallback" && (
+            <Text style={styles.fallback}>
+              Shown in English · a reviewed {languageByCode(lang).endonym} translation is coming.
+            </Text>
+          )}
+          {bodyRes.status === "draft" && (
+            <Text style={styles.fallback}>
+              {languageByCode(lang).endonym} · machine translation, unreviewed draft.
+            </Text>
+          )}
+          <Text style={styles.interp}>{t(UI.interpretation, lang)}</Text>
           <Text style={styles.source}>
-            {UI.source[lang]}: {scene.sourceNote}
+            {t(UI.source, lang)}: {scene.sourceNote}
           </Text>
+          {module.archivePrompt && onArchive && (
+            <Pressable style={styles.archiveCta} onPress={onArchive} accessibilityRole="button">
+              <Text style={styles.archiveCtaText}>🎙  {t(module.archivePrompt, lang)}</Text>
+            </Pressable>
+          )}
+          </Fade>
         </ScrollView>
 
         {/* Scene nav */}
         <View style={styles.nav}>
           <NavButton
-            label={UI.prev[lang]}
+            label={t(UI.prev, lang)}
             disabled={index === 0}
             onPress={() => setIndex((i) => Math.max(0, i - 1))}
           />
@@ -114,7 +162,7 @@ export function CinematicReader({
             {index + 1} / {module.scenes.length}
           </Text>
           <NavButton
-            label={UI.next[lang]}
+            label={t(UI.next, lang)}
             disabled={index === module.scenes.length - 1}
             onPress={() =>
               setIndex((i) => Math.min(module.scenes.length - 1, i + 1))
@@ -177,14 +225,6 @@ function NavButton({
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.night },
-  scrim: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.scrim,
-  },
   safe: { flex: 1, padding: spacing.lg, justifyContent: "space-between" },
   topBar: { flexDirection: "row", justifyContent: "space-between", gap: spacing.md },
   titleWrap: { flexDirection: "row", alignItems: "center", gap: spacing.sm, flexShrink: 1 },
@@ -199,11 +239,12 @@ const styles = StyleSheet.create({
   backText: { color: colors.sand, fontSize: 24, lineHeight: 26, marginTop: -2 },
   kicker: {
     color: colors.gold,
+    fontFamily: fonts.bodySemi,
     fontSize: type.small,
     letterSpacing: 1,
     textTransform: "uppercase",
   },
-  sceneTitle: { color: colors.sand, fontSize: type.title, fontWeight: "700", marginTop: 2 },
+  sceneTitle: { color: colors.sand, fontFamily: fonts.displaySemi, fontSize: type.title + 4, marginTop: 2 },
   toggles: { gap: spacing.sm, alignItems: "flex-end" },
   toggle: {
     flexDirection: "row",
@@ -213,14 +254,44 @@ const styles = StyleSheet.create({
   },
   toggleItem: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: radius.pill },
   toggleItemActive: { backgroundColor: colors.gold },
-  toggleText: { color: colors.muted, fontSize: type.small, fontWeight: "600" },
+  toggleText: { color: colors.muted, fontFamily: fonts.bodySemi, fontSize: type.small },
   toggleTextActive: { color: colors.night },
+  listenBtn: {
+    backgroundColor: colors.scrimStrong,
+    borderRadius: radius.pill,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: colors.gold,
+  },
+  listenBtnActive: { backgroundColor: colors.gold, borderColor: colors.gold },
+  listenText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.small },
+  listenTextActive: { color: colors.night },
   textArea: { flexGrow: 0, maxHeight: "55%", marginVertical: spacing.lg },
-  body: { color: colors.sand, fontSize: type.body, lineHeight: 26 },
-  interp: { color: colors.muted, fontSize: type.small, fontStyle: "italic", marginTop: spacing.lg },
-  source: { color: colors.muted, fontSize: type.small, marginTop: spacing.xs },
+  body: { color: colors.sand, fontFamily: fonts.body, fontSize: type.body + 1, lineHeight: 29 },
+  fallback: {
+    color: colors.gold,
+    fontFamily: fonts.body,
+    fontSize: type.small,
+    lineHeight: 18,
+    marginTop: spacing.md,
+    fontStyle: "italic",
+  },
+  interp: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, fontStyle: "italic", marginTop: spacing.lg },
+  source: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, marginTop: spacing.xs },
+  archiveCta: {
+    alignSelf: "flex-start",
+    marginTop: spacing.lg,
+    backgroundColor: colors.scrimStrong,
+    borderWidth: 1,
+    borderColor: colors.gold,
+    borderRadius: radius.pill,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  archiveCtaText: { color: colors.gold, fontFamily: fonts.bodySemi, fontSize: type.small },
   nav: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  progress: { color: colors.muted, fontSize: type.small },
+  progress: { color: colors.muted, fontFamily: fonts.bodyMedium, fontSize: type.small },
   navBtn: {
     backgroundColor: colors.scrimStrong,
     paddingVertical: 10,
@@ -228,5 +299,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   navBtnDisabled: { opacity: 0.35 },
-  navBtnText: { color: colors.sand, fontSize: type.body, fontWeight: "600" },
+  navBtnText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.body },
 });

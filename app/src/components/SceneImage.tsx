@@ -1,39 +1,52 @@
-import React, { useState } from "react";
-import { Image, View, ActivityIndicator, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, StyleSheet, View } from "react-native";
+import { Image } from "expo-image";
 import { colors } from "../theme/tokens";
 
-// Full-bleed cinematic background image with a loading state and a graceful failure fallback.
-// Never a hung spinner or crash (accessibility rule, docs/07). Phase 1 upgrades to expo-image
-// for disk caching (T008).
+// Full-bleed cinematic background. Uses expo-image for disk caching (offline / low-data — an
+// accessibility win, task T008) and a built-in cross-fade on load, over a warm placeholder so there
+// is never a white flash or a hung spinner. An optional slow "Ken Burns" drift adds cinematic life
+// to the Reader's hero image (disabled for list thumbnails to keep them calm and cheap).
 
-export function SceneImage({ uri }: { uri: string }) {
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
+// `source` is either a remote URL (Pollinations) or a bundled asset id (a generated local image).
+export function SceneImage({
+  source,
+  kenBurns = false,
+}: {
+  source: string | number;
+  kenBurns?: boolean;
+}) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!kenBurns) return;
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(scale, { toValue: 1.08, duration: 14000, useNativeDriver: true }),
+        Animated.timing(scale, { toValue: 1.0, duration: 14000, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [scale, kenBurns]);
 
   return (
-    <View style={[StyleSheet.absoluteFill, styles.fallback]}>
-      {!failed && (
+    <View style={[StyleSheet.absoluteFill, styles.bg]}>
+      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scale }] }]}>
         <Image
-          source={{ uri }}
+          // Only a remote URL string needs wrapping in { uri }. A local asset — a number on native,
+          // an object on web (from require) — must be passed through untouched.
+          source={typeof source === "string" ? { uri: source } : source}
           style={StyleSheet.absoluteFill}
-          resizeMode="cover"
-          onLoadEnd={() => setLoading(false)}
-          onError={() => {
-            setFailed(true);
-            setLoading(false);
-          }}
+          contentFit="cover"
+          transition={500}
+          cachePolicy="disk"
         />
-      )}
-      {loading && !failed && (
-        <View style={[StyleSheet.absoluteFill, styles.center]}>
-          <ActivityIndicator color={colors.gold} size="large" />
-        </View>
-      )}
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  fallback: { backgroundColor: colors.ink },
-  center: { alignItems: "center", justifyContent: "center" },
+  bg: { backgroundColor: colors.ink, overflow: "hidden" },
 });

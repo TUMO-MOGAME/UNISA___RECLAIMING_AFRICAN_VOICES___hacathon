@@ -1,4 +1,4 @@
-import { Module } from "./types";
+import type { Module } from "./types";
 
 // Grounded in Sol Plaatje, *Mhudi* (1930) — see docs/04-humanities-sources.md.
 // NOTE(setswana): the `tn` fields are AI-assisted DRAFTS and must be reviewed by a

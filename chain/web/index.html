@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maloba · Heritage Notary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --paper:#F4EEE1; --card:#fff; --navy:#16293F; --orange:#D96A1C; --gold:#EBA43C;
+        --slate:#5D6B79; --line:rgba(21,41,63,.12);
+      }
+      * { box-sizing:border-box; }
+      body { margin:0; background:var(--paper); color:var(--navy);
+             font-family:Barlow,system-ui,sans-serif; line-height:1.5; }
+      .wrap { max-width:720px; margin:0 auto; padding:32px 20px 64px; }
+      .kicker { color:var(--orange); font-weight:700; letter-spacing:3px; text-transform:uppercase; font-size:12px; }
+      h1 { font-family:Anton,sans-serif; font-weight:400; font-size:56px; letter-spacing:1px;
+           text-transform:uppercase; margin:6px 0 2px; }
+      .rule { width:60px; height:4px; background:var(--orange); border-radius:2px; margin:14px 0; }
+      .sub { color:var(--slate); font-style:italic; margin-bottom:8px; }
+      p.lead { font-size:16px; }
+      .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:18px 0; }
+      input[type=text] { flex:1; min-width:240px; padding:11px 14px; border:1px solid var(--line);
+                         border-radius:10px; font-family:inherit; font-size:14px; color:var(--navy); background:#fff; }
+      button { font-family:Barlow,sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+               border:0; border-radius:999px; padding:12px 20px; font-size:13px; cursor:pointer; }
+      .btn-primary { background:var(--orange); color:var(--paper); }
+      .btn-navy { background:var(--navy); color:var(--paper); }
+      .btn-primary:disabled, .btn-navy:disabled { opacity:.45; cursor:not-allowed; }
+      .status { padding:12px 16px; border-radius:12px; background:#fff; border:1px solid var(--line);
+                font-size:14px; margin:12px 0; }
+      .status.ok { border-color:var(--orange); }
+      .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 18px;
+              margin:12px 0; box-shadow:0 8px 22px rgba(22,41,63,.08); }
+      .card h3 { font-family:Anton,sans-serif; font-weight:400; font-size:24px; letter-spacing:.5px;
+                 text-transform:uppercase; margin:0; }
+      .meta { color:var(--orange); font-weight:700; font-size:12px; letter-spacing:1px; text-transform:uppercase; margin:2px 0 8px; }
+      .fld { color:var(--slate); font-weight:700; font-size:11px; letter-spacing:1px; text-transform:uppercase; margin-top:8px; }
+      .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; word-break:break-all; color:var(--navy); }
+      a { color:var(--orange); font-weight:700; }
+      .navycard { background:var(--navy); color:var(--paper); border-radius:16px; padding:16px 18px; margin-top:20px; font-size:13px; }
+      .navycard b { color:var(--gold); }
+      .tx { margin-top:6px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="kicker">Reclaiming African Voices</div>
+      <h1>Heritage Notary</h1>
+      <div class="rule"></div>
+      <div class="sub">Mantswe a maloba — notarised forever</div>
+      <p class="lead">
+        Anchor South Africa's foundational literature on the Solana blockchain — permanent,
+        tamper-evident, and community-owned. Connect your Phantom wallet (Devnet) and sign once to
+        notarise all four works. <b>POPIA-safe:</b> only public works + content hashes go on-chain,
+        never a person's recording.
+      </p>
+
+      <div class="row">
+        <input id="rpc" type="text" value="https://solana-devnet.api.onfinality.io/public"
+               placeholder="Devnet RPC URL" />
+      </div>
+      <div class="row">
+        <button id="connect" class="btn-navy">Connect Phantom</button>
+        <button id="notarise" class="btn-primary" disabled>Notarise all on Devnet</button>
+      </div>
+
+      <div id="status" class="status">Not connected.</div>
+      <div id="works"></div>
+
+      <div class="navycard">
+        🔒 <b>Privacy first (POPIA).</b> This notarises only the public literary canon and its
+        cryptographic hashes. Community members' personal voice recordings are never placed on-chain —
+        they stay in private, erasable storage the contributor controls.
+      </div>
+    </div>
+
+    <script type="module">
+      import { Buffer } from "https://esm.sh/buffer@6.0.3";
+      globalThis.Buffer = Buffer;
+      import {
+        Connection, PublicKey, Transaction, TransactionInstruction, Keypair, SystemProgram,
+      } from "https://esm.sh/@solana/web3.js@1.95.3?bundle";
+      import {
+        MINT_SIZE, TOKEN_PROGRAM_ID, getMinimumBalanceForRentExemptMint,
+        createInitializeMint2Instruction, getAssociatedTokenAddressSync,
+        createAssociatedTokenAccountInstruction, createMintToInstruction,
+      } from "https://esm.sh/@solana/spl-token@0.4.9?bundle&deps=@solana/web3.js@1.95.3";
+      import {
+        createCreateMetadataAccountV3Instruction, createCreateMasterEditionV3Instruction,
+        PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
+      } from "https://esm.sh/@metaplex-foundation/mpl-token-metadata@2.13.0?bundle&deps=@solana/web3.js@1.95.3";
+
+      const MEMO = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+      const CLUSTER = "devnet";
+      const rpc = () => document.getElementById("rpc").value.trim() || "https://solana-devnet.api.onfinality.io/public";
+      const ORIGIN = location.origin; // metadata + images are served from this page
+
+      // Maloba's public canon + real content fingerprints (from chain/anchor.mjs).
+      const WORKS = [
+        { id:"mhudi", title:"Mhudi", author:"Sol T. Plaatje", year:1930,
+          cid:"QmS7yTdvrDyM6t8ixVAG8gNhCeM7os4JZ6b6cjG6itZjDv",
+          sha256:"70d0fd49add448d6ced8d751421dc6beca53e270a4e5a5cb26aeab5259eb6d43" },
+        { id:"ityala-lamawele", title:"Ityala Lamawele", author:"S.E.K. Mqhayi", year:1914,
+          cid:"QmWN17Rxo1jfCjUaf954ikwozZa7p3XvoSBa1MMDmhgsRG",
+          sha256:"b25017a431ce388ac3ff4b7d7d70874cf2ba4c4075d2bd62fc076cc67eda5fac" },
+        { id:"indaba", title:"Indaba, My Children", author:"Vusamazulu Credo Mutwa", year:1964,
+          cid:"QmfXqrny67c4qZGEHUXrqtWaAUbLDeA5C9PTKgfQ7zDZja",
+          sha256:"763f1d913696315690d2c29b8c877b04dcc6d2ed2484110fea9ee1676b338a8c" },
+        { id:"vilakazi", title:"Inkondlo kaZulu", author:"B.W. Vilakazi", year:1935,
+          cid:"QmR3XckkF3ypBLAoPNcqPx1kcEa8EQByTq19mnyRv129Pf",
+          sha256:"73d5d595c190d021eda9725a7da026cf25e074a1bdd5a1f39dad8ebe2aeacae5" },
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      const setStatus = (msg, ok=false) => { const s=$("status"); s.innerHTML=msg; s.className="status"+(ok?" ok":""); };
+      const provider = () => window.phantom?.solana ?? window.solana;
+      const short = (s) => s.length>18 ? s.slice(0,10)+"…"+s.slice(-8) : s;
+
+      function renderWorks() {
+        $("works").innerHTML = WORKS.map((w) => `
+          <div class="card">
+            <h3>${w.title}</h3>
+            <div class="meta">${w.author} · ${w.year}</div>
+            <div class="fld">IPFS content ID</div><div class="mono">${short(w.cid)}</div>
+            <div class="fld">SHA-256 fingerprint</div><div class="mono">${short(w.sha256)}</div>
+            <div class="tx" id="tx-${w.id}"></div>
+            <button class="btn-navy mintbtn" data-id="${w.id}" style="margin-top:12px">Mint certificate → my Phantom</button>
+            <div class="mono" id="mr-${w.id}" style="margin-top:6px"></div>
+          </div>`).join("");
+      }
+      function setVerify(sig) {
+        for (const w of WORKS) {
+          const el = document.getElementById("tx-" + w.id);
+          if (el) el.innerHTML = `<a href="https://explorer.solana.com/tx/${sig}?cluster=${CLUSTER}" target="_blank" rel="noopener">Verify provenance on Solana ↗</a>`;
+        }
+      }
+      renderWorks();
+
+      let pubkey = null;
+
+      // Mint a one-of-one Metaplex NFT (name + image = the work) into the connected wallet.
+      async function mintCertificate(work) {
+        const conn = new Connection(rpc(), "confirmed");
+        const mint = Keypair.generate();
+        const ata = getAssociatedTokenAddressSync(mint.publicKey, pubkey);
+        const seeds = (extra) => [Buffer.from("metadata"), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mint.publicKey.toBuffer(), ...extra];
+        const [metadataPda] = PublicKey.findProgramAddressSync(seeds([]), TOKEN_METADATA_PROGRAM_ID);
+        const [editionPda] = PublicKey.findProgramAddressSync(seeds([Buffer.from("edition")]), TOKEN_METADATA_PROGRAM_ID);
+        const rent = await getMinimumBalanceForRentExemptMint(conn);
+
+        const tx = new Transaction().add(
+          SystemProgram.createAccount({ fromPubkey: pubkey, newAccountPubkey: mint.publicKey, space: MINT_SIZE, lamports: rent, programId: TOKEN_PROGRAM_ID }),
+          createInitializeMint2Instruction(mint.publicKey, 0, pubkey, pubkey),
+          createAssociatedTokenAccountInstruction(pubkey, ata, pubkey, mint.publicKey),
+          createMintToInstruction(mint.publicKey, ata, pubkey, 1),
+          createCreateMetadataAccountV3Instruction(
+            { metadata: metadataPda, mint: mint.publicKey, mintAuthority: pubkey, payer: pubkey, updateAuthority: pubkey },
+            { createMetadataAccountArgsV3: { data: { name: `Maloba · ${work.title}`.slice(0, 32), symbol: "MALOBA", uri: `${ORIGIN}/meta/${work.id}.json`, sellerFeeBasisPoints: 0, creators: null, collection: null, uses: null }, isMutable: true, collectionDetails: null } }
+          ),
+          createCreateMasterEditionV3Instruction(
+            { edition: editionPda, mint: mint.publicKey, updateAuthority: pubkey, mintAuthority: pubkey, payer: pubkey, metadata: metadataPda },
+            { createMasterEditionArgs: { maxSupply: 0 } }
+          )
+        );
+        tx.feePayer = pubkey;
+        const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("finalized");
+        tx.recentBlockhash = blockhash;
+        tx.partialSign(mint); // the new mint account signs
+        const signedTx = await provider().signTransaction(tx); // Phantom signs as payer + authority
+        const sig = await conn.sendRawTransaction(signedTx.serialize());
+        await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+        return { sig, mint: mint.publicKey.toBase58() };
+      }
+
+      $("works").addEventListener("click", async (ev) => {
+        const btn = ev.target.closest(".mintbtn");
+        if (!btn) return;
+        if (!pubkey) { alert("Connect Phantom first."); return; }
+        const work = WORKS.find((w) => w.id === btn.dataset.id);
+        const out = document.getElementById("mr-" + work.id);
+        btn.disabled = true;
+        out.innerHTML = "Approve the mint in Phantom…";
+        try {
+          const { mint } = await mintCertificate(work);
+          out.innerHTML = `✓ Minted! <a href="https://explorer.solana.com/address/${mint}?cluster=${CLUSTER}" target="_blank" rel="noopener">View NFT ↗</a> — open Phantom → Collectibles.`;
+        } catch (e) {
+          console.error(e);
+          out.innerHTML = "Failed: " + (e.message || e);
+          btn.disabled = false;
+        }
+      });
+
+      $("connect").onclick = async () => {
+        const p = provider();
+        if (!p) { setStatus("Phantom not found. Install the Phantom browser extension, then reload."); return; }
+        try {
+          const res = await p.connect();
+          pubkey = res.publicKey;
+          setStatus(`Connected: <span class="mono">${pubkey.toBase58()}</span><br>Make sure Phantom is set to <b>Devnet</b>, then click “Notarise”.`, true);
+          $("notarise").disabled = false;
+        } catch (e) { setStatus("Connection cancelled: " + e.message); }
+      };
+
+      $("notarise").onclick = async () => {
+        const p = provider();
+        if (!p || !pubkey) { setStatus("Connect Phantom first."); return; }
+        $("notarise").disabled = true;
+        try {
+          setStatus("Building transaction…");
+          const conn = new Connection($("rpc").value.trim() || "https://solana-devnet.api.onfinality.io/public", "confirmed");
+          const tx = new Transaction();
+          for (const w of WORKS) {
+            const memo = JSON.stringify({ p:"maloba", v:1, id:w.id, t:w.title, a:w.author, y:w.year, cid:w.cid, h:w.sha256 });
+            tx.add(new TransactionInstruction({ keys:[], programId:MEMO, data:Buffer.from(memo,"utf8") }));
+          }
+          const { blockhash, lastValidBlockHeight } = await conn.getLatestBlockhash("finalized");
+          tx.feePayer = pubkey;
+          tx.recentBlockhash = blockhash;
+          setStatus("Approve the transaction in Phantom…");
+          const signedTx = await p.signTransaction(tx); // Phantom only signs; we submit ourselves
+          setStatus("Sending to Solana devnet…");
+          const sig = await conn.sendRawTransaction(signedTx.serialize(), { skipPreflight: false, preflightCommitment: "confirmed" });
+          setStatus("Confirming on-chain…");
+          await conn.confirmTransaction({ signature: sig, blockhash, lastValidBlockHeight }, "confirmed");
+          setStatus(`✓ Notarised on Solana ${CLUSTER}! Tx: <span class="mono">${short(sig)}</span><br><a href="https://explorer.solana.com/tx/${sig}?cluster=${CLUSTER}" target="_blank" rel="noopener">Open on Solana Explorer ↗</a><br><br>Copy this signature back to Claude to light up the app's Heritage Ledger:<br><span class="mono">${sig}</span>`, true);
+          setVerify(sig);
+        } catch (e) {
+          console.error(e);
+          setStatus("Failed: " + (e.message || e));
+          $("notarise").disabled = false;
+        }
+      };
+    </script>
+  </body>
+</html>

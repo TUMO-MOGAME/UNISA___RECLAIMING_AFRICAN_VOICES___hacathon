@@ -1,0 +1,29 @@
+{
+  "name": "Maloba · Mhudi",
+  "symbol": "MALOBA",
+  "description": "Heritage certificate — Mhudi by Sol T. Plaatje (1930). Maloba: Reclaiming African Voices. Provenance anchored on Solana; content fingerprinted (IPFS QmS7yTdvrDyM6t8ixVAG8gNhCeM7os4JZ6b6cjG6itZjDv, SHA-256 70d0fd49add448d6ced8d751421dc6beca53e270a4e5a5cb26aeab5259eb6d43).",
+  "image": "https://image.pollinations.ai/prompt/A%20dignified%20Barolong%20woman%20on%20the%20pre-colonial%20southern%20African%20highveld%20at%20golden%20hour%2C%201830s%2C%20cinematic%20warm%20earthy%20tones%2C%20photorealistic?model=flux&width=1024&height=1024&seed=41&nologo=true",
+  "external_url": "https://maloba.app",
+  "attributes": [
+    {
+      "trait_type": "Author",
+      "value": "Sol T. Plaatje"
+    },
+    {
+      "trait_type": "Year",
+      "value": "1930"
+    },
+    {
+      "trait_type": "IPFS CID",
+      "value": "QmS7yTdvrDyM6t8ixVAG8gNhCeM7os4JZ6b6cjG6itZjDv"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "70d0fd49add448d6ced8d751421dc6beca53e270a4e5a5cb26aeab5259eb6d43"
+    },
+    {
+      "trait_type": "Chain",
+      "value": "Solana devnet"
+    }
+  ]
+}

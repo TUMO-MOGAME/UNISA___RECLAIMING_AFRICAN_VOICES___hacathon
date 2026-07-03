@@ -1,4 +1,4 @@
-import { Module } from "./types";
+import type { Module } from "./types";
 
 // Grounded in S.E.K. Mqhayi, *Ityala Lamawele* ("The Lawsuit of the Twins", 1914).
 // See docs/04-humanities-sources.md. Integrity rule: every fact traces to the source.

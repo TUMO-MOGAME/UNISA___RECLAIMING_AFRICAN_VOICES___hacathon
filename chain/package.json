@@ -1,0 +1,15 @@
+{
+  "name": "maloba-chain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Maloba on-chain heritage provenance (Solana devnet). Custodial + POPIA-safe: anchors only a content hash + IPFS CID, never personal data. See docs/11-blockchain-heritage-plan.md.",
+  "scripts": {
+    "anchor": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON anchor.mjs"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.95.3",
+    "ipfs-only-hash": "^4.0.0"
+  }
+}

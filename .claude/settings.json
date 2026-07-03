@@ -12,7 +12,10 @@
       "Bash(rm -f project-lentswe.md)",
       "Bash(npx expo *)",
       "Bash(node -e \"console.log\\(require\\('expo-audio/package.json'\\).version\\)\")",
-      "Bash(grep -rhA3 \"RecordingPresets\" node_modules/expo-audio/build/RecordingConstants.d.ts)"
+      "Bash(grep -rhA3 \"RecordingPresets\" node_modules/expo-audio/build/RecordingConstants.d.ts)",
+      "WebFetch(domain:botlhale.ai)",
+      "WebFetch(domain:docs.botlhale.xyz)",
+      "WebFetch(domain:docs-apis.botlhale.xyz)"
     ]
   }
 }

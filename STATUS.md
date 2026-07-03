@@ -3,7 +3,7 @@
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
 > of "done."
 
-_Last updated: 2026-06-29 — by Emma (via Claude)_
+_Last updated: 2026-07-02 — by Emma (via Claude)_
 
 ---
 
@@ -17,15 +17,36 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
 | Cinematic Reader: Child/Adult + EN/Setswana + scene nav + back | ✅ done |
 | "About the Sources" screen (credits + references + integrity note) | ✅ done |
 | **Community Archive**: POPIA consent → record → list → play → delete | ✅ done (session-state) |
+| **Reader "Listen" (TTS)**: pluggable Botlhale AI → on-device fallback | ✅ done (device path live; Botlhale on key) |
+| **All 11 SA languages**: data-driven registry + picker + TTS + honest EN fallback | ✅ framework done (EN/TSW text authored) |
+| **Machine-draft translations** (Botlhale): service + draft-aware Reader + gen script | ✅ built, awaiting token+org_id to run |
+| **Visual polish**: cinematic fonts · gradients · image fade+KenBurns · motion · branded launch | ✅ done (compiles; eyeball via `npm run web`) |
+| **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
+| **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
 
 ## ⏭️ Next action
 
-1. Run it: `cd app && npm run start` → **Expo Go on a phone** (best for recording) or `npm run web`.
-   Browse 4 pillars, open any, toggle Child/Adult + EN/TSW; open About the Sources; open Community
-   Archive → Record → see the POPIA consent sheet → record → play → delete.
-2. **Review the Setswana** `tn` drafts in `app/src/content/*.ts` + the consent/UI strings (you're the authority).
+1. **Record the demo video** — follow the shot-by-shot script in [specs/demo-video-script.md](specs/demo-video-script.md)
+   (~2:55, web target). Do one dry run of record→consent→delete first; art is cached so nothing pops
+   in live on camera.
+2. **Emma's review pass** — [specs/emma-review-handoff.md](specs/emma-review-handoff.md) lists exactly
+   what needs your eyes, top-down: the 3 on-camera UI strings (**Reetsa** / Simolola go bala / Rekoto
+   ya Boswa), the Setswana `tn` drafts across all 7 modules, and 3 cultural-accuracy questions (Atlas).
 3. When keys arrive: `services/gemini.ts` (T017) · Supabase + RLS upload (T027) · Lelapa transcribe (T028).
+   **Botlhale TTS:** contract now wired from their public docs — `POST api.botlhale.xyz/tts`,
+   form-encoded `text_msg`+`language_code`, Bearer token, returns `audio_url`; Setswana = `tn-ZA`.
+   Paste a Bearer token into `app/.env` (`EXPO_PUBLIC_BOTLHALE_API_KEY`) → Listen auto-upgrades to real
+   Setswana audio. **3 residual unknowns for the contact** (marked in `botlhale.ts`): (a) field name
+   `text` vs `text_msg`; (b) dev vs prod host; (c) refresh_token→IdToken flow (using a ready token for
+   the demo).
+3. When keys arrive: `services/gemini.ts` (T017) · Supabase + RLS upload (T027) · Lelapa transcribe (T028).
+   **Botlhale TTS:** contract now wired from their public docs — `POST api.botlhale.xyz/tts`,
+   form-encoded `text_msg`+`language_code`, Bearer token, returns `audio_url`; Setswana = `tn-ZA`.
+   Paste a Bearer token into `app/.env` (`EXPO_PUBLIC_BOTLHALE_API_KEY`) → Listen auto-upgrades to real
+   Setswana audio. **3 residual unknowns for the contact** (marked in `botlhale.ts`): (a) field name
+   `text` vs `text_msg`; (b) dev vs prod host; (c) refresh_token→IdToken flow (using a ready token for
+   the demo).
 4. Persistence: WatermelonDB so recordings survive reload (T024). Optional: NativeWind (T006).
 5. Phase 3: ElevenLabs static intro · record the 2–3 min demo video · finalise the written narrative.
 
@@ -65,8 +86,55 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
   *Mantswe a maloba* = "Voices of Yesterday".
 - Decide demo target for the video: web (easiest to screen-record) vs Expo Go on a phone.
 
+## 🔗 Blockchain (Phase A — on-chain heritage provenance)
+
+- Plan: [docs/11-blockchain-heritage-plan.md](docs/11-blockchain-heritage-plan.md). Decision: build Phase A
+  now; IPFS + custodial wallet; **POPIA-safe** (only public works + hashes on-chain, never recordings).
+- `chain/` workspace anchors the canon: real **IPFS CIDs + SHA-256** computed for all 4 works, submits
+  a **provenance memo tx**, and **mints a heritage certificate SPL token** (fixed supply 1) per work to
+  a recipient wallet (`MALOBA_RECIPIENT` = Emma's Phantom address). In-app **Heritage Ledger** screen
+  shows CID/hash + "Verify on Solana" + certificate links.
+- **To complete live:** (1) Emma sends ~0.1 **testnet** SOL from Phantom to the custodial address;
+  (2) provide Phantom testnet address; (3) run `cd chain && MALOBA_RECIPIENT=<addr> npm run anchor`.
+  Certificates then appear in Phantom (unnamed on testnet — Metaplex metadata/naming is Phase B on
+  devnet/mainnet).
+- **✅ LIVE on Solana devnet.** The canon was notarised via a **browser Heritage Notary**
+  (`chain/web/index.html`, served on :8090) where Emma connected **Phantom** and signed — no custodial
+  wallet needed. RPC reachability solved with the keyless `solana-devnet.api.onfinality.io/public`
+  (api.devnet.solana.com is blocked on this network). One tx carries all 4 provenance memos:
+  `3SafBbHpT7YYBKDkkRP8rAi43eqVzCgnydiJwkGwH6im94sP1nxdS1Dh66MDxccSMxAF2mXy9g2LhU4Z6XhpmKax` — confirmed,
+  err=null. Wired into `app/src/content/heritage.data.ts` (cluster=devnet); the in-app Heritage Ledger
+  now shows live "Verify on Solana" links. Owner: `BDscn3fpj4hw7H9Jm8SKis2NmPSX8Rd5to4JzyNgkLWh`.
+- Next: in-browser **certificate NFT minting** (Metaplex named NFTs to Phantom). Custodial keypair
+  `9CW9…` (gitignored) retained for the headless `chain/anchor.mjs` path.
+
+## 🧭 Cultural Atlas (levels up Humanities Depth)
+
+- New **Cultural Atlas** section (3 grounded, cited modules): **Unsung Heroes** (Galeshewe, Nyabela,
+  Moleli & Anta, Youth of 1976), **Rites of Passage: Marriage** (lobola/Patlo/Umtshato/Umabo),
+  **The Peopling of SA** (Khoisan → Bantu → Sotho-Tswana & Nguni). Reuses the cinematic Reader.
+- **Integrity choices (kept out on purpose):** the genetic-admixture % table (race-science risk),
+  the hard "Tswana oldest" chronology (framed as debated), and `grokipedia` sourcing. Sensitive
+  customs kept with context. Sources credited on the About screen. **Setswana + cultural content needs
+  Emma's review** (marked in files).
+- **Archive tie-in:** every Atlas entry has a "🎙 record your family's version" button → Community
+  Archive. **Chain tie-in:** the on-chain Heritage Ledger already covers the literary canon; extending
+  anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
+
 ## 🗒️ Log
 
+- **2026-07-03** — **Submission-package + Atlas visual parity.** (1) **Atlas hero art:** wired the 3
+  Cultural Atlas modules into the Gemini image pipeline and made `gen:images` **idempotent** (skips the
+  4 cached literary heroes → no wasted quota; `--force` to regenerate). Generated 3 new cinematic heroes
+  (Galeshewe, lobola, first-people) — dignified, no text, no fabricated author portraits; labelled AI
+  interpretations. All **7 modules** now have local hero art. (2) **Written narrative** rewritten to
+  match the app: folded in the Cultural Atlas (7 modules, not "four pillars"), the on-chain Heritage
+  Ledger (described honestly as Solana **devnet** provenance — hashes/citations only, no PII), and a
+  re-aligned rubric table + shot list. (3) New **demo-video script** ([specs/demo-video-script.md]) —
+  shot-by-shot, ~2:55, web target. (4) New **review handoff** ([specs/emma-review-handoff.md]) — exact
+  files/strings needing Emma's Setswana + cultural review, prioritised (3 on-camera strings first).
+  Verified: `tsc` clean · **32/32 tests** · `expo export --platform web` green (exit 0, all new image
+  `require()`s bundle). **Pending Emma:** record the video; Setswana review; Atlas cultural-accuracy pass.
 - **2026-06-29** — Project kicked off. Read hackathon brief + rubric + architectural blueprint PDF +
   FrameFlow reference. Created governance scaffold, docs set, .claude skills, specs, and initialized
   the Expo app with a first cinematic literary module.
@@ -77,3 +145,82 @@ _Last updated: 2026-06-29 — by Emma (via Claude)_
   screen, and shipped the **Community Archive**: POPIA `ConsentSheet` → record (expo-audio) → list →
   play → rename → delete (erasure). Session-state for now; cloud sync + WatermelonDB are stretch.
   tsc + web bundle green.
+- **2026-07-02** — Researched **Botlhale AI** (SA indigenous-language ASR/TTS/translate; enterprise/
+  sales-gated, no public free tier — Emma has a direct contact fast-tracking access). Built a
+  **pluggable Reader TTS layer** (`app/src/services/tts/`): Botlhale neural voice as primary,
+  **on-device `expo-speech` as a free offline fallback** so "Listen" works today and auto-upgrades to
+  real Setswana audio when the key lands. Added a 🔊 Listen control to `CinematicReader`. Pure logic
+  (lang mapping / request builder / provider select) unit-tested with Node's built-in runner —
+  **12/12 pass**; `tsc --noEmit` clean; web bundle green (259 modules). New scripts: `npm test`,
+  `npm run typecheck`. Follow-ups: confirm Botlhale endpoint/codes; Emma to review "Reetsa" label.
+- **2026-07-02** — Refined the **written narrative** (`specs/concept-submission.md`) to submission
+  quality: folded in the read-aloud/narration feature and the African-built-AI framing (Lelapa +
+  Botlhale), updated the demo shot list + pre-submission TODO. Grounding preserved (no new facts).
+  Drafted the Botlhale-contact request for TTS endpoint/key.
+- **2026-07-03** — **Cultural Atlas — humanities depth level-up.** Added 3 grounded, cited modules
+  (Unsung Heroes, Marriage Rites, Peopling of SA) from Emma's sourced history document, reusing the
+  cinematic Reader (Child/Adult, 11-language framework, Listen). Applied the integrity guardrails:
+  cut the genetic-% table, framed contested chronology as debated, dropped grokipedia sourcing, kept
+  sensitive customs with context. New Home "Cultural Atlas" section; About screen now credits all 7
+  modules; every Atlas entry links to the Community Archive ("record your family's version"). Extended
+  `Module` (kind/archivePrompt/optional year). 32/32 tests; tsc clean; bundle green. **Needs Emma's
+  Setswana + cultural-accuracy review** (flagged in files).
+- **2026-07-02** — **On-chain heritage (Phase A).** Wrote the plan (docs/11) — honest case for
+  blockchain (permanence + provenance + ownership), POPIA-safe design (no personal data on-chain,
+  hash-anchor + consent only), what to tokenise (provenance cNFTs + custodian badges, never commodify
+  heritage). Built `chain/` workspace (@solana/web3.js + ipfs-only-hash): `anchor.mjs` computes real
+  SHA-256 + IPFS CID for all 4 canon works and submits a Memo tx (custodial wallet). Fixed the web
+  `<Image>` source crash + `shadow*→boxShadow`. Added the in-app **Heritage Ledger** screen + nav +
+  "Verify on Solana" links. Cluster = testnet (devnet RPC unreachable here); on-chain txs pending a
+  faucet top-up. 32/32 tests; tsc clean; bundle green. `solana-ai-kit` reviewed for Phase B (Anchor
+  program + cNFT minting).
+- **2026-07-02** — **Consistency system + Gemini images.** Built a reusable **UI kit** (`src/ui/`:
+  `Screen`, `ScreenHeader`, `Card`, `Rule`, and `Type` primitives) + a **page-building guide**
+  (`src/ui/README.md`) so every screen — and any NEW tab — inherits the brief theme, Anton/Barlow type,
+  colours and spacing by construction. Converted About + Archive onto the kit (light cream); modals +
+  Reader stay dark-navy with gold accents (rule: orange on cream, gold on navy). Built the **Gemini
+  image pipeline**: pure `services/images/gemini.ts` (+tests), offline `npm run gen:images` → cached
+  local PNGs + manifest, app resolver auto-uses them (Pollinations fallback). Validated end-to-end
+  (`gemini-2.5-flash-image`) and generated the **4 hero images**. 32/32 tests; tsc clean; bundle green
+  (415 modules). Gemini key stored build-time-only in gitignored `app/.env`.
+- **2026-07-02** — **Re-themed to the AADHIH brief identity** (Emma loved the brief's look): palette
+  → deep **navy + burnt orange + gold on warm cream**; fonts → **Anton** (heavy caps display) +
+  **Barlow** (body), repointed in `theme/tokens.ts` (all components inherit). Rebuilt **HomeGallery**
+  in the light cream theme (Anton masthead, orange rules, featured pillar + numbered index, white cards
+  with depth, navy CTA block) and **LaunchScreen** as a navy+orange banner. Tuned Pollinations prompts
+  toward warm, dignified real-people photography. Other screens now render dark-navy (coherent) pending
+  light conversion. Copied `frontend-design` + `brand-guidelines` skills into `.claude/skills/`.
+  Stored the **Gemini key** in gitignored `app/.env` as build-time-only `GEMINI_API_KEY` (NOT
+  EXPO_PUBLIC — never bundle a real key to the client; rotate after event). tsc clean; bundle green.
+  Next: Gemini image pre-gen pipeline; convert remaining screens to the light theme.
+- **2026-07-02** — **Visual polish pass** (all four picked): (1) **Cinematic typography** — Playfair
+  Display (brand/titles) + Spectral (reading/UI) via bundled @expo-google-fonts (offline), centralized
+  in `theme/tokens.ts` (`fonts`), applied across every component. (2) **Gradients + images** —
+  `expo-linear-gradient` scrims (Reader + cards), `SceneImage` moved to `expo-image` (disk cache =
+  offline/low-data win) with fade-in + slow Ken Burns on the Reader hero. (3) **Motion** — reusable
+  `Motion.tsx` (Fade + PressScale): screen cross-fade on navigation, scene text cross-fade, press-
+  scale on cards. (4) **Branded LaunchScreen** — animated "Maloba · Mantswe a maloba" over a dusk
+  gradient while fonts load; root bg set to night (`app.json`) so no white flash. tsc clean; 27/27
+  tests; web bundle green (410 modules). Note: final app-icon/splash PNG art still a designer asset.
+- **2026-07-02** — Built the **machine-draft translation pipeline** (Emma's call: drafts once the
+  Botlhale token lands). New `services/translate/botlhale.ts` (`/translate/v2` JSON, tested), resolver
+  now 3-state **reviewed / draft / fallback**, drafts store (`content/drafts.ts` + generated
+  `drafts.data.ts`), Reader labels drafts "machine translation, unreviewed" and narrates them in-
+  language. Ready-to-run `npm run gen:drafts` script pre-generates drafts for the 9 not-yet-reviewed
+  languages (gated on `EXPO_PUBLIC_BOTLHALE_API_KEY` + new `EXPO_PUBLIC_BOTLHALE_ORG_ID`). 27/27 tests
+  pass; tsc clean; web bundle green (263 modules). [NEEDS from contact: org_id; confirm translate
+  field semantics.]
+- **2026-07-02** — Expanded to **all 11 official SA languages** as a data-driven framework: new
+  `src/i18n/` (registry with endonyms + BCP-47 + Botlhale codes; `t`/`resolveText` with honest English
+  fallback), widened `Lang` to 11 codes, `LocalizedText` non-EN fields now optional. Replaced the
+  EN/TSW toggle with a **LanguagePicker** (all 11 by native name) in the gallery + Reader; migrated all
+  47 string sites to `t()`. Reader shows a fallback badge + narrates in the *shown* language. TTS now
+  covers all 11 (Botlhale primary + device fallback). Folded the old `tts/lang.ts` into the registry.
+  **Honest state:** framework is all-11; human-reviewed *story text* is EN + Setswana — the other 9
+  show English text (clearly labelled) until real translations land. 21/21 tests pass; tsc clean; web
+  bundle green (262 modules). [NEEDS: confirm Botlhale codes for nr/ss/ve with contact.]
+- **2026-07-02** — Researched Botlhale's public API docs and **wired the real TTS contract**:
+  `POST api.botlhale.xyz/tts`, form-encoded (`text_msg`, `language_code`), Bearer token, JSON
+  `audio_url` response; corrected Setswana code to `tn-ZA`. Updated `botlhale.ts`/`lang.ts`/tests +
+  `.env.example`. 13/13 tests pass; tsc clean. 3 unknowns left for the contact (field name, host,
+  token flow). **Next: lock demo target (web vs Expo Go).**

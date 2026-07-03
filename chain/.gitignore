@@ -1,0 +1,3 @@
+node_modules/
+# The custodial devnet keypair is a SECRET — never commit it.
+.keypair.json

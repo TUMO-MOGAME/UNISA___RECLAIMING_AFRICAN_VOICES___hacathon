@@ -1,22 +1,16 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Lang } from "../content/types";
-import { modules } from "../content";
-import { colors, spacing, radius, type } from "../theme/tokens";
+import { allModules } from "../content";
+import { t } from "../i18n";
+import { Screen, ScreenHeader, Card, Title, Body, Meta, Muted } from "../ui";
+import { spacing } from "../theme/tokens";
 
 // "About the Sources" — credits every author + text, states adaptation vs original, and labels AI
 // images as interpretations. Earns Humanities Depth + the "acknowledge sources" ethics rule.
-// See docs/04-humanities-sources.md + .claude/skills/humanities-grounding.
+// See docs/04-humanities-sources.md + .claude/skills/humanities-grounding. Built on the UI kit.
 
 const UI = {
-  back: { en: "‹ Back", tn: "‹ Morago" },
   title: { en: "About the Sources", tn: "Ka ga Metswedi" },
   intro: {
     en: "Maloba is grounded in real, foundational South African texts — not generic summaries. Every story credits its author and source, and we follow one rule: truth only, no invented history.",
@@ -29,88 +23,44 @@ const UI = {
   references: { en: "References", tn: "Metswedi" },
 };
 
-export function AboutSourcesScreen({
-  lang,
-  onBack,
-}: {
-  lang: Lang;
-  onBack: () => void;
-}) {
+export function AboutSourcesScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
   return (
-    <View style={styles.root}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <Pressable onPress={onBack} hitSlop={10}>
-            <Text style={styles.backText}>{UI.back[lang]}</Text>
-          </Pressable>
-          <Text style={styles.title}>{UI.title[lang]}</Text>
-        </View>
+    <Screen tone="paper">
+      <ScreenHeader kicker="Acknowledgements" title={t(UI.title, lang)} onBack={onBack} />
 
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.intro}>{UI.intro[lang]}</Text>
+      <Body style={styles.intro}>{t(UI.intro, lang)}</Body>
 
-          {modules.map((m) => (
-            <View key={m.id} style={styles.card}>
-              <Text style={styles.cardTitle}>{m.title}</Text>
-              <Text style={styles.cardMeta}>
-                {m.author} · {m.year}
-              </Text>
-              <Text style={styles.cardSource}>{m.source}</Text>
-              <Text style={styles.refLabel}>{UI.references[lang]}</Text>
-              {m.references.map((r, i) => (
-                <Text key={i} style={styles.refItem}>
-                  • {r}
-                </Text>
-              ))}
-            </View>
+      {allModules.map((m) => (
+        <Card key={m.id} style={styles.card}>
+          <Title>{m.title}</Title>
+          <Meta style={styles.meta}>
+            {m.author}
+            {m.year ? ` · ${m.year}` : ""}
+          </Meta>
+          <Muted style={styles.source}>{m.source}</Muted>
+          <Meta style={styles.refLabel}>{t(UI.references, lang)}</Meta>
+          {m.references.map((r, i) => (
+            <Muted key={i} style={styles.refItem}>
+              • {r}
+            </Muted>
           ))}
+        </Card>
+      ))}
 
-          <View style={styles.disclaimerBox}>
-            <Text style={styles.disclaimerText}>{UI.disclaimer[lang]}</Text>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+      <Card style={styles.disclaimer}>
+        <Muted style={styles.disclaimerText}>{t(UI.disclaimer, lang)}</Muted>
+      </Card>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.night },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  backText: { color: colors.gold, fontSize: type.body, fontWeight: "600" },
-  title: { color: colors.sand, fontSize: type.title, fontWeight: "700" },
-  content: { padding: spacing.lg, paddingTop: 0, paddingBottom: spacing.xxl },
-  intro: { color: colors.sand, fontSize: type.body, lineHeight: 24, marginBottom: spacing.lg },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  cardTitle: { color: colors.gold, fontSize: type.title, fontWeight: "700" },
-  cardMeta: { color: colors.sand, fontSize: type.small, marginTop: 2, fontWeight: "600" },
-  cardSource: { color: colors.muted, fontSize: type.small, marginTop: spacing.xs, fontStyle: "italic" },
-  refLabel: {
-    color: colors.ember,
-    fontSize: type.small,
-    fontWeight: "700",
-    marginTop: spacing.md,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  refItem: { color: colors.muted, fontSize: type.small, lineHeight: 20, marginTop: 4 },
-  disclaimerBox: {
-    borderWidth: 1,
-    borderColor: colors.card,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    marginTop: spacing.sm,
-  },
-  disclaimerText: { color: colors.muted, fontSize: type.small, lineHeight: 20, fontStyle: "italic" },
+  intro: { marginBottom: spacing.lg },
+  card: { marginBottom: spacing.md },
+  meta: { marginTop: 2 },
+  source: { fontStyle: "italic", marginTop: spacing.xs },
+  refLabel: { marginTop: spacing.md },
+  refItem: { marginTop: 4 },
+  disclaimer: { marginTop: spacing.sm },
+  disclaimerText: { fontStyle: "italic" },
 });

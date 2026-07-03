@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  TextInput,
-} from "react-native";
+import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
 import {
   useAudioRecorder,
   useAudioPlayer,
@@ -16,13 +8,16 @@ import {
   setAudioModeAsync,
 } from "expo-audio";
 import { Lang } from "../content/types";
+import { t } from "../i18n";
 import { ConsentSheet, Visibility } from "./ConsentSheet";
-import { colors, spacing, radius, type } from "../theme/tokens";
+import { PressScale } from "./Motion";
+import { Screen, ScreenHeader, Card, Body, Meta, Muted } from "../ui";
+import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
 // behind a POPIA consent gate, keep them private or public, and can delete them at any time (erasure).
 // Recordings are kept in-session for this concept build; WatermelonDB persistence + Supabase/Lelapa
-// sync are the online stretch (specs/tasks.md T024/T027/T028). See popia-compliance skill.
+// sync are the online stretch (T024/T027/T028). See popia-compliance skill. Built on the UI kit.
 
 type Recording = {
   id: string;
@@ -33,7 +28,6 @@ type Recording = {
 };
 
 const UI = {
-  back: { en: "‹ Back", tn: "‹ Morago" },
   title: { en: "Community Archive", tn: "Polokelo ya Setšhaba" },
   intro: {
     en: "Record an elder's story, a memory, or a tradition in your own words. Your voice, your history — kept on your terms.",
@@ -68,7 +62,7 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     try {
       const perm = await requestRecordingPermissionsAsync();
       if (!perm.granted) {
-        setError(UI.permDenied[lang]);
+        setError(t(UI.permDenied, lang));
         return;
       }
       await setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });
@@ -77,7 +71,7 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
       setPendingVisibility(visibility);
       setIsRecording(true);
     } catch (e) {
-      setError(UI.unsupported[lang]);
+      setError(t(UI.unsupported, lang));
     }
   }
 
@@ -91,14 +85,14 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
             id: String(Date.now()),
             uri,
             visibility: pendingVisibility,
-            title: UI.placeholder[lang],
+            title: t(UI.placeholder, lang),
             createdAt: new Date().toLocaleString(),
           },
           ...rs,
         ]);
       }
     } catch (e) {
-      setError(UI.unsupported[lang]);
+      setError(t(UI.unsupported, lang));
     } finally {
       setIsRecording(false);
       setPendingVisibility(null);
@@ -110,7 +104,7 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
       player.replace(uri);
       player.play();
     } catch (e) {
-      setError(UI.unsupported[lang]);
+      setError(t(UI.unsupported, lang));
     }
   }
 
@@ -124,61 +118,50 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
   }
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <Pressable onPress={onBack} hitSlop={10}>
-            <Text style={styles.backText}>{UI.back[lang]}</Text>
-          </Pressable>
-          <Text style={styles.title}>{UI.title[lang]}</Text>
-        </View>
+    <Screen tone="paper">
+      <ScreenHeader kicker="Your voice, your history" title={t(UI.title, lang)} onBack={onBack} />
 
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.intro}>{UI.intro[lang]}</Text>
+      <Body style={styles.intro}>{t(UI.intro, lang)}</Body>
 
-          {isRecording ? (
-            <Pressable style={[styles.recordBtn, styles.stopBtn]} onPress={stopRecording}>
-              <Text style={styles.recordText}>{UI.stop[lang]}</Text>
-            </Pressable>
-          ) : (
-            <Pressable style={styles.recordBtn} onPress={() => setConsentVisible(true)}>
-              <Text style={styles.recordText}>{UI.record[lang]}</Text>
-            </Pressable>
-          )}
-          {isRecording && <Text style={styles.recordingHint}>{UI.recording[lang]}</Text>}
-          {error && <Text style={styles.error}>{error}</Text>}
+      {isRecording ? (
+        <Pressable style={[styles.recordBtn, styles.stopBtn]} onPress={stopRecording}>
+          <Text style={styles.recordText}>{t(UI.stop, lang)}</Text>
+        </Pressable>
+      ) : (
+        <PressScale style={styles.recordBtn} onPress={() => setConsentVisible(true)}>
+          <Text style={styles.recordText}>{t(UI.record, lang)}</Text>
+        </PressScale>
+      )}
+      {isRecording && <Text style={styles.recordingHint}>{t(UI.recording, lang)}</Text>}
+      {error && <Muted style={styles.error}>{error}</Muted>}
 
-          {recordings.length === 0 ? (
-            <Text style={styles.empty}>{UI.empty[lang]}</Text>
-          ) : (
-            recordings.map((r) => (
-              <View key={r.id} style={styles.item}>
-                <View style={styles.itemTop}>
-                  <Text style={styles.badge}>
-                    {r.visibility === "private" ? UI.privateBadge[lang] : UI.publicBadge[lang]}
-                  </Text>
-                  <Text style={styles.date}>{r.createdAt}</Text>
-                </View>
-                <TextInput
-                  style={styles.titleInput}
-                  value={r.title}
-                  onChangeText={(t) => rename(r.id, t)}
-                  placeholder={UI.placeholder[lang]}
-                  placeholderTextColor={colors.muted}
-                />
-                <View style={styles.itemActions}>
-                  <Pressable style={styles.playBtn} onPress={() => play(r.uri)}>
-                    <Text style={styles.playText}>{UI.play[lang]}</Text>
-                  </Pressable>
-                  <Pressable style={styles.delBtn} onPress={() => remove(r.id)}>
-                    <Text style={styles.delText}>{UI.del[lang]}</Text>
-                  </Pressable>
-                </View>
-              </View>
-            ))
-          )}
-        </ScrollView>
-      </SafeAreaView>
+      {recordings.length === 0 ? (
+        <Muted style={styles.empty}>{t(UI.empty, lang)}</Muted>
+      ) : (
+        recordings.map((r) => (
+          <Card key={r.id} style={styles.item}>
+            <View style={styles.itemTop}>
+              <Meta>{r.visibility === "private" ? t(UI.privateBadge, lang) : t(UI.publicBadge, lang)}</Meta>
+              <Muted style={styles.date}>{r.createdAt}</Muted>
+            </View>
+            <TextInput
+              style={styles.titleInput}
+              value={r.title}
+              onChangeText={(txt) => rename(r.id, txt)}
+              placeholder={t(UI.placeholder, lang)}
+              placeholderTextColor={colors.slate}
+            />
+            <View style={styles.itemActions}>
+              <Pressable style={styles.playBtn} onPress={() => play(r.uri)}>
+                <Text style={styles.playText}>{t(UI.play, lang)}</Text>
+              </Pressable>
+              <Pressable style={styles.delBtn} onPress={() => remove(r.id)}>
+                <Text style={styles.delText}>{t(UI.del, lang)}</Text>
+              </Pressable>
+            </View>
+          </Card>
+        ))
+      )}
 
       <ConsentSheet
         visible={consentVisible}
@@ -186,48 +169,42 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
         onConsent={beginRecording}
         onCancel={() => setConsentVisible(false)}
       />
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.night },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-  },
-  backText: { color: colors.gold, fontSize: type.body, fontWeight: "600" },
-  title: { color: colors.sand, fontSize: type.title, fontWeight: "700" },
-  content: { padding: spacing.lg, paddingTop: 0, paddingBottom: spacing.xxl },
-  intro: { color: colors.sand, fontSize: type.body, lineHeight: 24, marginBottom: spacing.lg },
+  intro: { marginBottom: spacing.lg },
   recordBtn: {
-    backgroundColor: colors.ember,
+    backgroundColor: colors.orange,
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     alignItems: "center",
   },
-  stopBtn: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.ember },
-  recordText: { color: colors.sand, fontSize: type.body, fontWeight: "800", letterSpacing: 0.5 },
-  recordingHint: { color: colors.ember, fontSize: type.small, textAlign: "center", marginTop: spacing.sm },
-  error: { color: colors.gold, fontSize: type.small, lineHeight: 20, marginTop: spacing.md },
-  empty: { color: colors.muted, fontSize: type.body, lineHeight: 24, marginTop: spacing.xl, textAlign: "center" },
-  item: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginTop: spacing.md },
-  itemTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  badge: { color: colors.gold, fontSize: type.small, fontWeight: "700" },
-  date: { color: colors.muted, fontSize: type.small },
-  titleInput: {
-    color: colors.sand,
+  stopBtn: { backgroundColor: colors.paperCard, borderWidth: 2, borderColor: colors.orange },
+  recordText: {
+    color: colors.paper,
+    fontFamily: fonts.bodyBold,
     fontSize: type.body,
-    fontWeight: "600",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  recordingHint: { color: colors.orange, fontFamily: fonts.bodySemi, fontSize: type.small, textAlign: "center", marginTop: spacing.sm },
+  error: { color: colors.orange, marginTop: spacing.md },
+  empty: { marginTop: spacing.xl, textAlign: "center" },
+  item: { marginTop: spacing.md, padding: spacing.md },
+  itemTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  date: { fontSize: type.small },
+  titleInput: {
+    color: colors.navy,
+    fontFamily: fonts.bodySemi,
+    fontSize: type.body,
     marginTop: spacing.sm,
     paddingVertical: spacing.xs,
   },
   itemActions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm },
-  playBtn: { backgroundColor: colors.night, borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18 },
-  playText: { color: colors.sand, fontWeight: "700", fontSize: type.small },
-  delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: colors.muted },
-  delText: { color: colors.muted, fontWeight: "700", fontSize: type.small },
+  playBtn: { backgroundColor: colors.navy, borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18 },
+  playText: { color: colors.paper, fontFamily: fonts.bodySemi, fontSize: type.small },
+  delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: colors.slate },
+  delText: { color: colors.slate, fontFamily: fonts.bodySemi, fontSize: type.small },
 });

@@ -1,0 +1,29 @@
+{
+  "name": "Maloba · Ityala Lamawele",
+  "symbol": "MALOBA",
+  "description": "Heritage certificate — Ityala Lamawele by S.E.K. Mqhayi (1914). Maloba: Reclaiming African Voices. Provenance anchored on Solana; content fingerprinted (IPFS QmWN17Rxo1jfCjUaf954ikwozZa7p3XvoSBa1MMDmhgsRG, SHA-256 b25017a431ce388ac3ff4b7d7d70874cf2ba4c4075d2bd62fc076cc67eda5fac).",
+  "image": "https://image.pollinations.ai/prompt/A%20traditional%20Xhosa%20inkundla%20court%20gathering%20of%20elders%20under%20a%20great%20tree%2C%20warm%20golden%20light%2C%20cinematic%2C%20photorealistic?model=flux&width=1024&height=1024&seed=42&nologo=true",
+  "external_url": "https://maloba.app",
+  "attributes": [
+    {
+      "trait_type": "Author",
+      "value": "S.E.K. Mqhayi"
+    },
+    {
+      "trait_type": "Year",
+      "value": "1914"
+    },
+    {
+      "trait_type": "IPFS CID",
+      "value": "QmWN17Rxo1jfCjUaf954ikwozZa7p3XvoSBa1MMDmhgsRG"
+    },
+    {
+      "trait_type": "SHA-256",
+      "value": "b25017a431ce388ac3ff4b7d7d70874cf2ba4c4075d2bd62fc076cc67eda5fac"
+    },
+    {
+      "trait_type": "Chain",
+      "value": "Solana devnet"
+    }
+  ]
+}

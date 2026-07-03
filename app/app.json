@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "app",
+    "name": "Maloba",
     "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0E0B07",
     "ios": {
       "supportsTablet": true
     },
@@ -22,7 +23,9 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-audio"
+      "expo-audio",
+      "expo-font",
+      "expo-image"
     ]
   }
 }

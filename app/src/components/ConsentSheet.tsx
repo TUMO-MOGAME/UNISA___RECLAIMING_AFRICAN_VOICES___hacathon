@@ -1,7 +1,8 @@
 import React from "react";
 import { Modal, View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { Lang } from "../content/types";
-import { colors, spacing, radius, type } from "../theme/tokens";
+import { t } from "../i18n";
+import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 
 // POPIA consent gate — MUST appear before the microphone is ever activated.
 // See .claude/skills/popia-compliance + docs/05-popia-compliance.md.
@@ -39,26 +40,26 @@ export function ConsentSheet({
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           <ScrollView>
-            <Text style={styles.title}>{UI.title[lang]}</Text>
-            <Text style={styles.body}>{UI.body[lang]}</Text>
+            <Text style={styles.title}>{t(UI.title, lang)}</Text>
+            <Text style={styles.body}>{t(UI.body, lang)}</Text>
 
-            <Text style={styles.question}>{UI.question[lang]}</Text>
+            <Text style={styles.question}>{t(UI.question, lang)}</Text>
 
             <Pressable style={styles.choice} onPress={() => onConsent("private")}>
-              <Text style={styles.choiceTitle}>🔒 {UI.private[lang]}</Text>
-              <Text style={styles.choiceHint}>{UI.privateHint[lang]}</Text>
+              <Text style={styles.choiceTitle}>🔒 {t(UI.private, lang)}</Text>
+              <Text style={styles.choiceHint}>{t(UI.privateHint, lang)}</Text>
             </Pressable>
 
             <Pressable
               style={[styles.choice, styles.choicePublic]}
               onPress={() => onConsent("public")}
             >
-              <Text style={styles.choiceTitle}>🌍 {UI.public[lang]}</Text>
-              <Text style={styles.choiceHint}>{UI.publicHint[lang]}</Text>
+              <Text style={styles.choiceTitle}>🌍 {t(UI.public, lang)}</Text>
+              <Text style={styles.choiceHint}>{t(UI.publicHint, lang)}</Text>
             </Pressable>
 
             <Pressable style={styles.cancel} onPress={onCancel}>
-              <Text style={styles.cancelText}>{UI.cancel[lang]}</Text>
+              <Text style={styles.cancelText}>{t(UI.cancel, lang)}</Text>
             </Pressable>
           </ScrollView>
         </View>
@@ -76,13 +77,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     maxHeight: "85%",
   },
-  title: { color: colors.gold, fontSize: type.title, fontWeight: "800" },
-  body: { color: colors.sand, fontSize: type.body, lineHeight: 24, marginTop: spacing.md },
-  question: { color: colors.muted, fontSize: type.small, marginTop: spacing.lg, marginBottom: spacing.sm, textTransform: "uppercase", letterSpacing: 1 },
+  title: { color: colors.gold, fontFamily: fonts.displaySemi, fontSize: type.title + 2 },
+  body: { color: colors.sand, fontFamily: fonts.body, fontSize: type.body, lineHeight: 26, marginTop: spacing.md },
+  question: { color: colors.muted, fontFamily: fonts.bodySemi, fontSize: type.small, marginTop: spacing.lg, marginBottom: spacing.sm, textTransform: "uppercase", letterSpacing: 1 },
   choice: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginTop: spacing.sm },
   choicePublic: { borderWidth: 1, borderColor: colors.gold },
-  choiceTitle: { color: colors.sand, fontSize: type.body, fontWeight: "700" },
-  choiceHint: { color: colors.muted, fontSize: type.small, marginTop: 2 },
+  choiceTitle: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.body },
+  choiceHint: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, marginTop: 2 },
   cancel: { alignItems: "center", paddingVertical: spacing.lg, marginTop: spacing.sm },
-  cancelText: { color: colors.muted, fontSize: type.body },
+  cancelText: { color: colors.muted, fontFamily: fonts.body, fontSize: type.body },
 });

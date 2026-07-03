@@ -1,4 +1,4 @@
-import { Module } from "./types";
+import type { Module } from "./types";
 
 // Grounded in B.W. Vilakazi, *Inkondlo kaZulu* (1935) — the first published volume of Zulu poetry.
 // See docs/04-humanities-sources.md. NOTE(setswana): `tn` fields are AI-assisted DRAFTS — review.

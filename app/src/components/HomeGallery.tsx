@@ -1,166 +1,353 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView } from "react-native";
 import { Module, Lang } from "../content/types";
-import { modules } from "../content";
-import { sceneImageUrl } from "../services/pollinations";
+import { modules, atlasModules } from "../content";
+import { sceneImageSource } from "../content/images";
+import { t } from "../i18n";
+import { LinearGradient } from "expo-linear-gradient";
 import { SceneImage } from "./SceneImage";
-import { colors, spacing, radius, type } from "../theme/tokens";
+import { LanguagePicker } from "./LanguagePicker";
+import { PressScale, Reveal } from "./Motion";
+import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 
-// The front door: a cinematic gallery of the literary pillars. Tap one to open its Reader.
-// Phase 1 (T013). Community Archive card is a placeholder until Phase 2.
+// The front door — styled after the AADHIH "Reclaiming African Voices" brief: warm cream paper,
+// heavy Anton display headings, burnt-orange accents, navy text, and dignified African imagery.
+// A featured pillar leads; the rest read as a numbered index. Orchestrated staggered reveal.
+
+const KICKER = "Reclaiming African Voices";
+// Nudge Pollinations toward the brief's warm, human, real-people photography look.
+const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 
 const UI = {
-  intro: {
-    en: "Four pillars of South African letters — brought to life. Tap a story to begin.",
-    tn: "Dikokwane tse nne tsa dingwalo tsa Aforika Borwa — di tsosolositswe. Tobetsa kanegelo go simolola.",
+  section: { en: "The Four Pillars", tn: "Dikokwane tse Nne" },
+  sectionSub: {
+    en: "Foundational works of South African literature — read, heard, and kept alive.",
+    tn: "Dingwalo tsa motheo tsa Aforika Borwa — di badiwa, di utlwiwa, di tshelwa.",
   },
-  archive: { en: "🎙️  Community Archive", tn: "🎙️  Polokelo ya Setšhaba" },
+  begin: { en: "Begin reading", tn: "Simolola go bala" }, // [REVIEW: Setswana]
+  atlas: { en: "Cultural Atlas", tn: "Atlase ya Setso" },
+  atlasSub: {
+    en: "The history, customs and heroes behind the literature — grounded and cited.",
+    tn: "Hisitori, ngwao le bagaki ba ba mo tlase ga dingwalo — di theilwe mo metsweding.",
+  },
+  archive: { en: "Community Archive", tn: "Polokelo ya Setšhaba" },
   archiveHint: {
-    en: "Record & preserve your own family's stories",
+    en: "Record & preserve your family's own stories",
     tn: "Gatisa o boloke dikanegelo tsa lelapa la gago",
   },
-  about: { en: "About the Sources →", tn: "Ka ga Metswedi →" },
-  language: { en: "EN", tn: "TSW" },
+  about: { en: "About the Sources", tn: "Ka ga Metswedi" },
+  heritage: { en: "⛓  Heritage Ledger · on-chain", tn: "⛓  Rekoto ya Boswa · mo blockchain" },
 };
 
 export function HomeGallery({
   lang,
-  onToggleLang,
+  onLangChange,
   onOpen,
   onAbout,
   onArchive,
+  onHeritage,
 }: {
   lang: Lang;
-  onToggleLang: () => void;
+  onLangChange: (l: Lang) => void;
   onOpen: (id: string) => void;
   onAbout: () => void;
   onArchive: () => void;
+  onHeritage: () => void;
 }) {
+  const featured = modules[0];
+  const rest = modules.slice(1);
+
   return (
     <View style={styles.root}>
+      {/* Faint warm wash at the top of the cream page — depth without a flat fill. */}
+      <LinearGradient colors={[colors.glowGold, "transparent"]} style={styles.wash} pointerEvents="none" />
+
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <View style={styles.headerRow}>
-            <View style={{ flexShrink: 1 }}>
-              <Text style={styles.brand}>Maloba</Text>
-              <Text style={styles.tagline}>Mantswe a maloba · Voices of Yesterday</Text>
-            </View>
-            <Pressable style={styles.langBtn} onPress={onToggleLang}>
-              <Text style={styles.langBtnText}>{UI.language[lang]}</Text>
-            </Pressable>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.topBar}>
+            <LanguagePicker lang={lang} onChange={onLangChange} />
           </View>
 
-          <Text style={styles.intro}>{UI.intro[lang]}</Text>
+          {/* Masthead */}
+          <Reveal style={styles.masthead}>
+            <Text style={styles.kicker}>{KICKER}</Text>
+            <Text style={styles.brand}>Maloba</Text>
+            <View style={styles.rule} />
+            <Text style={styles.tagline}>Mantswe a maloba — Voices of Yesterday</Text>
+          </Reveal>
 
-          {modules.map((m) => (
-            <PillarCard key={m.id} module={m} lang={lang} onPress={() => onOpen(m.id)} />
+          {/* Section heading */}
+          <Reveal delay={100} style={styles.sectionHead}>
+            <Text style={styles.sectionLabel}>{t(UI.section, lang)}</Text>
+            <Text style={styles.sectionSub}>{t(UI.sectionSub, lang)}</Text>
+          </Reveal>
+
+          {/* Featured pillar */}
+          <Reveal delay={150}>
+            <FeatureCard module={featured} lang={lang} onPress={() => onOpen(featured.id)} beginLabel={t(UI.begin, lang)} />
+          </Reveal>
+
+          {/* Numbered index */}
+          {rest.map((m, i) => (
+            <Reveal key={m.id} delay={230 + i * 90}>
+              <IndexRow module={m} n={i + 2} lang={lang} onPress={() => onOpen(m.id)} />
+            </Reveal>
           ))}
 
-          <Pressable style={styles.archiveCard} onPress={onArchive}>
-            <Text style={styles.archiveTitle}>{UI.archive[lang]}</Text>
-            <Text style={styles.archiveHint}>{UI.archiveHint[lang]}</Text>
-          </Pressable>
+          {/* Cultural Atlas — grounded heritage entries */}
+          <Reveal delay={230 + rest.length * 90 + 40} style={styles.sectionHead}>
+            <Text style={styles.sectionLabel}>{t(UI.atlas, lang)}</Text>
+            <Text style={styles.sectionSub}>{t(UI.atlasSub, lang)}</Text>
+          </Reveal>
+          {atlasModules.map((m, i) => (
+            <Reveal key={m.id} delay={230 + (rest.length + i) * 90 + 80}>
+              <IndexRow module={m} n={i + 1} lang={lang} onPress={() => onOpen(m.id)} atlas />
+            </Reveal>
+          ))}
 
-          <Pressable style={styles.aboutBtn} onPress={onAbout}>
-            <Text style={styles.aboutBtnText}>{UI.about[lang]}</Text>
-          </Pressable>
+          {/* Community Archive — navy call-to-action block, brief-style */}
+          <Reveal delay={230 + rest.length * 90 + 60}>
+            <PressScale style={styles.archive} onPress={onArchive} accessibilityLabel={t(UI.archive, lang)}>
+              <Text style={styles.archiveMark}>🎙</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.archiveTitle}>{t(UI.archive, lang)}</Text>
+                <Text style={styles.archiveHint}>{t(UI.archiveHint, lang)}</Text>
+              </View>
+              <Text style={styles.archiveChevron}>›</Text>
+            </PressScale>
+          </Reveal>
+
+          {/* Heritage Ledger (on-chain) */}
+          <Reveal delay={230 + rest.length * 90 + 100} style={styles.heritageWrap}>
+            <PressScale style={styles.heritageBtn} onPress={onHeritage} accessibilityLabel={t(UI.heritage, lang)}>
+              <Text style={styles.heritageText}>{t(UI.heritage, lang)}</Text>
+            </PressScale>
+          </Reveal>
+
+          {/* About */}
+          <Reveal delay={230 + rest.length * 90 + 140} style={styles.aboutWrap}>
+            <Pressable onPress={onAbout} hitSlop={10}>
+              <Text style={styles.aboutText}>{t(UI.about, lang)}  →</Text>
+            </Pressable>
+          </Reveal>
         </ScrollView>
       </SafeAreaView>
     </View>
   );
 }
 
-function PillarCard({
+function FeatureCard({
   module,
   lang,
   onPress,
+  beginLabel,
 }: {
   module: Module;
   lang: Lang;
   onPress: () => void;
+  beginLabel: string;
 }) {
   const hero = module.scenes[0];
-  const uri = sceneImageUrl(hero.imagePrompt, { seed: hero.seed, w: 1024, h: 768 });
-
+  const source = sceneImageSource(module.id, hero.id, `${hero.imagePrompt}, ${PHOTO}`, { seed: hero.seed, w: 1024, h: 1024 });
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <View style={styles.cardImage}>
-        <SceneImage uri={uri} />
-        <View style={styles.cardScrim} pointerEvents="none" />
+    <PressScale style={styles.feature} onPress={onPress} accessibilityLabel={`${module.title} — ${module.author}`}>
+      <View style={StyleSheet.absoluteFill}>
+        <SceneImage source={source} kenBurns />
       </View>
-      <View style={styles.cardBody}>
-        <Text style={styles.cardKicker}>
+      <LinearGradient
+        colors={["transparent", "rgba(14,28,46,0.5)", "rgba(14,28,46,0.97)"]}
+        locations={[0, 0.5, 1]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <Text style={styles.featureIndex}>01</Text>
+      <View style={styles.featureText}>
+        <Text style={styles.featureKicker}>
           {module.author} · {module.year}
         </Text>
-        <Text style={styles.cardTitle}>{module.title}</Text>
-        <Text style={styles.cardBlurb} numberOfLines={3}>
-          {module.blurb[lang]}
+        <Text style={styles.featureTitle}>{module.title}</Text>
+        <Text style={styles.featureBlurb} numberOfLines={2}>
+          {t(module.blurb, lang)}
         </Text>
-        <Text style={styles.cardAudience}>{module.audience}</Text>
+        <Text style={styles.featureCta}>{beginLabel}  →</Text>
       </View>
-    </Pressable>
+    </PressScale>
   );
 }
 
+function IndexRow({
+  module,
+  n,
+  lang,
+  onPress,
+  atlas,
+}: {
+  module: Module;
+  n: number;
+  lang: Lang;
+  onPress: () => void;
+  atlas?: boolean;
+}) {
+  const hero = module.scenes[0];
+  const source = sceneImageSource(module.id, hero.id, `${hero.imagePrompt}, ${PHOTO}`, { seed: hero.seed, w: 512, h: 640 });
+  return (
+    <PressScale style={styles.row} onPress={onPress} accessibilityLabel={`${module.title} — ${module.author}`}>
+      <Text style={styles.rowIndex}>{atlas ? "✦" : String(n).padStart(2, "0")}</Text>
+      <View style={styles.rowThumb}>
+        <SceneImage source={source} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.rowTitle}>{module.title}</Text>
+        <Text style={styles.rowMeta}>
+          {module.author}
+          {module.year ? ` · ${module.year}` : ""}
+        </Text>
+        <Text style={styles.rowBlurb} numberOfLines={2}>
+          {t(module.blurb, lang)}
+        </Text>
+      </View>
+      <Text style={styles.chevron}>›</Text>
+    </PressScale>
+  );
+}
+
+const SHADOW = "0px 10px 24px rgba(22,41,63,0.14)";
+const SHADOW_SOFT = "0px 6px 16px rgba(22,41,63,0.07)";
+
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.night },
-  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  headerRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+  root: { flex: 1, backgroundColor: colors.paper },
+  wash: { position: "absolute", top: 0, left: 0, right: 0, height: 320 },
+  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: spacing.xxl },
+
+  topBar: { flexDirection: "row", justifyContent: "flex-end", marginBottom: spacing.md },
+
+  masthead: { alignItems: "center", marginBottom: spacing.xl },
+  kicker: {
+    color: colors.orange,
+    fontFamily: fonts.bodyBold,
+    fontSize: 12,
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    marginBottom: spacing.sm,
   },
-  brand: { color: colors.gold, fontSize: type.display, fontWeight: "800", letterSpacing: 0.5 },
-  tagline: { color: colors.muted, fontSize: type.small, marginTop: 2 },
-  langBtn: {
-    backgroundColor: colors.card,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: radius.pill,
+  brand: {
+    color: colors.navy,
+    fontFamily: fonts.display,
+    fontSize: 72,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    lineHeight: 74,
   },
-  langBtnText: { color: colors.sand, fontWeight: "700", fontSize: type.small },
-  intro: { color: colors.sand, fontSize: type.body, lineHeight: 24, marginVertical: spacing.lg },
-  card: {
-    backgroundColor: colors.card,
+  rule: { width: 60, height: 4, backgroundColor: colors.orange, borderRadius: 2, marginVertical: spacing.md },
+  tagline: { color: colors.slate, fontFamily: fonts.body, fontSize: 15, fontStyle: "italic" },
+
+  sectionHead: { marginBottom: spacing.lg },
+  sectionLabel: {
+    color: colors.navy,
+    fontFamily: fonts.displaySemi,
+    fontSize: 15,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  sectionSub: { color: colors.slate, fontFamily: fonts.body, fontSize: type.small + 1, lineHeight: 20, marginTop: 4 },
+
+  feature: {
+    height: 380,
     borderRadius: radius.lg,
     overflow: "hidden",
-    marginBottom: spacing.lg,
+    backgroundColor: colors.navy,
+    marginBottom: spacing.xl,
+    boxShadow: SHADOW,
   },
-  cardImage: { height: 180, backgroundColor: colors.ink },
-  cardScrim: {
+  featureIndex: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 80,
-    backgroundColor: colors.scrim,
+    top: spacing.sm,
+    right: spacing.lg,
+    color: colors.orange,
+    fontFamily: fonts.display,
+    fontSize: 54,
   },
-  cardBody: { padding: spacing.md },
-  cardKicker: {
+  featureText: { position: "absolute", left: spacing.lg, right: spacing.lg, bottom: spacing.lg },
+  featureKicker: {
     color: colors.gold,
+    fontFamily: fonts.bodyBold,
+    fontSize: type.small,
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+  },
+  featureTitle: { color: colors.sand, fontFamily: fonts.display, fontSize: 40, letterSpacing: 0.5, textTransform: "uppercase", marginTop: 4 },
+  featureBlurb: { color: colors.sand, fontFamily: fonts.body, fontSize: type.body, lineHeight: 24, marginTop: spacing.sm, opacity: 0.92 },
+  featureCta: {
+    color: colors.orange,
+    fontFamily: fonts.bodyBold,
+    fontSize: type.small,
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
+    marginTop: spacing.md,
+  },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.paperCard,
+    borderWidth: 1,
+    borderColor: colors.paperLine,
+    boxShadow: SHADOW_SOFT,
+  },
+  rowIndex: { color: colors.orange, fontFamily: fonts.display, fontSize: 24, width: 32 },
+  rowThumb: { width: 60, height: 76, borderRadius: radius.sm, overflow: "hidden", backgroundColor: colors.navy },
+  rowTitle: { color: colors.navy, fontFamily: fonts.displaySemi, fontSize: type.title, lineHeight: type.title + 3 },
+  rowMeta: {
+    color: colors.orange,
+    fontFamily: fonts.bodyBold,
+    fontSize: type.small - 1,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginTop: 2,
+  },
+  rowBlurb: { color: colors.slate, fontFamily: fonts.body, fontSize: type.small + 1, lineHeight: 19, marginTop: 4 },
+  chevron: { color: colors.slate, fontFamily: fonts.body, fontSize: 26 },
+
+  archive: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    marginTop: spacing.lg,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.navy,
+    boxShadow: SHADOW,
+  },
+  archiveMark: { fontSize: 26 },
+  archiveTitle: { color: colors.sand, fontFamily: fonts.displaySemi, fontSize: type.title },
+  archiveHint: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small + 1, marginTop: 2 },
+  archiveChevron: { color: colors.gold, fontFamily: fonts.body, fontSize: 26 },
+
+  heritageWrap: { alignItems: "center", marginTop: spacing.lg },
+  heritageBtn: {
+    borderWidth: 1,
+    borderColor: colors.navy,
+    borderRadius: radius.pill,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+  },
+  heritageText: {
+    color: colors.navy,
+    fontFamily: fonts.bodyBold,
     fontSize: type.small,
     letterSpacing: 1,
     textTransform: "uppercase",
   },
-  cardTitle: { color: colors.sand, fontSize: type.title, fontWeight: "700", marginTop: 2 },
-  cardBlurb: { color: colors.muted, fontSize: type.small, lineHeight: 20, marginTop: spacing.sm },
-  cardAudience: { color: colors.ember, fontSize: type.small, marginTop: spacing.sm, fontWeight: "600" },
-  archiveCard: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.ember,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
+  aboutWrap: { alignItems: "center", marginTop: spacing.xl },
+  aboutText: {
+    color: colors.navy,
+    fontFamily: fonts.bodyBold,
+    fontSize: type.small,
+    letterSpacing: 2,
+    textTransform: "uppercase",
   },
-  archiveTitle: { color: colors.sand, fontSize: type.title, fontWeight: "700" },
-  archiveHint: { color: colors.muted, fontSize: type.small, marginTop: 4 },
-  aboutBtn: { alignItems: "center", paddingVertical: spacing.lg },
-  aboutBtnText: { color: colors.gold, fontSize: type.body, fontWeight: "600" },
 });
