@@ -10,6 +10,12 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from "@expo-google-fonts/inter";
+import {
+  Montserrat_400Regular,
+  Montserrat_700Bold,
+  Montserrat_800ExtraBold,
+  Montserrat_900Black,
+} from "@expo-google-fonts/montserrat";
 import { HomeGallery } from "./src/components/HomeGallery";
 import { CinematicReader } from "./src/components/CinematicReader";
 import { AboutSourcesScreen } from "./src/components/AboutSourcesScreen";
@@ -51,6 +57,10 @@ export default function App() {
     Inter_700Bold,
     Inter_800ExtraBold,
     Inter_900Black,
+    Montserrat_400Regular,
+    Montserrat_700Bold,
+    Montserrat_800ExtraBold,
+    Montserrat_900Black,
   });
   // Don't let a font-loading failure (e.g. offline) trap the user on the launch screen.
   const ready = fontsLoaded || !!fontError;
