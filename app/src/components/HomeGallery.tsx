@@ -83,8 +83,9 @@ export function HomeGallery({
   onProvinces: () => void;
   onPresidents: () => void;
 }) {
-  const { height } = useWindowDimensions();
-  const heroH = Math.max(520, Math.min(height, 760));
+  const { width, height } = useWindowDimensions();
+  const wide = width >= 768;
+  const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
 
   return (
     <View style={styles.root}>
@@ -107,9 +108,9 @@ export function HomeGallery({
           />
           <View style={styles.heroInner}>
             <Reveal style={styles.heroTitleWrap}>
-              <Text style={styles.heroTitle}>Ubuntu{"\n"}Heritage</Text>
+              <Text style={[styles.heroTitle, wide && styles.heroTitleWide]}>Ubuntu{"\n"}Heritage</Text>
             </Reveal>
-            <Reveal delay={150} style={styles.heroCard}>
+            <Reveal delay={150} style={[styles.heroCard, wide && styles.heroCardWide]}>
               <Text style={styles.heroCardTitle}>Reclaiming African Voices</Text>
               <Text style={styles.heroCardSub}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
             </Reveal>
@@ -226,6 +227,8 @@ function Section({
   intro: string;
   children?: React.ReactNode;
 }) {
+  const { width } = useWindowDimensions();
+  const wide = width >= 768;
   const bg = tone === "light" ? colors.dsCloud : tone === "blue" ? colors.dsBlue : colors.dsSlate;
   const titleColor = tone === "light" ? colors.dsSlate : "#FFFFFF";
   const kickerColor = tone === "blue" ? "#FFFFFF" : colors.dsBlue;
@@ -233,35 +236,37 @@ function Section({
     tone === "light" ? "rgba(35,51,66,0.72)" : tone === "blue" ? "rgba(255,255,255,0.92)" : colors.dsGray;
 
   const imageBlock = (
-    <View style={styles.sectionImage}>
+    <View style={wide ? styles.sectionImageWide : styles.sectionImage}>
       <SceneImage source={image} />
     </View>
   );
   const textBlock = (
-    <Reveal style={styles.sectionText}>
-      {/* decorative blue accent bar (hidden on blue sections where it wouldn't read) */}
-      {tone !== "blue" && <View style={styles.accentBar} />}
-      <Text style={[styles.sectionKicker, { color: kickerColor }]}>{kicker.toUpperCase()}</Text>
-      <Text style={[styles.sectionTitle, { color: titleColor }]}>{title}</Text>
-      <Text style={[styles.sectionIntro, { color: introColor }]}>{intro}</Text>
-      {children}
+    <Reveal style={wide ? styles.sectionTextWide : styles.sectionText}>
+      <View style={wide ? { maxWidth: 520 } : undefined}>
+        {tone !== "blue" && <View style={styles.accentBar} />}
+        <Text style={[styles.sectionKicker, { color: kickerColor }]}>{kicker.toUpperCase()}</Text>
+        <Text style={[styles.sectionTitle, wide && styles.sectionTitleWide, { color: titleColor }]}>{title}</Text>
+        <Text style={[styles.sectionIntro, wide && styles.sectionIntroWide, { color: introColor }]}>{intro}</Text>
+        {children}
+      </View>
     </Reveal>
   );
 
+  // Wide screens: true side-by-side halves (image | text), alternating with `reverse`.
+  // Narrow: the halves stack (image over text), which is the mobile reading of the same design.
+  const dir: "row" | "row-reverse" = reverse ? "row-reverse" : "row";
+  const rowStyle = [
+    styles.section,
+    { backgroundColor: bg },
+    wide ? ({ flexDirection: dir, minHeight: 520, alignItems: "stretch" } as const) : null,
+  ];
+
+  // DOM order is always image→text; on wide screens `row-reverse` visually flips alternate sections,
+  // while narrow screens keep image-on-top (matching the reference's mobile `flex-col`).
   return (
-    <View style={[styles.section, { backgroundColor: bg }]}>
-      {/* On a phone-width column the split always stacks; `reverse` flips image above/below the text. */}
-      {reverse ? (
-        <>
-          {textBlock}
-          {imageBlock}
-        </>
-      ) : (
-        <>
-          {imageBlock}
-          {textBlock}
-        </>
-      )}
+    <View style={rowStyle}>
+      {imageBlock}
+      {textBlock}
     </View>
   );
 }
@@ -333,6 +338,8 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 18,
   },
+  heroTitleWide: { fontSize: 120, lineHeight: 116, letterSpacing: -2 },
+  heroCardWide: { paddingVertical: spacing.xl, paddingHorizontal: 48 },
   heroCard: {
     alignSelf: "center",
     alignItems: "center",
@@ -349,11 +356,15 @@ const styles = StyleSheet.create({
   // Section
   section: { width: "100%", borderTopWidth: 8, borderTopColor: BLUE },
   sectionImage: { width: "100%", height: 260, backgroundColor: SLATE },
+  sectionImageWide: { width: "50%", backgroundColor: SLATE, alignSelf: "stretch" },
   sectionText: { paddingHorizontal: spacing.lg, paddingVertical: spacing.xl },
+  sectionTextWide: { width: "50%", paddingHorizontal: 64, paddingVertical: 80, justifyContent: "center" },
   accentBar: { width: 56, height: 6, backgroundColor: BLUE, marginBottom: spacing.md },
   sectionKicker: { fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2.5, marginBottom: spacing.sm },
   sectionTitle: { fontFamily: fonts.displaySemi, fontSize: 34, lineHeight: 37, letterSpacing: -0.5 },
+  sectionTitleWide: { fontSize: 52, lineHeight: 54 },
   sectionIntro: { fontFamily: fonts.body, fontSize: 16, lineHeight: 25, marginTop: spacing.md },
+  sectionIntroWide: { fontSize: 19, lineHeight: 30 },
 
   // Link list (blue left border)
   linkList: { marginTop: spacing.lg, borderLeftWidth: 4, borderLeftColor: BLUE, paddingLeft: spacing.md, gap: spacing.sm },

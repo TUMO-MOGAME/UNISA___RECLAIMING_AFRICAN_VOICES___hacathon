@@ -119,15 +119,25 @@ export default function App() {
     }
   }
 
+  // Home + Reader are full-bleed (hero image / immersive reader); every other screen is a content
+  // page that reads better as a centred column on wide screens instead of stretching edge-to-edge.
+  const fullBleed = route.name === "home" || route.name === "reader";
+
   return (
     <View style={styles.app}>
       <StatusBar style="light" />
-      {/* Phone-width column so the app reads as a mobile app on wide web windows (and images fit
-          the way they do on a real phone — no over-zoomed full-window crops). */}
+      {/* Full-bleed on web — the app fills the whole viewport like a website. Content screens are
+          centred to a readable max-width; the hero/reader fill the screen. */}
       <View style={styles.frame}>
         {ready && (
           <Fade key={routeKey} style={{ flex: 1 }}>
-            {renderRoute()}
+            {fullBleed ? (
+              renderRoute()
+            ) : (
+              <View style={styles.centerWrap}>
+                <View style={styles.centerInner}>{renderRoute()}</View>
+              </View>
+            )}
           </Fade>
         )}
         {showLaunch && <LaunchScreen onDone={() => setLaunchDone(true)} />}
@@ -137,6 +147,9 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  app: { flex: 1, backgroundColor: "#0C1218", alignItems: "center" },
-  frame: { flex: 1, width: "100%", maxWidth: 480, overflow: "hidden", backgroundColor: "#152833" },
+  app: { flex: 1, backgroundColor: "#233342" },
+  frame: { flex: 1, width: "100%", backgroundColor: "#233342" },
+  // Content screens: full-width slate ground, content centred to a readable column.
+  centerWrap: { flex: 1, width: "100%", alignItems: "center", backgroundColor: "#1A2732" },
+  centerInner: { flex: 1, width: "100%", maxWidth: 900, backgroundColor: "#233342" },
 });
