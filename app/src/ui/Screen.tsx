@@ -20,8 +20,8 @@ export function Screen({
   padded?: boolean;
   contentStyle?: StyleProp<ViewStyle>;
 }) {
-  // Both tones are now the pure-black B&W world; the warm top-wash keeps a hint of gold.
-  const bg = tone === "dark" ? "#000" : "#000";
+  // "Modern South Africa" deck world — every screen sits on the deep-navy ground.
+  const bg = tone === "dark" ? colors.dsNavyDeep : colors.dsNavy;
   const pad = padded ? styles.padded : null;
 
   return (

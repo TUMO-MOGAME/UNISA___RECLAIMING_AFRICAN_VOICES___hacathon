@@ -1,20 +1,15 @@
 import { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { View, StyleSheet } from "react-native";
-import { useFonts, Anton_400Regular } from "@expo-google-fonts/anton";
 import {
-  Barlow_400Regular,
-  Barlow_500Medium,
-  Barlow_600SemiBold,
-  Barlow_700Bold,
-  Barlow_800ExtraBold,
-} from "@expo-google-fonts/barlow";
-import {
-  Fraunces_400Regular,
-  Fraunces_400Regular_Italic,
-  Fraunces_500Medium,
-  Fraunces_600SemiBold,
-} from "@expo-google-fonts/fraunces";
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from "@expo-google-fonts/inter";
 import { HomeGallery } from "./src/components/HomeGallery";
 import { CinematicReader } from "./src/components/CinematicReader";
 import { AboutSourcesScreen } from "./src/components/AboutSourcesScreen";
@@ -50,16 +45,12 @@ export default function App() {
   const home = () => setRoute({ name: "home" });
 
   const [fontsLoaded, fontError] = useFonts({
-    Anton_400Regular,
-    Barlow_400Regular,
-    Barlow_500Medium,
-    Barlow_600SemiBold,
-    Barlow_700Bold,
-    Barlow_800ExtraBold,
-    Fraunces_400Regular,
-    Fraunces_400Regular_Italic,
-    Fraunces_500Medium,
-    Fraunces_600SemiBold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
   });
   // Don't let a font-loading failure (e.g. offline) trap the user on the launch screen.
   const ready = fontsLoaded || !!fontError;
@@ -136,6 +127,6 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  app: { flex: 1, backgroundColor: "#000", alignItems: "center" },
-  frame: { flex: 1, width: "100%", maxWidth: 480, overflow: "hidden", backgroundColor: "#000" },
+  app: { flex: 1, backgroundColor: "#0C1218", alignItems: "center" },
+  frame: { flex: 1, width: "100%", maxWidth: 480, overflow: "hidden", backgroundColor: "#152833" },
 });

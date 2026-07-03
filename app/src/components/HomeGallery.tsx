@@ -294,7 +294,7 @@ const SHADOW = "0px 10px 24px rgba(22,41,63,0.14)";
 const SHADOW_SOFT = "0px 6px 16px rgba(22,41,63,0.07)";
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#000" },
+  root: { flex: 1, backgroundColor: colors.dsNavy },
   wash: { position: "absolute", top: 0, left: 0, right: 0, height: 340 },
   content: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: spacing.xxl },
 
@@ -325,7 +325,17 @@ const styles = StyleSheet.create({
 
   sectionHead: { marginBottom: spacing.lg },
   sectionLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  sectionTick: { width: 14, height: 3, borderRadius: 2, backgroundColor: colors.orange },
+  // Deck signature — a small yellow ▶ triangle before the label.
+  sectionTick: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 6,
+    borderBottomWidth: 6,
+    borderLeftWidth: 10,
+    borderTopColor: "transparent",
+    borderBottomColor: "transparent",
+    borderLeftColor: colors.dsYellow,
+  },
   sectionLabel: {
     color: "#fff",
     fontFamily: fonts.displaySemi,
@@ -416,8 +426,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.14)",
   },
-  rowIndex: { color: colors.orange, fontFamily: fonts.display, fontSize: 24, width: 32 },
-  rowThumb: { width: 60, height: 76, borderRadius: radius.sm, overflow: "hidden", backgroundColor: "#111" },
+  rowIndex: { color: colors.orange, fontFamily: fonts.display, fontSize: 26, width: 46, flexShrink: 0 },
+  rowThumb: { width: 60, height: 76, borderRadius: radius.sm, overflow: "hidden", backgroundColor: colors.dsNavyDeep },
   rowTitle: { color: "#fff", fontFamily: fonts.serif, fontSize: type.title, lineHeight: type.title + 4 },
   rowMeta: {
     color: colors.orange,
@@ -461,11 +471,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     padding: spacing.lg,
     borderRadius: radius.lg,
-    backgroundColor: "#0a0a0a",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
+    backgroundColor: colors.dsBlue,
   },
-  archiveMark: { width: 44, height: 44, borderRadius: 13, backgroundColor: "rgba(217,106,28,0.18)", borderWidth: 1, borderColor: "rgba(235,164,60,0.4)", alignItems: "center", justifyContent: "center" },
+  archiveMark: { width: 44, height: 44, borderRadius: 13, backgroundColor: "rgba(255,255,255,0.16)", borderWidth: 1, borderColor: "rgba(255,255,255,0.4)", alignItems: "center", justifyContent: "center" },
   archiveTitle: { color: "#fff", fontFamily: fonts.displaySemi, fontSize: type.title },
   archiveHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: type.small + 1, marginTop: 2 },
   archiveChevron: { color: colors.gold, fontFamily: fonts.body, fontSize: 26 },
@@ -477,9 +485,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     padding: spacing.lg,
     borderRadius: radius.lg,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "rgba(235,164,60,0.3)",
+    borderColor: colors.dsYellow,
   },
   provNavTitle: { color: "#fff", fontFamily: fonts.displaySemi, fontSize: type.title },
   provNavHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: type.small + 1, marginTop: 2 },
