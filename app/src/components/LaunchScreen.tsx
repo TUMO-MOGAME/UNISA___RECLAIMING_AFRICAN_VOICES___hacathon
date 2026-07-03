@@ -54,6 +54,11 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
       <Animated.View
         style={{ opacity: wordmark, transform: [{ translateY: rise }], alignItems: "center" }}
       >
+        {/* Rising-sun mark — same emblem as the home masthead, tying the cover to the app. */}
+        <View style={styles.emblem}>
+          <View style={styles.emblemRing} />
+          <View style={styles.emblemCore} />
+        </View>
         <Text style={styles.kicker}>Reclaiming African Voices</Text>
         <Text style={styles.brand}>Maloba</Text>
         <View style={styles.rule} />
@@ -67,6 +72,16 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
 const styles = StyleSheet.create({
   root: { alignItems: "center", justifyContent: "center" },
   topGlow: { position: "absolute", top: 0, left: 0, right: 0, height: 260 },
+  emblem: { width: 52, height: 52, alignItems: "center", justifyContent: "center", marginBottom: spacing.lg },
+  emblemRing: {
+    position: "absolute",
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: colors.gold,
+  },
+  emblemCore: { width: 26, height: 26, borderRadius: 13, backgroundColor: colors.orange },
   kicker: {
     color: colors.gold,
     fontFamily: fonts.bodySemi,

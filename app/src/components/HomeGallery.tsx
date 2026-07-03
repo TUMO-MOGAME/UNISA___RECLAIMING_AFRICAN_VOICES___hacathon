@@ -70,16 +70,19 @@ export function HomeGallery({
 
           {/* Masthead */}
           <Reveal style={styles.masthead}>
-            <Text style={styles.kicker}>{KICKER}</Text>
+            <Emblem />
+            <View style={styles.kickerRow}>
+              <View style={styles.kickerLine} />
+              <Text style={styles.kicker}>{KICKER}</Text>
+              <View style={styles.kickerLine} />
+            </View>
             <Text style={styles.brand}>Maloba</Text>
-            <View style={styles.rule} />
             <Text style={styles.tagline}>Mantswe a maloba — Voices of Yesterday</Text>
           </Reveal>
 
           {/* Section heading */}
           <Reveal delay={100} style={styles.sectionHead}>
-            <Text style={styles.sectionLabel}>{t(UI.section, lang)}</Text>
-            <Text style={styles.sectionSub}>{t(UI.sectionSub, lang)}</Text>
+            <SectionHead label={t(UI.section, lang)} sub={t(UI.sectionSub, lang)} />
           </Reveal>
 
           {/* Featured pillar */}
@@ -96,8 +99,7 @@ export function HomeGallery({
 
           {/* Cultural Atlas — grounded heritage entries */}
           <Reveal delay={230 + rest.length * 90 + 40} style={styles.sectionHead}>
-            <Text style={styles.sectionLabel}>{t(UI.atlas, lang)}</Text>
-            <Text style={styles.sectionSub}>{t(UI.atlasSub, lang)}</Text>
+            <SectionHead label={t(UI.atlas, lang)} sub={t(UI.atlasSub, lang)} />
           </Reveal>
           {atlasModules.map((m, i) => (
             <Reveal key={m.id} delay={230 + (rest.length + i) * 90 + 80}>
@@ -136,6 +138,31 @@ export function HomeGallery({
   );
 }
 
+// The Maloba mark — a rising "sun" (gold ring, orange core) nodding to the brief's logo sun. Pure
+// views so it renders identically on web + native with no image asset.
+function Emblem() {
+  return (
+    <View style={styles.emblem}>
+      <View style={styles.emblemRing} />
+      <View style={styles.emblemCore} />
+    </View>
+  );
+}
+
+// Editorial section header — an orange accent tick + heavy label + supporting line. One place so the
+// "Four Pillars" and "Cultural Atlas" headers stay in perfect rhythm.
+function SectionHead({ label, sub }: { label: string; sub: string }) {
+  return (
+    <>
+      <View style={styles.sectionLabelRow}>
+        <View style={styles.sectionTick} />
+        <Text style={styles.sectionLabel}>{label}</Text>
+      </View>
+      <Text style={styles.sectionSub}>{sub}</Text>
+    </>
+  );
+}
+
 function FeatureCard({
   module,
   lang,
@@ -160,6 +187,8 @@ function FeatureCard({
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
+      {/* Thin gold frame — a premium, "plate"-like edge over the image. */}
+      <View style={styles.featureFrame} pointerEvents="none" />
       <Text style={styles.featureIndex}>01</Text>
       <View style={styles.featureText}>
         <Text style={styles.featureKicker}>
@@ -222,34 +251,50 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: "row", justifyContent: "flex-end", marginBottom: spacing.md },
 
   masthead: { alignItems: "center", marginBottom: spacing.xl },
+
+  // Rising-sun emblem (gold ring + orange core)
+  emblem: { width: 44, height: 44, alignItems: "center", justifyContent: "center", marginBottom: spacing.md },
+  emblemRing: {
+    position: "absolute",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: colors.gold,
+  },
+  emblemCore: { width: 22, height: 22, borderRadius: 11, backgroundColor: colors.orange },
+
+  // Kicker flanked by hairlines — editorial masthead treatment
+  kickerRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm },
+  kickerLine: { width: 24, height: 1, backgroundColor: colors.orange, opacity: 0.6 },
   kicker: {
     color: colors.orange,
     fontFamily: fonts.bodyBold,
     fontSize: 12,
     letterSpacing: 3,
     textTransform: "uppercase",
-    marginBottom: spacing.sm,
   },
   brand: {
     color: colors.navy,
     fontFamily: fonts.display,
-    fontSize: 72,
+    fontSize: 76,
     letterSpacing: 1,
     textTransform: "uppercase",
-    lineHeight: 74,
+    lineHeight: 78,
   },
-  rule: { width: 60, height: 4, backgroundColor: colors.orange, borderRadius: 2, marginVertical: spacing.md },
-  tagline: { color: colors.slate, fontFamily: fonts.body, fontSize: 15, fontStyle: "italic" },
+  tagline: { color: colors.slate, fontFamily: fonts.body, fontSize: 15, fontStyle: "italic", marginTop: spacing.sm },
 
   sectionHead: { marginBottom: spacing.lg },
+  sectionLabelRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  sectionTick: { width: 14, height: 3, borderRadius: 2, backgroundColor: colors.orange },
   sectionLabel: {
     color: colors.navy,
     fontFamily: fonts.displaySemi,
     fontSize: 15,
-    letterSpacing: 1,
+    letterSpacing: 1.2,
     textTransform: "uppercase",
   },
-  sectionSub: { color: colors.slate, fontFamily: fonts.body, fontSize: type.small + 1, lineHeight: 20, marginTop: 4 },
+  sectionSub: { color: colors.slate, fontFamily: fonts.body, fontSize: type.small + 1, lineHeight: 20, marginTop: 6 },
 
   feature: {
     height: 380,
@@ -258,6 +303,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.navy,
     marginBottom: spacing.xl,
     boxShadow: SHADOW,
+  },
+  featureFrame: {
+    position: "absolute",
+    top: spacing.sm,
+    left: spacing.sm,
+    right: spacing.sm,
+    bottom: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.lineStrong,
   },
   featureIndex: {
     position: "absolute",
