@@ -285,7 +285,11 @@ function LinkRow({
 }) {
   const light = tone === "light";
   return (
-    <PressScale style={[styles.linkRow, light ? styles.linkRowLight : styles.linkRowSlate]} onPress={onPress}>
+    <PressScale
+      style={[styles.linkRow, light ? styles.linkRowLight : styles.linkRowSlate]}
+      onPress={onPress}
+      accessibilityLabel={meta ? `${title} — ${meta}` : title}
+    >
       <View style={{ flex: 1 }}>
         <Text style={[styles.linkTitle, { color: light ? colors.dsSlate : "#FFFFFF" }]}>{title}</Text>
         {meta ? <Text style={styles.linkMeta}>{meta}</Text> : null}

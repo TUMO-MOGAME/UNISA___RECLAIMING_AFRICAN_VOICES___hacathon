@@ -43,7 +43,7 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: cover }]}>
       <Pressable style={StyleSheet.absoluteFill} onPress={finish} accessibilityRole="button" accessibilityLabel="Enter Ubuntu Heritage">
         <ImageBackground
-          source={require("../../assets/brand/launch-bg.jpg")}
+          source={require("../../assets/brand/launch-bg.webp")}
           style={styles.bg}
           resizeMode="cover"
         >

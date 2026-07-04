@@ -7,12 +7,21 @@ import { unsungHeroes } from "./unsung-heroes";
 import { marriageRites } from "./marriage-rites";
 import { peoplingOfSa } from "./peopling-of-sa";
 import { peoplesCultures } from "./peoples-cultures";
+import { traditions } from "./traditions";
+import { food } from "./food";
 
 // The four literary pillars.
 export const modules: Module[] = [mhudi, ityalaLamawele, indaba, vilakazi];
 
 // The Cultural Atlas — grounded, cited heritage entries (history, customs, heroes, peoples).
-export const atlasModules: Module[] = [peoplingOfSa, peoplesCultures, unsungHeroes, marriageRites];
+export const atlasModules: Module[] = [
+  peoplingOfSa,
+  peoplesCultures,
+  traditions,
+  marriageRites,
+  food,
+  unsungHeroes,
+];
 
 // Everything — for reader lookup and source crediting on the About screen.
 export const allModules: Module[] = [...modules, ...atlasModules];

@@ -10,6 +10,7 @@
 // Integrity: these are AI artistic interpretations (labelled as such in the Reader). Do NOT use this
 // to fabricate photoreal portraits of the real named authors.
 
+import sharp from "sharp";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -22,6 +23,8 @@ import { unsungHeroes } from "../src/content/unsung-heroes.ts";
 import { marriageRites } from "../src/content/marriage-rites.ts";
 import { peoplingOfSa } from "../src/content/peopling-of-sa.ts";
 import { peoplesCultures } from "../src/content/peoples-cultures.ts";
+import { traditions } from "../src/content/traditions.ts";
+import { food } from "../src/content/food.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appDir = resolve(__dirname, "..");
@@ -50,6 +53,7 @@ const STYLE =
 const modules = [
   mhudi, ityalaLamawele, indaba, vilakazi,
   unsungHeroes, marriageRites, peoplingOfSa, peoplesCultures,
+  traditions, food,
 ];
 const outDir = resolve(appDir, "assets", "generated");
 mkdirSync(outDir, { recursive: true });
@@ -63,10 +67,10 @@ let ok = 0;
 let failed = 0;
 let skipped = 0;
 
-// Find an already-generated file for this scene (png or jpg), so re-runs are idempotent and don't
+// Find an already-generated file for this scene (webp/png/jpg), so re-runs are idempotent and don't
 // burn Gemini quota regenerating art that already exists. Pass --force to regenerate everything.
 const existingFor = (id) =>
-  ["png", "jpg"].map((e) => `${id}.${e}`).find((f) => existsSync(resolve(outDir, f)));
+  ["webp", "png", "jpg"].map((e) => `${id}.${e}`).find((f) => existsSync(resolve(outDir, f)));
 
 for (const mod of modules) {
   const scenes = ALL ? mod.scenes : mod.scenes.slice(0, 1);
@@ -82,8 +86,13 @@ for (const mod of modules) {
     const prompt = `${scene.imagePrompt}. ${STYLE}`;
     try {
       const img = await geminiGenerateImage({ prompt, apiKey, model });
-      const file = `${base}.${ext(img.mimeType)}`;
-      writeFileSync(resolve(outDir, file), Buffer.from(img.base64, "base64"));
+      // Store as WebP (small, fast to load) rather than the raw PNG Gemini returns.
+      const file = `${base}.webp`;
+      const webp = await sharp(Buffer.from(img.base64, "base64"))
+        .resize({ width: 1280, withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+      writeFileSync(resolve(outDir, file), webp);
       manifest[`${mod.id}:${scene.id}`] = `../../assets/generated/${file}`;
       ok++;
       console.log(`  ✓ ${mod.id}/${scene.id} -> assets/generated/${file}`);

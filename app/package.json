@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "sharp": "^0.35.3",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -36,7 +37,8 @@
     "typecheck": "node --stack-size=8000 ./node_modules/typescript/lib/tsc.js --noEmit",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\"",
     "gen:drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-draft-translations.mjs",
-    "gen:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-scene-images.mjs"
+    "gen:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-scene-images.mjs",
+    "webp": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/convert-webp.mjs"
   },
   "private": true
 }

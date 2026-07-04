@@ -36,15 +36,15 @@ export type Province = {
   cities: City[];
 };
 
-const WC = require("../../assets/places/western-cape.jpg");
-const GP = require("../../assets/places/gauteng.jpg");
-const NC = require("../../assets/places/northern-cape.jpg");
-const EC = require("../../assets/places/eastern-cape.jpg");
-const KZN = require("../../assets/places/kwazulu-natal.jpg");
-const FS = require("../../assets/places/free-state.jpg");
-const LP = require("../../assets/places/limpopo.jpg");
-const MP = require("../../assets/places/mpumalanga.jpg");
-const NW = require("../../assets/places/north-west.jpg");
+const WC = require("../../assets/places/western-cape.webp");
+const GP = require("../../assets/places/gauteng.webp");
+const NC = require("../../assets/places/northern-cape.webp");
+const EC = require("../../assets/places/eastern-cape.webp");
+const KZN = require("../../assets/places/kwazulu-natal.webp");
+const FS = require("../../assets/places/free-state.webp");
+const LP = require("../../assets/places/limpopo.webp");
+const MP = require("../../assets/places/mpumalanga.webp");
+const NW = require("../../assets/places/north-west.webp");
 
 export const provinces: Province[] = [
   {
