@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, Pressable, Animated, StyleSheet, useWindowDimensions } from "react-native";
 import { Module, Lang } from "../content/types";
 import { modules, atlasModules } from "../content";
 import { sceneImageSource } from "../content/images";
@@ -58,6 +58,9 @@ const UI = {
   heritage: { en: "Heritage Ledger · on-chain", tn: "Rekoto ya Boswa · mo blockchain" },
 };
 
+// Feeds the page scroll position + viewport height to each Section for scroll-in reveals + parallax.
+const ScrollCtx = React.createContext<{ scrollY: Animated.Value; vh: number } | null>(null);
+
 // The generated (or Pollinations) hero image for a module — used as the big section photos.
 function heroSource(m: Module, w = 1200, h = 900) {
   const s = m.scenes[0];
@@ -86,6 +89,8 @@ export function HomeGallery({
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
+  // Drives scroll-in reveals + image parallax across the page.
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   return (
     <View style={styles.root}>
@@ -94,7 +99,13 @@ export function HomeGallery({
         <LanguagePicker lang={lang} onChange={onLangChange} />
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 0 }} showsVerticalScrollIndicator={false}>
+      <ScrollCtx.Provider value={{ scrollY, vh: height }}>
+      <Animated.ScrollView
+        contentContainerStyle={{ paddingBottom: 0 }}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+      >
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
         <View style={[styles.hero, { height: heroH }]}>
           <View style={StyleSheet.absoluteFill}>
@@ -204,7 +215,8 @@ export function HomeGallery({
           </Pressable>
           <Text style={styles.footerFine}>{KICKER} · POPIA-compliant · built on free-tier, African-built AI</Text>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
+      </ScrollCtx.Provider>
     </View>
   );
 }
@@ -235,13 +247,37 @@ function Section({
   const introColor =
     tone === "light" ? "rgba(35,51,66,0.72)" : tone === "blue" ? "rgba(255,255,255,0.92)" : colors.dsGray;
 
+  // Scroll-driven life: the section rises + fades in as it enters the viewport; its photo parallaxes.
+  const ctx = React.useContext(ScrollCtx);
+  const [y, setY] = useState<number | null>(null);
+  const vh = ctx?.vh ?? 800;
+  const scrollY = ctx?.scrollY;
+  const measured = y != null;
+
+  const revealStyle = !scrollY
+    ? {}
+    : !measured
+    ? { opacity: 0 }
+    : {
+        opacity: scrollY.interpolate({ inputRange: [y - vh * 0.92, y - vh * 0.42], outputRange: [0, 1], extrapolate: "clamp" }),
+        transform: [
+          { translateY: scrollY.interpolate({ inputRange: [y - vh * 0.92, y - vh * 0.42], outputRange: [44, 0], extrapolate: "clamp" }) },
+        ],
+      };
+  const parallax =
+    scrollY && measured
+      ? scrollY.interpolate({ inputRange: [y - vh, y + 600], outputRange: [-26, 26], extrapolate: "clamp" })
+      : 0;
+
   const imageBlock = (
-    <View style={wide ? styles.sectionImageWide : styles.sectionImage}>
-      <SceneImage source={image} />
+    <View style={[wide ? styles.sectionImageWide : styles.sectionImage, styles.imgClip]}>
+      <Animated.View style={[StyleSheet.absoluteFill, styles.imgInner, { transform: [{ translateY: parallax }] }]}>
+        <SceneImage source={image} />
+      </Animated.View>
     </View>
   );
   const textBlock = (
-    <Reveal style={wide ? styles.sectionTextWide : styles.sectionText}>
+    <View style={wide ? styles.sectionTextWide : styles.sectionText}>
       <View style={wide ? { maxWidth: 520 } : undefined}>
         {tone !== "blue" && <View style={styles.accentBar} />}
         <Text style={[styles.sectionKicker, { color: kickerColor }]}>{kicker.toUpperCase()}</Text>
@@ -249,25 +285,22 @@ function Section({
         <Text style={[styles.sectionIntro, wide && styles.sectionIntroWide, { color: introColor }]}>{intro}</Text>
         {children}
       </View>
-    </Reveal>
+    </View>
   );
 
-  // Wide screens: true side-by-side halves (image | text), alternating with `reverse`.
-  // Narrow: the halves stack (image over text), which is the mobile reading of the same design.
   const dir: "row" | "row-reverse" = reverse ? "row-reverse" : "row";
   const rowStyle = [
     styles.section,
     { backgroundColor: bg },
     wide ? ({ flexDirection: dir, minHeight: 520, alignItems: "stretch" } as const) : null,
+    revealStyle,
   ];
 
-  // DOM order is always image→text; on wide screens `row-reverse` visually flips alternate sections,
-  // while narrow screens keep image-on-top (matching the reference's mobile `flex-col`).
   return (
-    <View style={rowStyle}>
+    <Animated.View style={rowStyle} onLayout={(e) => setY(e.nativeEvent.layout.y)}>
       {imageBlock}
       {textBlock}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -361,6 +394,8 @@ const styles = StyleSheet.create({
   section: { width: "100%", borderTopWidth: 8, borderTopColor: BLUE },
   sectionImage: { width: "100%", height: 260, backgroundColor: SLATE },
   sectionImageWide: { width: "50%", backgroundColor: SLATE, alignSelf: "stretch" },
+  imgClip: { overflow: "hidden" },
+  imgInner: { top: -32, bottom: -32 }, // extra height so parallax shift never reveals an edge
   sectionText: { paddingHorizontal: spacing.lg, paddingVertical: spacing.xl },
   sectionTextWide: { width: "50%", paddingHorizontal: 64, paddingVertical: 80, justifyContent: "center" },
   accentBar: { width: 56, height: 6, backgroundColor: BLUE, marginBottom: spacing.md },

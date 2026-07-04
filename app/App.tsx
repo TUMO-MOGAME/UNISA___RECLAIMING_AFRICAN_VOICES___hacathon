@@ -27,6 +27,7 @@ import { provinceById, cityById } from "./src/content/provinces";
 import { PresidentsScreen, PresidentScreen } from "./src/components/PresidentsScreens";
 import { presidentById } from "./src/content/presidents";
 import { Fade } from "./src/components/Motion";
+import { RockArtGuide } from "./src/components/RockArtGuide";
 import { moduleById } from "./src/content";
 import { Lang } from "./src/content/types";
 
@@ -141,6 +142,8 @@ export default function App() {
           </Fade>
         )}
         {showLaunch && <LaunchScreen onDone={() => setLaunchDone(true)} />}
+        {/* The rock-art guide — runs in from the left on each screen and walks alongside you. */}
+        {ready && !showLaunch && <RockArtGuide runKey={routeKey} />}
       </View>
     </View>
   );
