@@ -15,19 +15,19 @@ export function ProvincesScreen({ onBack, onOpenProvince }: { onBack: () => void
     <Screen tone="dark">
       <ScreenHeader kicker="South Africa" title="The Provinces" onBack={onBack} />
       <Text style={s.intro}>
-        Each province carries its own founders, leaders and living history. Tap a province to explore its
-        famous cities. (More provinces are being added.)
+        All nine provinces — each with its own founders, leaders and living history. Tap a province to
+        explore its famous cities.
       </Text>
       <View style={s.grid}>
         {provinces.map((p) => (
-          <PressScale key={p.id} style={s.provCard} onPress={() => onOpenProvince(p.id)}>
+          <PressScale key={p.id} style={s.provCard} onPress={() => onOpenProvince(p.id)} accessibilityLabel={`${p.name} — capital ${p.capital}`}>
             <Image source={p.hero} style={StyleSheet.absoluteFill as any} resizeMode="cover" />
-            <LinearGradient colors={["rgba(0,0,0,0.05)", "rgba(0,0,0,0.55)", "rgba(0,0,0,0.92)"]} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={["rgba(0,0,0,0.2)", "rgba(0,0,0,0.5)", "rgba(0,0,0,0.9)"]} style={StyleSheet.absoluteFill} />
             <View style={s.provCardText}>
               <Text style={s.provName}>{p.name}</Text>
               <Text style={s.provCap}>{p.capital}</Text>
             </View>
-            <View style={s.provCount}><Text style={s.provCountText}>{p.cities.length} cities</Text></View>
+            <View style={s.provCount}><Text style={s.provCountText}>{p.cities.length} {p.cities.length === 1 ? "city" : "cities"}</Text></View>
           </PressScale>
         ))}
       </View>
@@ -61,7 +61,7 @@ export function ProvinceScreen({ province, onBack, onOpenCity }: { province: Pro
       <SectionLabel label="Famous cities" sub="Tap a city for its full history." />
       <View style={{ gap: spacing.md }}>
         {province.cities.map((c) => (
-          <PressScale key={c.id} style={s.cityRow} onPress={() => onOpenCity(c.id)}>
+          <PressScale key={c.id} style={s.cityRow} onPress={() => onOpenCity(c.id)} accessibilityLabel={`${c.name} — founded ${c.founded}`}>
             <Image source={c.hero} style={s.cityThumb} resizeMode="cover" />
             <View style={{ flex: 1 }}>
               <Text style={s.cityRowName}>{c.name}</Text>
@@ -194,13 +194,13 @@ function StatTile({ stat }: { stat: Stat }) {
 
 const s = StyleSheet.create({
   intro: { color: "rgba(255,255,255,0.62)", fontFamily: fonts.serifItalic, fontSize: 15, lineHeight: 22, marginBottom: spacing.lg },
-  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  provCard: { width: "48.5%", height: 150, borderRadius: radius.md, overflow: "hidden", marginBottom: spacing.md, justifyContent: "flex-end", padding: spacing.md, backgroundColor: "#111" },
+  grid: { gap: spacing.md },
+  provCard: { width: "100%", height: 128, borderRadius: radius.md, overflow: "hidden", justifyContent: "flex-end", padding: spacing.md, backgroundColor: "#111" },
   provCardText: {},
-  provName: { color: "#fff", fontFamily: fonts.serif, fontSize: 16, lineHeight: 18 },
-  provCap: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 0.8, textTransform: "uppercase", marginTop: 5 },
-  provCount: { position: "absolute", top: 11, right: 11, backgroundColor: colors.orange, paddingVertical: 3, paddingHorizontal: 8, borderRadius: radius.pill },
-  provCountText: { color: "#fff", fontFamily: fonts.bodyBold, fontSize: 9, letterSpacing: 0.3, textTransform: "uppercase" },
+  provName: { color: "#fff", fontFamily: fonts.serifSemi, fontSize: 26, letterSpacing: -0.3 },
+  provCap: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", marginTop: 4 },
+  provCount: { position: "absolute", top: 12, right: 12, backgroundColor: colors.orange, paddingVertical: 4, paddingHorizontal: 9, borderRadius: radius.pill },
+  provCountText: { color: "#fff", fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 0.3, textTransform: "uppercase" },
 
   provHero: { height: 172, borderRadius: radius.lg, overflow: "hidden", marginBottom: spacing.md, justifyContent: "flex-end", padding: spacing.md },
   provHeroText: {},
@@ -246,8 +246,8 @@ const s = StyleSheet.create({
   tlName: { color: "#fff", fontFamily: fonts.serif, fontSize: 15, marginTop: 1 },
   tlRole: { color: "rgba(255,255,255,0.58)", fontFamily: fonts.body, fontSize: 12, lineHeight: 17, marginTop: 2 },
 
-  statGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
-  statTile: { width: "48.5%", backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md },
+  statGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },
+  statTile: { flexGrow: 1, flexBasis: 150, minWidth: 140, backgroundColor: "rgba(255,255,255,0.05)", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderRadius: radius.md, padding: spacing.md },
   statVal: { color: "#fff", fontFamily: fonts.display, fontSize: 24 },
   statLabel: { color: "rgba(255,255,255,0.55)", fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 0.4, textTransform: "uppercase", marginTop: 6 },
   pill: { alignSelf: "flex-start", borderWidth: 1, borderRadius: radius.pill, paddingVertical: 1, paddingHorizontal: 7, marginTop: 7 },

@@ -9,4 +9,5 @@ export const GENERATED_IMAGES: Record<string, number> = {
   "unsung-heroes:galeshewe": require("../../assets/generated/unsung-heroes-galeshewe.png"),
   "marriage-rites:lobola": require("../../assets/generated/marriage-rites-lobola.png"),
   "peopling-of-sa:first-people": require("../../assets/generated/peopling-of-sa-first-people.png"),
+  "peoples-cultures:two-families": require("../../assets/generated/peoples-cultures-two-families.png"),
 };

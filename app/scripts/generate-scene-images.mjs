@@ -21,6 +21,7 @@ import { vilakazi } from "../src/content/vilakazi.ts";
 import { unsungHeroes } from "../src/content/unsung-heroes.ts";
 import { marriageRites } from "../src/content/marriage-rites.ts";
 import { peoplingOfSa } from "../src/content/peopling-of-sa.ts";
+import { peoplesCultures } from "../src/content/peoples-cultures.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appDir = resolve(__dirname, "..");
@@ -48,7 +49,7 @@ const STYLE =
 
 const modules = [
   mhudi, ityalaLamawele, indaba, vilakazi,
-  unsungHeroes, marriageRites, peoplingOfSa,
+  unsungHeroes, marriageRites, peoplingOfSa, peoplesCultures,
 ];
 const outDir = resolve(appDir, "assets", "generated");
 mkdirSync(outDir, { recursive: true });
