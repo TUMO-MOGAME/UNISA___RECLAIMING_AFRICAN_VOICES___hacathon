@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Ubuntu Heritage — Reclaiming African Voices</title>
+<meta name="theme-color" content="#0E1C2E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet" />
+<style>
+
+  /* ============================================================
+     UBUNTU HERITAGE — UI Redesign Lab   ·   the whole journey
+     Brand palette locked to the AADHIH "Reclaiming African Voices"
+     brief: deep navy + burnt orange + gold on warm cream.
+     Direction: cinematic editorial archive.
+     All content grounded in the real app data (no invented facts).
+     ============================================================ */
+  :root {
+    --paper:#F4EEE1; --paper-card:#FFFFFF; --paper-2:#EFE7D6;
+    --line:rgba(21,41,63,0.12);
+    --navy:#16293F; --navy-deep:#0E1C2E; --card:#1E344C;
+    --orange:#D96A1C; --orange-dk:#B4530F; --gold:#EBA43C;
+    --slate:#5D6B79; --sand:#F4EEE1; --muted:#9FB0C0;
+    --shadow-lg:0 24px 60px -20px rgba(14,28,46,0.45);
+    --shadow-md:0 14px 32px -14px rgba(14,28,46,0.30);
+    --shadow-sm:0 6px 16px -8px rgba(14,28,46,0.20);
+    --font-display:'Anton',system-ui,sans-serif;
+    --font-serif:'Fraunces',Georgia,serif;
+    --font-body:'Barlow',system-ui,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:var(--font-body);
+    background:
+      radial-gradient(1200px 700px at 12% -5%, rgba(217,106,28,0.16), transparent 60%),
+      radial-gradient(1000px 800px at 100% 0%, rgba(235,164,60,0.12), transparent 55%),
+      linear-gradient(160deg,#10202f 0%,#0b1826 55%,#0a1420 100%);
+    color:var(--sand); min-height:100vh; -webkit-font-smoothing:antialiased;
+    padding:clamp(20px,4vw,56px); overflow-x:hidden;
+  }
+  body::after {
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:0.045; z-index:9999;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Lab header ---------- */
+  .lab-head { max-width:1180px; margin:0 auto 12px; }
+  .eyebrow {
+    font-weight:700; font-size:11px; letter-spacing:0.32em; text-transform:uppercase;
+    color:var(--gold); display:flex; align-items:center; gap:10px; margin-bottom:16px;
+  }
+  .eyebrow::before { content:""; width:26px; height:2px; background:var(--orange); }
+  .lab-title {
+    font-family:var(--font-display); font-size:clamp(44px,7vw,84px); line-height:0.9;
+    text-transform:uppercase; letter-spacing:0.01em;
+  }
+  .lab-title em { font-style:normal; color:transparent; -webkit-text-stroke:1.5px var(--gold); }
+  .lab-sub { margin-top:18px; color:var(--muted); font-size:15px; line-height:1.65; max-width:64ch; }
+  .lab-sub b { color:var(--sand); font-weight:600; }
+
+  .meta-strip {
+    display:flex; flex-wrap:wrap; gap:28px; margin-top:26px; padding-top:24px;
+    border-top:1px solid rgba(255,255,255,0.1);
+  }
+  .swatches { display:flex; gap:8px; }
+  .sw { width:40px; height:40px; border-radius:9px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.12); position:relative; }
+  .sw span { position:absolute; bottom:-17px; left:0; font-size:8.5px; letter-spacing:0.06em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+  .type-list { display:flex; gap:26px; align-items:baseline; flex-wrap:wrap; }
+  .type-item .k { display:block; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:4px; }
+  .type-item .d { font-family:var(--font-display); font-size:24px; text-transform:uppercase; }
+  .type-item .s { font-family:var(--font-serif); font-size:22px; font-style:italic; }
+  .type-item .b { font-family:var(--font-body); font-size:18px; font-weight:500; }
+
+  /* ---------- Filmstrip of screens ---------- */
+  .strip {
+    max-width:1180px; margin:44px auto 0;
+    display:flex; gap:44px; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+  }
+  .frame-wrap { display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .screen-label { text-align:center; }
+  .screen-label .n {
+    font-family:var(--font-display); font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold);
+  }
+  .screen-label .t { font-size:12px; color:var(--muted); margin-top:3px; max-width:30ch; line-height:1.4; }
+
+  /* ---------- Phone frame ---------- */
+  .phone {
+    width:372px; background:var(--paper); border-radius:44px; padding:11px; position:relative;
+    box-shadow:var(--shadow-lg), 0 0 0 2px rgba(255,255,255,0.06), inset 0 0 0 1px rgba(14,28,46,0.5);
+  }
+  .phone::before { content:""; position:absolute; left:-3px; top:120px; width:3px; height:58px; border-radius:3px; background:rgba(255,255,255,0.12); }
+  .screen {
+    background:var(--paper); border-radius:34px; overflow:hidden; height:760px; overflow-y:auto;
+    position:relative; scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar { display:none; }
+  .screen.dark { background:var(--navy-deep); }
+  .notch { position:absolute; top:11px; left:50%; transform:translateX(-50%); width:108px; height:24px; background:var(--navy-deep); border-radius:0 0 15px 15px; z-index:20; }
+  .screen.dark .notch { background:#060d16; }
+
+  .statusbar { position:relative; z-index:15; display:flex; align-items:center; justify-content:space-between; padding:13px 22px 4px; font-size:12px; font-weight:700; color:var(--navy); }
+  .screen.dark .statusbar { color:var(--sand); }
+  .statusbar .dots { display:flex; gap:4px; }
+  .statusbar .dots i { width:5px; height:5px; border-radius:50%; background:currentColor; opacity:0.55; }
+
+  /* warm paper wash */
+  .paper-wash::before {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(560px 300px at 82% -60px, rgba(235,164,60,0.22), transparent 70%),
+      radial-gradient(460px 260px at -10% 140px, rgba(217,106,28,0.09), transparent 70%);
+  }
+
+  /* ===== shared bits ===== */
+  .topbar { position:relative; z-index:5; display:flex; align-items:center; justify-content:space-between; padding:6px 22px 8px; }
+  .brandmark { display:flex; align-items:center; gap:10px; }
+  .emblem { width:30px; height:30px; position:relative; display:grid; place-items:center; }
+  .emblem .ring { position:absolute; inset:0; border-radius:50%; border:2px solid var(--gold); }
+  .emblem .core { width:15px; height:15px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#f4b45a,var(--orange)); }
+  .emblem .rays { position:absolute; inset:-5px; border-radius:50%;
+    background:conic-gradient(from 0deg,transparent 0 8deg,rgba(235,164,60,0.5) 9deg 10deg,transparent 11deg 30deg);
+    -webkit-mask:radial-gradient(circle,transparent 60%,#000 62%); mask:radial-gradient(circle,transparent 60%,#000 62%); }
+  .brandmark .name { font-family:var(--font-display); font-size:16px; line-height:0.94; color:var(--navy); text-transform:uppercase; letter-spacing:0.03em; max-width:120px; }
+  .brand-logo { height:42px; width:auto; display:block; }
+
+  /* ===== Launch / splash — wordmark over a dramatic SA image ===== */
+  .screen.launch { background:#0d0b0a; display:flex; flex-direction:column; }
+  .launch-bg { position:absolute; inset:0; z-index:0; background:url('launch-bg.jpg') center/cover no-repeat; animation:kb 34s ease-in-out infinite alternate; }
+  .launch-scrim { position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(70% 50% at 50% 48%, rgba(10,8,6,0.72), transparent 78%),
+      linear-gradient(180deg, rgba(10,8,6,0.55) 0%, rgba(10,8,6,0.28) 40%, rgba(10,8,6,0.66) 74%, rgba(10,8,6,0.95) 100%); }
+  .launch-inner { position:relative; z-index:2; margin:auto; display:flex; flex-direction:column; align-items:center; padding:0 24px; text-align:center; }
+  .launch-wordmark { display:flex; flex-direction:column; align-items:center; line-height:0.84; margin-top:16px; }
+  .launch-wordmark span { font-family:var(--font-display); text-transform:uppercase; color:var(--sand); font-size:62px; letter-spacing:0.02em; text-shadow:0 4px 26px rgba(0,0,0,0.65); }
+  .lw-country { font-family:var(--font-body); font-weight:700; font-size:14px; letter-spacing:0.42em; text-transform:uppercase; color:var(--gold); margin-top:16px; padding-left:0.42em; text-shadow:0 2px 14px rgba(0,0,0,0.7); }
+  .lw-rule { width:60px; height:2px; background:var(--orange); border-radius:2px; margin:18px 0 0; }
+  .launch-tag { color:var(--sand); font-family:var(--font-serif); font-style:italic; font-size:15px; margin-top:16px; opacity:0.92; text-shadow:0 2px 12px rgba(0,0,0,0.7); }
+  .launch-kicker { color:rgba(235,164,60,0.85); font-size:10px; letter-spacing:0.28em; text-transform:uppercase; font-weight:700; display:flex; align-items:center; gap:10px; text-shadow:0 2px 12px rgba(0,0,0,0.7); }
+  .launch-kicker::before, .launch-kicker::after { content:""; width:20px; height:1px; background:rgba(235,164,60,0.55); }
+  .lang-pill { display:flex; align-items:center; gap:6px; background:var(--paper-card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:11.5px; font-weight:600; color:var(--navy); box-shadow:var(--shadow-sm); cursor:pointer; }
+  .lang-pill .chev { color:var(--slate); font-size:9px; }
+  .lang-pill.on-dark { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:var(--sand); }
+
+  /* ===================== HOME ===================== */
+  .hero { position:relative; z-index:2; margin:6px 16px 4px; height:412px; border-radius:26px; overflow:hidden; box-shadow:var(--shadow-md); background:#23324a; }
+  .savanna { position:absolute; inset:0; }
+  .savanna .sky {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(36,26,44,0.18), rgba(16,26,43,0.48)),
+      url("geranimo-N9s3FjzsstM-unsplash.jpg") center/cover no-repeat,
+      linear-gradient(180deg,#3a2a1e 0%,#241a2c 45%,#101a2b 100%);
+    animation:kb 26s ease-in-out infinite alternate;
+  }
+  @keyframes kb { from { transform:scale(1); } to { transform:scale(1.08); } }
+  .savanna .scrim {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(60% 40% at 50% 96%, rgba(14,28,46,0.9), transparent 70%),
+      linear-gradient(180deg, transparent 52%, rgba(14,28,46,0.55) 76%, rgba(14,28,46,0.98) 100%);
+  }
+  .savanna .sun { position:absolute; top:52px; right:58px; width:88px; height:88px; border-radius:50%;
+    background:radial-gradient(circle at 50% 45%,#ffe6a8,#f6b64a 55%,rgba(246,182,74,0) 72%); }
+  .savanna .horizon {
+    position:absolute; left:0; right:0; bottom:120px; height:88px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='372' height='88' preserveAspectRatio='none'%3E%3Cpath d='M0 88 L0 58 Q40 53 70 56 T140 48 L150 32 Q152 28 156 32 L162 48 Q210 44 250 50 L258 28 Q262 22 266 28 L274 50 Q330 46 372 54 L372 88 Z' fill='%230e1c2e'/%3E%3C/svg%3E") bottom/cover no-repeat;
+  }
+  .hero .frame { position:absolute; inset:12px; border-radius:18px; border:1px solid rgba(244,238,225,0.30); pointer-events:none; }
+  .hero .index { position:absolute; top:14px; left:22px; font-family:var(--font-display); font-size:15px; letter-spacing:0.2em; color:var(--gold); }
+  .hero .badge { position:absolute; top:17px; right:22px; font-size:9.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--sand); font-weight:700; background:rgba(217,106,28,0.92); padding:5px 10px; border-radius:999px; }
+  .hero .caption { position:absolute; left:24px; right:24px; bottom:22px; z-index:2; }
+  .hero .kick { font-size:10.5px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); margin-bottom:7px; }
+  .hero h2 { font-family:var(--font-display); font-size:44px; line-height:0.9; text-transform:uppercase; color:var(--sand); }
+  .hero .blurb { font-family:var(--font-serif); font-style:italic; font-size:14px; color:rgba(244,238,225,0.9); line-height:1.5; margin-top:9px; max-width:32ch; }
+  .cta { display:inline-flex; align-items:center; gap:9px; margin-top:15px; background:var(--orange); color:#fff; font-weight:700; font-size:12.5px; letter-spacing:0.05em; padding:11px 19px; border-radius:999px; box-shadow:0 10px 24px -8px rgba(217,106,28,0.7); cursor:pointer; }
+  .cta .arw { transition:transform 0.25s; }
+  .cta:hover .arw { transform:translateX(4px); }
+
+  .masthead { position:relative; z-index:2; text-align:center; padding:20px 24px 4px; }
+  .masthead .rule { display:flex; align-items:center; justify-content:center; gap:11px; margin-bottom:9px; }
+  .masthead .rule i { height:1px; width:32px; background:var(--orange); opacity:0.55; }
+  .masthead .rule span { font-size:10px; font-weight:700; letter-spacing:0.26em; text-transform:uppercase; color:var(--orange); }
+  .masthead .tag { font-family:var(--font-serif); font-style:italic; font-size:15px; color:var(--slate); }
+
+  .section-head { padding:24px 24px 12px; position:relative; z-index:2; }
+  .section-head .label { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:16px; text-transform:uppercase; letter-spacing:0.05em; color:var(--navy); }
+  .section-head .label::before { content:""; width:15px; height:3px; border-radius:2px; background:var(--orange); }
+  .section-head .sub { color:var(--slate); font-size:12.5px; line-height:1.5; margin-top:7px; max-width:42ch; }
+
+  .pillars { padding:0 20px; display:grid; gap:12px; position:relative; z-index:2; }
+  .pcard { display:flex; gap:14px; align-items:center; background:var(--paper-card); border:1px solid var(--line); border-radius:20px; padding:13px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .22s, box-shadow .22s; }
+  .pcard:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+  .pcard .num { font-family:var(--font-display); font-size:21px; color:var(--orange); width:24px; text-align:center; flex:none; }
+  .pcard .thumb { width:60px; height:78px; border-radius:12px; flex:none; overflow:hidden; position:relative; box-shadow:inset 0 0 0 1px rgba(14,28,46,0.15); }
+  .thumb .g::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 40%,rgba(14,28,46,0.5)); }
+  .g { position:absolute; inset:0; }
+  .g-mhudi   { background:url("pexels-khulani-36419398.jpg") center/cover, radial-gradient(120% 80% at 60% 10%,#f6c66b,#d97b26 45%,#3a2340 100%); }
+  .g-ityala  { background:url("pexels-magda-ehlers-pexels-3193548.jpg") center/cover, radial-gradient(120% 80% at 40% 15%,#eab04a,#b45a1f 50%,#1c2a44 100%); }
+  .g-indaba  { background:url("pexels-stewphotography-7825650.jpg") center/cover, radial-gradient(120% 90% at 55% 20%,#7fb0c9,#2b5a73 45%,#141d33 100%); }
+  .g-vilakazi{ background:url("pexels-skylight-views-2151863365-34735591.jpg") center/cover, radial-gradient(120% 80% at 50% 12%,#f2b06a,#a34d2a 50%,#241a2c 100%); }
+  .g-atlas1  { background:url("pexels-omar-photographer-686423191-33212386.jpg") center/cover, radial-gradient(120% 80% at 55% 15%,#eec06a,#c06a26 45%,#2a2030 100%); }
+  .g-atlas2  { background:url("pexels-kaybee-photography-664870201-33687401.jpg") center/cover, radial-gradient(120% 80% at 45% 20%,#e79b5a,#8f4a2c 50%,#1a2436 100%); }
+  .g-atlas3  { background:url("pexels-jann-bader-411133784-17176393.jpg") center/cover, radial-gradient(120% 90% at 50% 18%,#cdaf7e,#7a6046 50%,#1d2333 100%); }
+  .pcard .body { flex:1; min-width:0; }
+  .pcard .title { font-family:var(--font-serif); font-weight:500; font-size:18px; color:var(--navy); line-height:1.12; }
+  .pcard .meta { font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--orange); margin-top:5px; }
+  .pcard .desc { font-size:12px; color:var(--slate); line-height:1.42; margin-top:5px; }
+  .pcard .chev { color:var(--slate); font-size:21px; flex:none; }
+
+  .atlas-grid { padding:2px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:11px; position:relative; z-index:2; }
+  .achip { border-radius:17px; overflow:hidden; position:relative; height:116px; cursor:pointer; box-shadow:var(--shadow-sm); display:flex; align-items:flex-end; padding:12px; transition:transform .22s; }
+  .achip:hover { transform:translateY(-3px); }
+  .achip::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg,transparent 28%,rgba(14,28,46,0.85)); }
+  .achip .star { position:absolute; top:11px; left:12px; z-index:2; color:var(--gold); font-size:12px; }
+  .achip .tt { position:relative; z-index:2; }
+  .achip .tt .h { font-family:var(--font-serif); font-weight:500; color:#fff; font-size:14.5px; line-height:1.1; }
+  .achip .tt .s { color:rgba(244,238,225,0.75); font-size:10px; margin-top:3px; }
+
+  .archive { margin:20px 20px 0; position:relative; z-index:2; background:linear-gradient(145deg,#1d3450 0%,#16293F 45%,#0e1c2e 100%); border-radius:22px; padding:19px; overflow:hidden; display:flex; align-items:center; gap:15px; box-shadow:var(--shadow-md); cursor:pointer; }
+  .archive::before { content:""; position:absolute; top:-40px; right:-30px; width:150px; height:150px; background:radial-gradient(circle,rgba(235,164,60,0.28),transparent 65%); }
+  .archive::after { content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.14'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .archive .mic { width:52px; height:52px; border-radius:15px; flex:none; position:relative; z-index:2; display:grid; place-items:center; font-size:23px; background:rgba(217,106,28,0.18); box-shadow:inset 0 0 0 1px rgba(235,164,60,0.4); }
+  .archive .txt { position:relative; z-index:2; flex:1; }
+  .archive .txt .h { font-family:var(--font-display); font-size:19px; text-transform:uppercase; color:var(--sand); letter-spacing:0.02em; }
+  .archive .txt .s { color:var(--muted); font-size:12px; margin-top:3px; line-height:1.4; }
+  .archive .go { position:relative; z-index:2; color:var(--gold); font-size:25px; flex:none; }
+
+  .foot { position:relative; z-index:2; padding:22px 20px 38px; display:grid; gap:15px; justify-items:center; }
+  .ledger { display:inline-flex; align-items:center; gap:9px; border:1px solid var(--navy); border-radius:999px; padding:10px 19px; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--navy); cursor:pointer; transition:background .2s,color .2s; }
+  .ledger:hover { background:var(--navy); color:var(--sand); }
+  .live { width:7px; height:7px; border-radius:50%; background:#3fbf6a; box-shadow:0 0 0 3px rgba(63,191,106,0.25); animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 6px rgba(63,191,106,0); } }
+  .about-link { font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--slate); cursor:pointer; }
+  .about-link:hover { color:var(--orange); }
+
+  /* ===================== READER ===================== */
+  .reader-art { position:absolute; inset:0; z-index:0; }
+  .reader-art .sky {
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(44,32,22,0.30), rgba(12,20,32,0.60)),
+      url("tobias-reich--7ZwuyDx2rI-unsplash.jpg") center/cover no-repeat,
+      linear-gradient(180deg,#2c2016 0%,#1a1622 48%,#0c1420 100%);
+    animation:kb 30s ease-in-out infinite alternate;
+  }
+  .reader-art .figures {
+    position:absolute; left:0; right:0; bottom:38%; height:120px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='372' height='120' preserveAspectRatio='xMidYMax meet'%3E%3Cg fill='%230b1420'%3E%3Cpath d='M120 120 q6 -60 14 -66 q3 -18 10 -18 q7 0 9 18 q9 8 13 66 z'/%3E%3Cpath d='M150 120 q4 -52 12 -58 q2 -14 8 -14 q6 0 8 14 q9 8 12 58 z'/%3E%3C/g%3E%3C/svg%3E") bottom center no-repeat;
+    opacity:0.9;
+  }
+  .reader-scrim { position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(14,11,7,0.74) 0%, rgba(14,11,7,0.28) 42%, rgba(14,11,7,0.92) 100%); }
+  .reader-body { position:relative; z-index:5; display:flex; flex-direction:column; height:100%; padding:6px 20px 22px; }
+  .reader-top { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+  .reader-titlewrap { display:flex; gap:10px; align-items:flex-start; flex-shrink:1; }
+  .back-btn { width:34px; height:34px; border-radius:999px; background:rgba(6,13,22,0.7); display:grid; place-items:center; color:var(--sand); font-size:22px; flex:none; cursor:pointer; }
+  .reader-kick { color:var(--gold); font-family:var(--font-body); font-weight:600; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; }
+  .reader-scene { color:var(--sand); font-family:var(--font-serif); font-weight:500; font-size:25px; line-height:1.05; margin-top:3px; }
+  .reader-controls { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex:none; }
+  .seg { display:flex; background:rgba(6,13,22,0.72); border-radius:999px; padding:3px; }
+  .seg button { border:none; background:none; color:var(--muted); font-family:var(--font-body); font-weight:600; font-size:11px; padding:6px 12px; border-radius:999px; cursor:pointer; }
+  .seg button.active { background:var(--gold); color:var(--navy-deep); }
+  .listen { display:flex; align-items:center; gap:6px; background:rgba(6,13,22,0.72); border:1px solid var(--gold); border-radius:999px; padding:7px 13px; color:var(--sand); font-weight:600; font-size:11px; cursor:pointer; }
+
+  .reader-text { margin:auto 0; padding:14px 0; }
+  .reader-text .passage { color:var(--sand); font-family:var(--font-serif); font-weight:400; font-size:18.5px; line-height:1.62; }
+  .reader-text .passage .drop { float:left; font-family:var(--font-display); font-size:56px; line-height:0.8; color:var(--gold); margin:4px 10px 0 0; }
+  .reader-note { color:var(--muted); font-size:11.5px; font-style:italic; margin-top:16px; line-height:1.5; }
+  .reader-source { color:var(--muted); font-size:11.5px; margin-top:6px; }
+  .reader-source b { color:var(--gold); font-weight:600; font-style:normal; }
+  .reader-archive-cta { display:inline-flex; align-self:flex-start; margin-top:16px; gap:8px; align-items:center; border:1px solid var(--gold); border-radius:999px; padding:9px 15px; color:var(--gold); font-weight:600; font-size:11.5px; cursor:pointer; }
+
+  .reader-nav { display:flex; align-items:center; justify-content:space-between; padding-top:12px; }
+  .nav-btn { background:rgba(6,13,22,0.72); border-radius:999px; padding:10px 18px; color:var(--sand); font-weight:600; font-size:13px; cursor:pointer; }
+  .nav-btn.disabled { opacity:0.35; }
+  .nav-progress { color:var(--muted); font-size:12px; letter-spacing:0.08em; }
+
+  /* ===================== ARCHIVE ===================== */
+  .scr-head { position:relative; z-index:2; padding:8px 22px 4px; }
+  .scr-head .top { display:flex; align-items:center; gap:12px; }
+  .scr-head .kicker { color:var(--orange); font-weight:700; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; }
+  .scr-head h1 { font-family:var(--font-display); font-size:34px; text-transform:uppercase; color:var(--navy); line-height:1; margin-top:3px; }
+  .back-dark { width:34px; height:34px; border-radius:999px; border:1px solid var(--line); background:var(--paper-card); display:grid; place-items:center; color:var(--navy); font-size:20px; flex:none; cursor:pointer; box-shadow:var(--shadow-sm); }
+  .scr-intro { position:relative; z-index:2; padding:12px 22px 0; color:var(--slate); font-size:14px; line-height:1.55; font-family:var(--font-serif); }
+  .record-btn { position:relative; z-index:2; margin:20px 22px 0; background:var(--orange); border-radius:999px; padding:16px; text-align:center; color:#fff; font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; box-shadow:0 12px 26px -10px rgba(217,106,28,0.7); display:flex; align-items:center; justify-content:center; gap:9px; }
+  .record-btn .rec-dot { width:11px; height:11px; border-radius:50%; background:#fff; }
+  .rec-card { position:relative; z-index:2; margin:16px 22px 0; background:var(--paper-card); border:1px solid var(--line); border-radius:18px; padding:15px; box-shadow:var(--shadow-sm); }
+  .rec-card .rc-top { display:flex; align-items:center; justify-content:space-between; }
+  .badge-priv { display:inline-flex; gap:5px; align-items:center; font-size:10.5px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--navy); }
+  .rc-date { color:var(--slate); font-size:11px; }
+  .rc-title { font-family:var(--font-serif); font-weight:500; font-size:17px; color:var(--navy); margin-top:11px; padding-bottom:7px; border-bottom:1px dashed var(--line); }
+  .rc-actions { display:flex; gap:9px; margin-top:13px; }
+  .play-btn { background:var(--navy); color:var(--paper); border-radius:999px; padding:8px 18px; font-size:12px; font-weight:600; cursor:pointer; }
+  .del-btn { border:1px solid var(--slate); color:var(--slate); border-radius:999px; padding:8px 18px; font-size:12px; font-weight:600; cursor:pointer; }
+  .waveform { display:flex; align-items:center; gap:3px; height:26px; margin-top:12px; }
+  .waveform i { width:3px; background:var(--gold); border-radius:2px; opacity:0.7; }
+
+  /* consent sheet overlay */
+  .sheet-backdrop { position:absolute; inset:0; z-index:30; background:rgba(6,13,22,0.62); display:flex; align-items:flex-end; }
+  .sheet { width:100%; background:var(--navy); border-radius:24px 24px 34px 34px; padding:22px 20px 30px; box-shadow:0 -20px 50px -20px rgba(0,0,0,0.6); }
+  .sheet .grip { width:40px; height:4px; border-radius:2px; background:rgba(255,255,255,0.22); margin:0 auto 16px; }
+  .sheet h3 { font-family:var(--font-serif); font-weight:600; font-size:23px; color:var(--gold); }
+  .sheet p { color:var(--sand); font-size:13px; line-height:1.6; margin-top:11px; }
+  .sheet .qlabel { color:var(--muted); font-size:10.5px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-top:20px; margin-bottom:9px; }
+  .choice { background:var(--card); border-radius:14px; padding:14px; margin-top:9px; cursor:pointer; }
+  .choice.pub { border:1px solid var(--gold); }
+  .choice .ch { color:var(--sand); font-weight:600; font-size:14px; }
+  .choice .cs { color:var(--muted); font-size:11.5px; margin-top:2px; }
+  .sheet .notnow { text-align:center; color:var(--muted); font-size:13px; padding:15px 0 0; cursor:pointer; }
+  .popia-tag { display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); font-weight:700; }
+
+  /* ===================== HERITAGE ===================== */
+  .h-intro { position:relative; z-index:2; padding:12px 22px 0; color:var(--slate); font-size:13.5px; line-height:1.55; font-family:var(--font-serif); }
+  .h-card { position:relative; z-index:2; margin:15px 22px 0; background:var(--paper-card); border:1px solid var(--line); border-radius:18px; padding:16px; box-shadow:var(--shadow-sm); }
+  .h-card .h-title { font-family:var(--font-serif); font-weight:600; font-size:19px; color:var(--navy); }
+  .h-card .h-meta { color:var(--orange); font-size:10.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-top:3px; }
+  .field-label { color:var(--slate); font-weight:700; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; margin-top:13px; }
+  .mono { font-family:'Barlow',monospace; font-variant-numeric:tabular-nums; color:var(--navy); font-size:12.5px; font-weight:500; margin-top:2px; letter-spacing:0.02em; word-break:break-all; }
+  .verify-btn { display:inline-flex; align-items:center; gap:7px; margin-top:14px; background:var(--orange); color:#fff; border-radius:999px; padding:9px 16px; font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; }
+  .anchored-row { display:flex; align-items:center; gap:8px; margin-top:13px; }
+  .chain-chip { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#2f8f52; }
+  .popia-card { position:relative; z-index:2; margin:18px 22px 34px; background:var(--navy); border-radius:18px; padding:17px; display:flex; gap:13px; align-items:flex-start; box-shadow:var(--shadow-md); overflow:hidden; }
+  .popia-card::after { content:""; position:absolute; inset:0; opacity:0.4; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.12'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .popia-card .lock { font-size:20px; position:relative; z-index:2; }
+  .popia-card p { position:relative; z-index:2; color:var(--muted); font-size:12px; line-height:1.55; font-style:italic; }
+
+  /* ===================== PROVINCES (grid) ===================== */
+  .prov-grid { padding:2px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; position:relative; z-index:2; }
+  .prov-card { position:relative; height:150px; border-radius:18px; overflow:hidden; cursor:pointer; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:flex-end; padding:13px; transition:transform .22s; }
+  .prov-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-md); }
+  .prov-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .prov-card::after { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(180deg, rgba(14,28,46,0.05) 25%, rgba(14,28,46,0.55) 62%, rgba(14,28,46,0.92) 100%); }
+  .prov-card .pc-in { position:relative; z-index:2; }
+  .prov-card .pc-name { font-family:var(--font-serif); font-weight:600; color:#fff; font-size:16px; line-height:1.04; }
+  .prov-card .pc-cap { color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-top:5px; }
+  .prov-card .pc-count { position:absolute; top:11px; right:11px; z-index:2; background:rgba(217,106,28,0.94); color:#fff; font-size:9px; font-weight:700; padding:3px 8px; border-radius:999px; letter-spacing:0.03em; }
+
+  /* ===================== PROVINCE DETAIL ===================== */
+  .prov-hero { position:relative; height:172px; margin:6px 16px 0; border-radius:22px; overflow:hidden; box-shadow:var(--shadow-md); }
+  .prov-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; animation:kb 32s ease-in-out infinite alternate; }
+  .prov-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,28,46,0.1) 25%, rgba(14,28,46,0.55) 62%, rgba(14,28,46,0.94) 100%); }
+  .prov-hero .ph-in { position:absolute; left:18px; right:18px; bottom:14px; z-index:2; }
+  .prov-hero .ph-kick { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; }
+  .prov-hero .ph-name { font-family:var(--font-display); font-size:34px; text-transform:uppercase; color:#fff; line-height:0.92; margin-top:4px; }
+  .prov-mini { display:flex; gap:9px; padding:14px 22px 0; position:relative; z-index:2; }
+  .prov-mini .pm { flex:1; background:var(--paper-card); border:1px solid var(--line); border-radius:12px; padding:10px 8px; text-align:center; box-shadow:var(--shadow-sm); }
+  .prov-mini .pm .v { font-family:var(--font-serif); font-weight:600; font-size:14px; color:var(--navy); line-height:1.1; }
+  .prov-mini .pm .l { font-size:8.5px; color:var(--slate); text-transform:uppercase; letter-spacing:0.05em; margin-top:4px; }
+  .city-row { display:flex; gap:13px; align-items:center; background:var(--paper-card); border:1px solid var(--line); border-radius:16px; padding:11px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .2s, box-shadow .2s; }
+  .city-row:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+  .city-row img { width:60px; height:60px; border-radius:12px; object-fit:cover; flex:none; }
+  .city-row .cr-b { flex:1; min-width:0; }
+  .city-row .cr-name { font-family:var(--font-serif); font-weight:600; font-size:16px; color:var(--navy); line-height:1.1; }
+  .city-row .cr-meta { color:var(--orange); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+  .city-row .cr-blurb { color:var(--slate); font-size:12px; line-height:1.4; margin-top:4px; }
+
+  /* ===================== CITY DETAIL ===================== */
+  .city-hero { position:relative; height:216px; margin:6px 16px 0; border-radius:22px; overflow:hidden; box-shadow:var(--shadow-md); }
+  .city-hero img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; animation:kb 30s ease-in-out infinite alternate; }
+  .city-hero::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,28,46,0.1) 25%, rgba(14,28,46,0.55) 60%, rgba(14,28,46,0.96) 100%); }
+  .city-hero .ch-in { position:absolute; left:18px; right:18px; bottom:15px; z-index:2; }
+  .city-hero .ch-kick { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; }
+  .city-hero .ch-name { font-family:var(--font-display); font-size:40px; text-transform:uppercase; color:#fff; line-height:0.9; margin-top:4px; }
+  .city-hero .ch-sub { color:rgba(244,238,225,0.88); font-family:var(--font-serif); font-style:italic; font-size:13.5px; margin-top:5px; }
+  .city-hero .ch-est { position:absolute; top:14px; left:16px; z-index:2; background:rgba(15,10,6,0.6); border:1px solid rgba(235,164,60,0.5); color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
+  .city-back { position:absolute; top:12px; right:16px; z-index:3; }
+
+  .city-band { margin:18px 20px 0; background:linear-gradient(135deg,#1d3450 0%,#16293F 45%,#0e1c2e 100%); border-radius:16px; padding:15px 16px; position:relative; z-index:2; overflow:hidden; }
+  .city-band::after { content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='20'%3E%3Cpath d='M17 0 L34 10 L17 20 L0 10 Z' fill='none' stroke='%23eba43c' stroke-opacity='0.12'/%3E%3C/svg%3E"); background-size:34px 20px; }
+  .city-band .cb-label { color:var(--gold); font-size:9.5px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase; position:relative; z-index:2; }
+  .city-band .cb-text { color:var(--sand); font-family:var(--font-serif); font-size:13.5px; line-height:1.55; margin-top:7px; position:relative; z-index:2; }
+
+  .city-para { padding:0 22px; color:var(--slate); font-size:13.5px; line-height:1.62; position:relative; z-index:2; }
+
+  /* leaders timeline */
+  .timeline { padding:4px 22px 0; position:relative; z-index:2; }
+  .tl-item { display:flex; gap:13px; }
+  .tl-rail { display:flex; flex-direction:column; align-items:center; flex:none; }
+  .tl-dot { width:12px; height:12px; border-radius:50%; background:var(--orange); box-shadow:0 0 0 3px rgba(217,106,28,0.18); margin-top:3px; }
+  .tl-dot.past { background:var(--slate); box-shadow:0 0 0 3px rgba(93,107,121,0.16); }
+  .tl-dot.now { background:#3fbf6a; box-shadow:0 0 0 3px rgba(63,191,106,0.22); }
+  .tl-line { width:2px; flex:1; background:var(--line); margin:2px 0; }
+  .tl-body { flex:1; padding-bottom:15px; }
+  .tl-when { color:var(--orange); font-size:10.5px; font-weight:700; letter-spacing:0.05em; }
+  .tl-when.muted { color:var(--slate); }
+  .tl-name { font-family:var(--font-serif); font-weight:600; color:var(--navy); font-size:15px; margin-top:1px; line-height:1.15; }
+  .tl-role { color:var(--slate); font-size:11.5px; margin-top:2px; line-height:1.4; }
+
+  /* by the numbers */
+  .stat-grid { padding:2px 22px 0; display:grid; grid-template-columns:1fr 1fr; gap:11px; position:relative; z-index:2; }
+  .stat-tile { background:var(--paper-card); border:1px solid var(--line); border-radius:14px; padding:13px; box-shadow:var(--shadow-sm); }
+  .stat-val { font-family:var(--font-display); font-size:25px; color:var(--navy); line-height:1; }
+  .stat-label { color:var(--slate); font-size:10px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; margin-top:6px; }
+  .stat-verify { display:inline-block; margin-top:7px; font-size:8px; color:var(--orange); border:1px solid rgba(217,106,28,0.4); border-radius:999px; padding:1px 6px; letter-spacing:0.05em; text-transform:uppercase; font-weight:700; }
+  .stat-cited { display:inline-block; margin-top:7px; font-size:8px; color:#2f8f52; border:1px solid rgba(47,143,82,0.4); border-radius:999px; padding:1px 6px; letter-spacing:0.05em; text-transform:uppercase; font-weight:700; }
+
+  .chip-row { display:flex; flex-wrap:wrap; gap:8px; padding:2px 22px 0; position:relative; z-index:2; }
+  .lm-chip { background:var(--paper-2); border:1px solid var(--line); border-radius:999px; padding:7px 13px; font-size:12px; color:var(--navy); font-weight:500; }
+
+  .src-note { margin:16px 22px 30px; padding:13px 15px; background:rgba(217,106,28,0.06); border-left:3px solid var(--orange); border-radius:0 10px 10px 0; position:relative; z-index:2; }
+  .src-note .sn-h { display:flex; align-items:center; gap:7px; font-size:9.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--orange); }
+  .src-note .sn-t { color:var(--slate); font-size:11.5px; line-height:1.55; margin-top:6px; }
+
+  .city-archive { margin:18px 22px 0; display:flex; align-items:center; gap:12px; background:var(--navy); border-radius:16px; padding:14px 15px; cursor:pointer; position:relative; z-index:2; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .city-archive .ca-mic { width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center; background:rgba(217,106,28,0.18); box-shadow:inset 0 0 0 1px rgba(235,164,60,0.4); color:var(--gold); }
+  .city-archive .ca-h { color:var(--sand); font-family:var(--font-body); font-weight:700; font-size:14px; }
+  .city-archive .ca-s { color:var(--muted); font-size:11px; margin-top:2px; }
+
+  /* Home — "The Nine Provinces" horizontal strip */
+  .prov-strip { display:flex; gap:11px; overflow-x:auto; padding:2px 20px 4px; position:relative; z-index:2; scrollbar-width:none; }
+  .prov-strip::-webkit-scrollbar { display:none; }
+  .prov-mini-card { flex:none; width:118px; height:146px; border-radius:16px; overflow:hidden; position:relative; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .2s; }
+  .prov-mini-card:hover { transform:translateY(-3px); }
+  .prov-mini-card img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .prov-mini-card::after { content:""; position:absolute; inset:0; background:linear-gradient(180deg, transparent 38%, rgba(14,28,46,0.92)); }
+  .prov-mini-card .n { position:absolute; left:11px; right:11px; bottom:10px; z-index:2; color:#fff; font-family:var(--font-serif); font-weight:600; font-size:13.5px; line-height:1.05; }
+  .prov-all { flex:none; width:118px; height:146px; border-radius:16px; background:linear-gradient(160deg,#1d3450,#0e1c2e); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; box-shadow:var(--shadow-sm); }
+  .prov-all .c { color:var(--gold); font-family:var(--font-display); font-size:34px; line-height:1; }
+  .prov-all .t { color:var(--sand); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+
+  /* Home — pure black & white, zebra-inspired. Pure #000 ground, pure #fff type. */
+  .screen.home-dark { background:#000; }
+  .home-dark .statusbar { color:#fff; }
+  .home-dark .brandmark .name { color:#fff; }
+  .home-dark .lang-pill { background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.22); color:#fff; box-shadow:none; }
+  .home-dark .lang-pill .chev { color:rgba(255,255,255,0.6); }
+  .home-dark .hero h2 { color:#fff; }
+  .home-dark .hero .blurb { color:rgba(255,255,255,0.9); }
+  .home-dark .masthead .tag { color:rgba(255,255,255,0.6); }
+  .home-dark .section-head .label { color:#fff; }
+  .home-dark .section-head .sub { color:rgba(255,255,255,0.55); }
+  .home-dark .pcard { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .home-dark .pcard:hover { background:rgba(255,255,255,0.09); box-shadow:none; }
+  .home-dark .pcard .title { color:#fff; }
+  .home-dark .pcard .desc { color:rgba(255,255,255,0.58); }
+  .home-dark .pcard .chev { color:rgba(255,255,255,0.5); }
+  .home-dark .archive { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); }
+  .home-dark .archive .txt .h { color:#fff; }
+  .home-dark .archive .txt .s { color:rgba(255,255,255,0.6); }
+  .home-dark .prov-all { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); }
+  .home-dark .ledger { border-color:rgba(255,255,255,0.32); color:#fff; }
+  .home-dark .ledger:hover { background:#fff; color:#000; }
+  .home-dark .about-link { color:rgba(255,255,255,0.55); }
+  .home-dark .about-link:hover { color:#fff; }
+  /* B&W base, brand accent kept for EMPHASIS. Imagery goes grayscale so the gold/orange on the
+     things that matter — the mission line, author credits, primary actions — leaps off the page. */
+  .home-dark .savanna { filter:grayscale(1) contrast(1.05); }
+  .home-dark .prov-mini-card img, .home-dark .achip .g, .home-dark .pcard .thumb .g { filter:grayscale(1) contrast(1.04); }
+  .home-dark .achip .tt .s { color:rgba(255,255,255,0.72); }
+  /* Make the mission line unmistakable — brighter, fuller gold. */
+  .home-dark .masthead .rule span { color:var(--gold); }
+  .home-dark .masthead .rule i { background:var(--gold); opacity:0.7; }
+
+  /* ===================== PRESIDENTS ===================== */
+  .pres-list { padding:2px 20px 34px; display:grid; gap:11px; position:relative; z-index:2; }
+  .pres-row { display:flex; gap:14px; align-items:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:12px; cursor:pointer; transition:transform .2s, background .2s; }
+  .pres-row:hover { transform:translateY(-2px); background:rgba(255,255,255,0.08); }
+  .pres-portrait { width:58px; height:70px; border-radius:10px; flex:none; display:grid; place-items:center; background:linear-gradient(160deg,#1c1c1c,#040404); border:1px solid rgba(235,164,60,0.5); position:relative; }
+  .pres-portrait .mono { font-family:var(--font-display); font-size:23px; color:var(--gold); }
+  .pres-portrait .pnum { position:absolute; top:3px; left:5px; font-size:8.5px; color:rgba(255,255,255,0.4); font-weight:700; }
+  .pres-b { flex:1; min-width:0; }
+  .pres-name { font-family:var(--font-serif); font-weight:600; font-size:16.5px; color:#fff; line-height:1.1; }
+  .pres-term { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+  .pres-role { color:rgba(255,255,255,0.58); font-size:12px; line-height:1.4; margin-top:4px; }
+  /* pre-1994 era — neutral grey, documented not celebrated */
+  .pres-portrait.hist { border-color:rgba(255,255,255,0.22); background:linear-gradient(160deg,#161616,#050505); }
+  .pres-portrait.hist .mono { color:rgba(255,255,255,0.66); font-size:19px; }
+  .pres-term.hist { color:rgba(255,255,255,0.5); }
+
+  .pres-hero { position:relative; margin:6px 16px 0; border-radius:22px; overflow:hidden; background:radial-gradient(120% 90% at 50% 18%, #242424 0%, #0a0a0a 58%, #000 100%); border:1px solid rgba(255,255,255,0.1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px 20px 24px; }
+  .pres-hero .big-mono { font-family:var(--font-display); font-size:82px; color:transparent; -webkit-text-stroke:2px var(--gold); line-height:0.9; }
+  .pres-hero .ph-name2 { font-family:var(--font-display); font-size:32px; color:#fff; text-transform:uppercase; margin-top:14px; text-align:center; letter-spacing:0.01em; }
+  .pres-hero .ph-clan { color:rgba(255,255,255,0.6); font-family:var(--font-serif); font-style:italic; font-size:14px; margin-top:6px; }
+  .pres-hero .ph-term2 { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-top:13px; border:1px solid rgba(235,164,60,0.5); border-radius:999px; padding:5px 13px; }
+  .p-back { position:absolute; top:14px; right:16px; z-index:3; }
+
+  .quote { margin:20px 22px 0; padding-left:14px; border-left:3px solid var(--gold); position:relative; z-index:2; }
+  .quote .q-text { font-family:var(--font-serif); font-style:italic; font-size:18px; line-height:1.42; color:#fff; }
+  .quote .q-attr { color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; margin-top:11px; }
+
+  .fam-row { display:flex; flex-wrap:wrap; gap:8px; padding:2px 22px 0; position:relative; z-index:2; }
+  .fam-chip { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:9px 13px; }
+  .fam-chip .fc-rel { font-size:8.5px; color:var(--gold); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+  .fam-chip .fc-name { color:#fff; font-size:13px; margin-top:2px; }
+
+  .know-list { padding:2px 22px 0; display:grid; gap:9px; position:relative; z-index:2; }
+  .kn { display:flex; gap:9px; color:rgba(255,255,255,0.82); font-size:13px; line-height:1.45; }
+  .kn svg { color:var(--gold); flex:none; margin-top:2px; }
+
+  .pres-strip { display:flex; gap:11px; overflow-x:auto; padding:2px 20px 4px; position:relative; z-index:2; scrollbar-width:none; }
+  .pres-strip::-webkit-scrollbar { display:none; }
+  .pres-mini { flex:none; width:104px; border-radius:16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); padding:13px 10px; text-align:center; cursor:pointer; transition:transform .2s; }
+  .pres-mini:hover { transform:translateY(-3px); }
+  .pres-mini .pm-mono { width:48px; height:48px; margin:0 auto; border-radius:50%; border:1px solid rgba(235,164,60,0.5); display:grid; place-items:center; font-family:var(--font-display); font-size:18px; color:var(--gold); background:#0c0c0c; }
+  .pres-mini .pm-name { color:#fff; font-size:11.5px; font-weight:600; margin-top:9px; line-height:1.15; }
+  .pres-mini .pm-yr { color:rgba(255,255,255,0.5); font-size:9.5px; margin-top:3px; }
+
+  /* ===== Shared B&W theme for the remaining screens (Archive · Heritage · Provinces · City) =====
+     Same system as Home: pure #000, white type, grayscale imagery, gold/orange kept ONLY for
+     emphasis (mission, author, primary actions, live status). */
+  .screen.bw { background:#000; }
+  .bw .statusbar { color:#fff; }
+  .bw img { filter:grayscale(1) contrast(1.04); }
+  .bw .back-dark { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.18); color:#fff; box-shadow:none; }
+  /* headers */
+  .bw .scr-head h1 { color:#fff; }
+  .bw .scr-intro, .bw .h-intro, .bw .city-para { color:rgba(255,255,255,0.62); }
+  .bw .section-head .label { color:#fff; }
+  .bw .section-head .sub { color:rgba(255,255,255,0.55); }
+  /* Province detail */
+  .bw .prov-card { box-shadow:none; }
+  .bw .prov-mini .pm { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .prov-mini .pm .v { color:#fff; }
+  .bw .prov-mini .pm .l { color:rgba(255,255,255,0.55); }
+  .bw .city-row { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .city-row .cr-name { color:#fff; }
+  .bw .city-row .cr-blurb { color:rgba(255,255,255,0.6); }
+  /* City detail */
+  .bw .city-band { background:rgba(255,255,255,0.04); border:1px solid rgba(235,164,60,0.3); }
+  .bw .city-band .cb-text { color:rgba(255,255,255,0.85); }
+  .bw .tl-line { background:rgba(255,255,255,0.15); }
+  .bw .tl-name { color:#fff; }
+  .bw .tl-role { color:rgba(255,255,255,0.58); }
+  .bw .tl-when.muted { color:rgba(255,255,255,0.5); }
+  .bw .tl-dot.past { background:rgba(255,255,255,0.4); box-shadow:0 0 0 3px rgba(255,255,255,0.1); }
+  .bw .stat-tile { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .stat-val { color:#fff; }
+  .bw .stat-label { color:rgba(255,255,255,0.55); }
+  .bw .lm-chip { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.14); color:#fff; }
+  .bw .city-archive { background:#0a0a0a; border:1px solid rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .city-archive .ca-h { color:#fff; }
+  .bw .city-archive .ca-s { color:rgba(255,255,255,0.6); }
+  .bw .src-note .sn-t { color:rgba(255,255,255,0.62); }
+  /* Archive */
+  .bw .rec-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .badge-priv { color:#fff; }
+  .bw .rc-date { color:rgba(255,255,255,0.5); }
+  .bw .rc-title { color:#fff; border-bottom-color:rgba(255,255,255,0.14); }
+  .bw .play-btn { background:#fff; color:#000; }
+  .bw .del-btn { border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.7); }
+  .bw .sheet { background:#0d0d0d; }
+  .bw .choice { background:rgba(255,255,255,0.06); }
+  /* Heritage */
+  .bw .h-card { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  .bw .h-card .h-title { color:#fff; }
+  .bw .field-label { color:rgba(255,255,255,0.5); }
+  .bw .mono { color:rgba(255,255,255,0.85); }
+  .bw .popia-card { background:#0a0a0a; border:1px solid rgba(255,255,255,0.12); box-shadow:none; }
+  .bw .popia-card p { color:rgba(255,255,255,0.6); }
+
+  /* Lab — the journey map */
+  .flowmap { max-width:1180px; margin:36px auto 0; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:18px; padding:22px 24px; }
+  .fm-title { font-family:var(--font-display); font-size:14px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+  .fm-title::before { content:""; width:22px; height:2px; background:var(--orange); }
+  .fm-rows { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .fm-node { border-radius:12px; padding:11px 17px; font-weight:700; font-size:14px; white-space:nowrap; }
+  .fm-node.entry { background:rgba(235,164,60,0.14); color:var(--gold); border:1px solid rgba(235,164,60,0.4); }
+  .fm-node.home { background:var(--orange); color:#fff; }
+  .fm-arrow { color:var(--muted); display:flex; align-items:center; }
+  .fm-branches { display:flex; flex-direction:column; gap:8px; flex:1; min-width:280px; }
+  .fm-branch { display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:9px 14px; }
+  .fm-branch.prov { border-color:rgba(235,164,60,0.45); background:rgba(235,164,60,0.08); }
+  .fm-branch .b-name { color:var(--sand); font-weight:600; font-size:13.5px; }
+  .fm-branch .b-desc { color:var(--muted); font-size:11.5px; }
+  .fm-sub { color:var(--muted); font-size:12px; margin-top:16px; font-style:italic; display:flex; align-items:center; gap:8px; }
+
+  /* Lucide icons (inline SVG, ISC-licensed) — one consistent set, no emoji. lucide.dev */
+  .ico { display:inline-block; vertical-align:-0.16em; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+  /* reveal */
+  .reveal { opacity:0; transform:translateY(14px); animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise { to { opacity:1; transform:none; } }
+
+  .foot-note { text-align:center; color:var(--muted); font-size:12px; margin-top:44px; letter-spacing:0.03em; }
+  .foot-note b { color:var(--sand); }
+
+
+  /* ===================== APP SHELL (added) ===================== */
+  body.app { padding:0; margin:0; min-height:100dvh; display:flex; align-items:center; justify-content:center; }
+  .app-stage { position:relative; width:100%; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:26px 16px 104px; }
+  .view { display:none; }
+  .view.active { display:block; animation:viewin .45s ease both; }
+  @keyframes viewin { from { opacity:0; transform:translateY(8px) scale(.995); } to { opacity:1; transform:none; } }
+  .reveal { animation-play-state:paused; }
+  .view.active .reveal { animation-play-state:running; }
+  .view[data-view="launch"] .launch-inner::after {
+    content:"Tap to enter"; display:block; margin-top:26px;
+    font-size:10.5px; letter-spacing:0.28em; text-transform:uppercase;
+    color:rgba(244,238,225,0.66); animation:tapblink 2.4s ease-in-out infinite;
+  }
+  @keyframes tapblink { 0%,100%{opacity:.4} 50%{opacity:.95} }
+  .sheet-backdrop.closed { display:none !important; }
+  .pcard,.prov-card,.city-row,.prov-mini-card,.prov-all,.pres-mini,
+  .hero,.archive,.ledger,.back-dark,.back-btn,.record-btn,.choice,.notnow,
+  .seg button,.verify-btn,.reader-archive-cta,.city-archive,.about-link,.cta,
+  .appbar button { cursor:pointer; }
+  .prov-card,.city-row,.pcard { transition:transform .16s ease; }
+  .prov-card:active,.city-row:active,.pcard:active { transform:scale(.985); }
+  .pres-row.tappable { cursor:pointer; }
+  .pres-row.tappable:active { transform:scale(.99); }
+
+  .appbar {
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:calc(16px + env(safe-area-inset-bottom)); z-index:200;
+    display:flex; gap:2px; padding:6px;
+    background:rgba(16,26,43,0.86); backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.12); border-radius:20px;
+    box-shadow:0 22px 50px -20px rgba(0,0,0,0.65);
+  }
+  .appbar.hidden { display:none; }
+  .appbar button {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:none; border:0; color:#9FB0C0; cursor:pointer;
+    font-family:var(--font-body); font-size:9.5px; font-weight:700;
+    letter-spacing:0.04em; text-transform:uppercase; padding:8px 15px; border-radius:14px;
+    transition:color .18s, background .18s;
+  }
+  .appbar button:hover { color:#E9EEF3; }
+  .appbar button.active { color:var(--gold); background:rgba(235,164,60,0.14); }
+  .appbar svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  @media (min-width:561px){ .app-stage .phone { flex:none; } }
+  @media (max-width:560px){
+    .app-stage { padding:0; }
+    .phone { width:100%; max-width:100%; padding:0; border-radius:0; box-shadow:none; background:transparent; }
+    .phone::before { display:none; }
+    .notch { display:none; }
+    .screen { height:100dvh !important; border-radius:0 !important; padding-bottom:104px; }
+    .appbar { bottom:calc(12px + env(safe-area-inset-bottom)); }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .view.active, .reveal { animation:none !important; opacity:1 !important; transform:none !important; }
+    .savanna .sky, .reader-art .sky { animation:none !important; }
+  }
+
+</style>
+</head>
+<body class="app">
+  <div class="app-stage">
+  <div class="view active" data-view="launch">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen launch">
+          <div class="launch-bg"></div>
+          <div class="launch-scrim"></div>
+          <div class="statusbar" style="color:#F4EEE1"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="launch-inner">
+            <div class="launch-kicker" style="margin-bottom:20px">Reclaiming African Voices</div>
+            <div class="launch-wordmark"><span>Ubuntu</span><span>Heritage</span></div>
+            <div class="lw-country">South Africa</div>
+            <div class="lw-rule"></div>
+            <div class="launch-tag">Mantswe a maloba — Voices of Yesterday</div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="home">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen home-dark">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="topbar reveal" style="animation-delay:.05s">
+            <div class="brandmark"><div class="name">Ubuntu Heritage</div></div>
+            <div class="lang-pill"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> Setswana <span class="chev"><svg class="ico" width="11" height="11" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+          </div>
+
+          <div class="hero reveal" style="animation-delay:.12s">
+            <div class="savanna"><div class="sky"></div><div class="sun"></div><div class="horizon"></div><div class="scrim"></div></div>
+            <div class="frame"></div>
+            <div class="index">01</div>
+            <div class="badge">Featured</div>
+            <div class="caption">
+              <div class="kick">Sol T. Plaatje · 1930</div>
+              <h2>Mhudi</h2>
+              <p class="blurb">The first English novel by a Black South African — overturning the colonial pastoral myth.</p>
+              <div class="cta">Simolola go bala <span class="arw"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></div>
+            </div>
+          </div>
+
+          <div class="masthead reveal" style="animation-delay:.18s">
+            <div class="rule"><i></i><span>Reclaiming African Voices</span><i></i></div>
+            <div class="tag">Mantswe a maloba — Voices of Yesterday</div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.22s">
+            <div class="label">The Four Pillars</div>
+            <div class="sub">Foundational works of South African literature — read, heard, and kept alive.</div>
+          </div>
+          <div class="pillars">
+            <div class="pcard reveal" style="animation-delay:.26s">
+              <div class="num">02</div><div class="thumb"><div class="g g-ityala"></div></div>
+              <div class="body"><div class="title">Ityala Lamawele</div><div class="meta">S.E.K. Mqhayi · 1914</div><div class="desc">Twin brothers dispute succession before the inkundla — a defence of pre-colonial law.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+            <div class="pcard reveal" style="animation-delay:.30s">
+              <div class="num">03</div><div class="thumb"><div class="g g-indaba"></div></div>
+              <div class="body"><div class="title">Indaba, My Children</div><div class="meta">Credo Mutwa · 1964</div><div class="desc">A sweeping Zulu cosmology set down before it could be lost.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+            <div class="pcard reveal" style="animation-delay:.34s">
+              <div class="num">04</div><div class="thumb"><div class="g g-vilakazi"></div></div>
+              <div class="body"><div class="title">Inkondlo kaZulu</div><div class="meta">B.W. Vilakazi · 1935</div><div class="desc">The first published volume of Zulu poetry — oral genius carried onto the page.</div></div><div class="chev"><svg class="ico" width="18" height="18" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.38s">
+            <div class="label">Cultural Atlas</div>
+            <div class="sub">The history, customs and heroes behind the literature — grounded and cited.</div>
+          </div>
+          <div class="atlas-grid">
+            <div class="achip reveal" style="animation-delay:.42s"><div class="g g-atlas1"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Unsung Heroes</div><div class="s">Galeshewe · Nyabela · 1976</div></div></div>
+            <div class="achip reveal" style="animation-delay:.46s"><div class="g g-atlas2"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Rites of Passage</div><div class="s">Marriage · lobola · umabo</div></div></div>
+            <div class="achip reveal" style="animation-delay:.50s"><div class="g g-atlas3"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Peopling of SA</div><div class="s">Khoisan → Bantu</div></div></div>
+            <div class="achip reveal" style="animation-delay:.54s"><div class="g g-mhudi"></div><span class="star"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><div class="tt"><div class="h">Your story</div><div class="s">Record a family memory</div></div></div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.55s">
+            <div class="label">The Nine Provinces</div>
+            <div class="sub">Explore the land — its cities, founders, and the people who shaped them.</div>
+          </div>
+          <div class="prov-strip reveal" style="animation-delay:.57s">
+            <div class="prov-mini-card"><img src="landing-bg.jpg" alt=""><div class="n">Western Cape</div></div>
+            <div class="prov-mini-card"><img src="pexels-sizwe-shabalala-1225168-2464890.jpg" alt=""><div class="n">Gauteng</div></div>
+            <div class="prov-mini-card"><img src="pexels-jann-bader-411133784-17176393.jpg" alt=""><div class="n">Northern Cape</div></div>
+            <div class="prov-mini-card"><img src="pexels-ygtphoto-13422789.jpg" alt=""><div class="n">KwaZulu-Natal</div></div>
+            <div class="prov-all"><div class="c">9</div><div class="t">All provinces</div><svg class="ico" width="16" height="16" viewBox="0 0 24 24" style="color:var(--gold)"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+          </div>
+
+          <div class="section-head reveal" style="animation-delay:.58s">
+            <div class="label">The Presidents</div>
+            <div class="sub">Five leaders of a free South Africa — their lives, struggles and legacies.</div>
+          </div>
+          <div class="pres-strip reveal" style="animation-delay:.60s">
+            <div class="pres-mini"><div class="pm-mono">NM</div><div class="pm-name">Mandela</div><div class="pm-yr">1994–99</div></div>
+            <div class="pres-mini"><div class="pm-mono">TM</div><div class="pm-name">Mbeki</div><div class="pm-yr">1999–08</div></div>
+            <div class="pres-mini"><div class="pm-mono">KM</div><div class="pm-name">Motlanthe</div><div class="pm-yr">2008–09</div></div>
+            <div class="pres-mini"><div class="pm-mono">JZ</div><div class="pm-name">Zuma</div><div class="pm-yr">2009–18</div></div>
+            <div class="pres-mini"><div class="pm-mono">CR</div><div class="pm-name">Ramaphosa</div><div class="pm-yr">2018–</div></div>
+          </div>
+
+          <div class="archive reveal" style="animation-delay:.62s">
+            <div class="mic"><svg class="ico" width="24" height="24" viewBox="0 0 24 24" style="color:var(--gold)"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div class="txt"><div class="h">Community Archive</div><div class="s">Record &amp; preserve your family's own stories</div></div>
+            <div class="go"><svg class="ico" width="22" height="22" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+
+          <div class="foot">
+            <div class="ledger reveal" style="animation-delay:.62s"><span class="live"></span><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Heritage Ledger · on-chain</div>
+            <div class="about-link reveal" style="animation-delay:.66s">About the Sources <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="reader">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen dark">
+          <div class="reader-art"><div class="sky"></div><div class="figures"></div></div>
+          <div class="reader-scrim"></div>
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="reader-body">
+            <div class="reader-top">
+              <div class="reader-titlewrap">
+                <div class="back-btn"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div>
+                <div>
+                  <div class="reader-kick">Mhudi · Sol T. Plaatje</div>
+                  <div class="reader-scene">The Forest Home</div>
+                </div>
+              </div>
+              <div class="reader-controls">
+                <div class="lang-pill on-dark"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> EN <span class="chev"><svg class="ico" width="11" height="11" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span></div>
+                <div class="seg"><button class="active">Adult</button><button>Child</button></div>
+                <div class="listen"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen</div>
+              </div>
+            </div>
+
+            <div class="reader-text">
+              <p class="passage"><span class="drop">A</span>fter the Matabele attack scattered the Barolong and destroyed the town of Kunana, Mhudi and Ra-Thaga met as survivors in the wilderness. Far from elders and the obligations of the village, they built a home of their own and named it Re-Nosi — 'We-are-alone.'</p>
+              <p class="reader-note">AI image — artistic interpretation, not a historical photo.</p>
+              <p class="reader-source"><b>Source:</b> Plaatje, Mhudi (1930), ch. 5 'The Forest Home' — the sanctuary Re-Nosi.</p>
+              <div class="reader-archive-cta"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg> Record your family's version <svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+            </div>
+
+            <div class="reader-nav">
+              <div class="nav-btn disabled"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg> Back</div>
+              <div class="nav-progress">1 / 2</div>
+              <div class="nav-btn">Next <svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="archive">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">Your voice, your history</div><h1>Community<br>Archive</h1></div></div>
+          </div>
+          <p class="scr-intro">Record an elder's story, a memory, or a tradition in your own words. Your voice, your history — kept on your terms.</p>
+          <div class="record-btn"><span class="rec-dot"></span> Record a story</div>
+
+          <div class="rec-card">
+            <div class="rc-top"><span class="badge-priv"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Private</span><span class="rc-date">3 Jul 2026, 14:20</span></div>
+            <div class="rc-title">Grandmother's story of Kunana</div>
+            <div class="waveform">
+              <i style="height:40%"></i><i style="height:70%"></i><i style="height:100%"></i><i style="height:55%"></i><i style="height:85%"></i><i style="height:35%"></i><i style="height:65%"></i><i style="height:95%"></i><i style="height:45%"></i><i style="height:75%"></i><i style="height:30%"></i><i style="height:60%"></i><i style="height:90%"></i><i style="height:50%"></i><i style="height:70%"></i><i style="height:40%"></i><i style="height:80%"></i><i style="height:55%"></i>
+            </div>
+            <div class="rc-actions"><div class="play-btn"><svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg> Play</div><div class="del-btn"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg> Delete</div></div>
+          </div>
+
+          <!-- POPIA consent sheet risen over the screen -->
+          <div class="sheet-backdrop">
+            <div class="sheet">
+              <div class="grip"></div>
+              <h3>Before you record</h3>
+              <p>Your story is personal information. Under South Africa's POPIA, your voice is protected — so we only record it with your clear consent. Your recording is saved on this device. You can delete it at any time.</p>
+              <div class="qlabel">How should this recording be kept?</div>
+              <div class="choice"><div class="ch"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Keep private</div><div class="cs">Only you can access it.</div></div>
+              <div class="choice pub"><div class="ch"><svg class="ico" width="15" height="15" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Share with community</div><div class="cs">Add your voice to the archive.</div></div>
+              <div class="notnow">Not now</div>
+              <div class="popia-tag"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> POPIA-compliant consent</div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="ledger">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">On-chain provenance</div><h1>Heritage<br>Ledger</h1></div></div>
+          </div>
+          <p class="h-intro">Every foundational work here is fingerprinted (SHA-256 + IPFS content ID) and anchored on a public blockchain — tamper-evident, permanently verifiable, owned by the community.</p>
+
+          <div class="h-card">
+            <div class="h-title">Mhudi</div>
+            <div class="h-meta">Sol T. Plaatje · 1930</div>
+            <div class="field-label">IPFS content ID</div>
+            <div class="mono">QmS7yTdvrD…cjG6itZjDv</div>
+            <div class="field-label">SHA-256 fingerprint</div>
+            <div class="mono">70d0fd49ad…59eb6d43</div>
+            <div class="anchored-row">
+              <div class="verify-btn">Verify on Solana <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+              <span class="chain-chip"><span class="live"></span>Anchored · devnet</span>
+            </div>
+          </div>
+
+          <div class="h-card">
+            <div class="h-title">Ityala Lamawele</div>
+            <div class="h-meta">S.E.K. Mqhayi · 1914</div>
+            <div class="field-label">IPFS content ID</div>
+            <div class="mono">QmWN17Rxo1…MDmhgsRG</div>
+            <div class="field-label">SHA-256 fingerprint</div>
+            <div class="mono">b25017a431…fc076cc6</div>
+            <div class="anchored-row">
+              <div class="verify-btn">Verify on Solana <svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></div>
+              <span class="chain-chip"><span class="live"></span>Anchored · devnet</span>
+            </div>
+          </div>
+
+          <div class="popia-card">
+            <span class="lock"><svg class="ico" width="20" height="20" viewBox="0 0 24 24" style="color:var(--gold)"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <p>Privacy first (POPIA): only public literary works and their hashes are placed on-chain. Community members' personal voice recordings are <b>never</b> put on the blockchain.</p>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="provinces">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">South Africa</div><h1>The Nine<br>Provinces</h1></div></div>
+          </div>
+          <p class="scr-intro">Nine provinces, hundreds of cities and towns — each with its own founders, leaders and living history. Tap a province to explore its famous places.</p>
+          <div class="prov-grid" style="padding-top:16px;padding-bottom:34px">
+            <div class="prov-card"><img src="pexels-sizwe-shabalala-1225168-2464890.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">Gauteng</div><div class="pc-cap">Johannesburg</div></div></div>
+            <div class="prov-card"><img src="landing-bg.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">Western Cape</div><div class="pc-cap">Cape Town</div></div></div>
+            <div class="prov-card"><img src="pexels-ygtphoto-13422789.jpg" alt=""><span class="pc-count">3 cities</span><div class="pc-in"><div class="pc-name">KwaZulu-Natal</div><div class="pc-cap">Pietermaritzburg</div></div></div>
+            <div class="prov-card"><img src="pexels-khulani-36419398.jpg" alt=""><span class="pc-count">4 cities</span><div class="pc-in"><div class="pc-name">Eastern Cape</div><div class="pc-cap">Bhisho</div></div></div>
+            <div class="prov-card"><img src="pexels-jann-bader-411133784-17176393.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Northern Cape</div><div class="pc-cap">Kimberley</div></div></div>
+            <div class="prov-card"><img src="pexels-ygtphoto-13408565.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Free State</div><div class="pc-cap">Bloemfontein</div></div></div>
+            <div class="prov-card"><img src="pexels-gwejeofafrica-38223519.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Limpopo</div><div class="pc-cap">Polokwane</div></div></div>
+            <div class="prov-card"><img src="jennifer-latuperisa-andresen-Pg6dgmTaqtM-unsplash.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">Mpumalanga</div><div class="pc-cap">Mbombela</div></div></div>
+            <div class="prov-card"><img src="pexels-kaybee-photography-664870201-33687401.jpg" alt=""><span class="pc-count">2 cities</span><div class="pc-in"><div class="pc-name">North West</div><div class="pc-cap">Mahikeng</div></div></div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="province">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="prov-hero">
+            <img src="landing-bg.jpg" alt="Western Cape" />
+            <div class="city-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="ph-in">
+              <div class="ph-kick">Province</div>
+              <div class="ph-name">Western Cape</div>
+            </div>
+          </div>
+
+          <div class="prov-mini">
+            <div class="pm"><div class="v">Cape Town</div><div class="l">Capital</div></div>
+            <div class="pm"><div class="v">~7.4M</div><div class="l">People · 2022</div></div>
+            <div class="pm"><div class="v">Afr · Xho · Eng</div><div class="l">Top languages</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">About the province</div></div>
+          <p class="city-para">South Africa's nine provinces were drawn in 1994, at the end of apartheid — but the places within them are far older. The Western Cape's story runs from the Khoikhoi and San of the Cape, through the 1652 Dutch station, the wine-lands and the Overberg, to the cities of today.</p>
+
+          <div class="section-head"><div class="label">Famous cities</div><div class="sub">Tap a city for its full history, leaders and heritage.</div></div>
+          <div id="pv-cities" style="padding:0 20px 34px; display:grid; gap:11px;">
+            <div class="city-row"><img src="landing-bg.jpg" alt=""><div class="cr-b"><div class="cr-name">Cape Town</div><div class="cr-meta">Founded 1652</div><div class="cr-blurb">The Mother City — VOC station, Table Mountain, seat of Parliament.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="city-row"><img src="pexels-taryn-elliott-9385208.jpg" alt=""><div class="cr-b"><div class="cr-name">Stellenbosch</div><div class="cr-meta">Founded 1679</div><div class="cr-blurb">Second-oldest colonial town; the wine-lands and a major university.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="city-row"><img src="tobias-reich--7ZwuyDx2rI-unsplash.jpg" alt=""><div class="cr-b"><div class="cr-name">George</div><div class="cr-meta">Founded 1811</div><div class="cr-blurb">Garden Route town beneath the Outeniqua mountains.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="city">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="city-hero">
+            <img src="landing-bg.jpg" alt="Cape Town" />
+            <div class="ch-est">Est. 1652</div>
+            <div class="city-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="ch-in">
+              <div class="ch-kick">Western Cape · City</div>
+              <div class="ch-name">Cape Town</div>
+              <div class="ch-sub">iKapa — 'the Mother City'</div>
+            </div>
+          </div>
+
+          <div class="city-band">
+            <div class="cb-label"><svg class="ico" width="13" height="13" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> Before the city</div>
+            <div class="cb-text">Long before any harbour, the Cape was home to the Khoikhoi herders and San hunter-gatherers — among them the Goringhaiqua and Gorachouqua clans. Autshumato, a leader and interpreter, was among the first to broker with passing ships.</div>
+          </div>
+
+          <div class="section-head"><div class="label">How it came to be</div></div>
+          <p class="city-para">In 1652 the Dutch East India Company, under Jan van Riebeeck, set up a refreshment station to resupply ships on the spice route — the first colonial town in southern Africa. It grew at the meeting point, and collision, of Khoikhoi, European, and enslaved Southeast Asian and African peoples — a history still written into the city's languages, food and faiths.</p>
+
+          <div class="section-head" id="ct-leaders-head"><div class="label">Those who led</div><div class="sub">Traditional and civic leaders, from when to when. (Illustrative — the full record is being sourced.)</div></div>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when muted">Until the 1650s</div><div class="tl-name">Khoikhoi &amp; San peoples</div><div class="tl-role">Indigenous inhabitants of the Cape Peninsula</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1652 – 1662</div><div class="tl-name">Jan van Riebeeck</div><div class="tl-role">VOC Commander · founding administrator</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when muted">1662 – 1910</div><div class="tl-name">VOC &amp; British governors</div><div class="tl-role">Colonial administration — see sources</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">2011 – 2018</div><div class="tl-name">Patricia de Lille</div><div class="tl-role">Executive Mayor</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot now"></div></div><div class="tl-body"><div class="tl-when">2021 – present</div><div class="tl-name">Geordin Hill-Lewis</div><div class="tl-role">Executive Mayor</div></div></div>
+          </div>
+
+          <div class="section-head"><div class="label">By the numbers</div></div>
+          <div class="stat-grid">
+            <div class="stat-tile"><div class="stat-val">1652</div><div class="stat-label">Founded (VOC)</div><span class="stat-cited">archives</span></div>
+            <div class="stat-tile"><div class="stat-val">~4.8M</div><div class="stat-label">Metro population</div><span class="stat-cited">Census 2022</span></div>
+            <div class="stat-tile"><div class="stat-val">~1,450</div><div class="stat-label">Public schools</div><span class="stat-verify">to verify</span></div>
+            <div class="stat-tile"><div class="stat-val">3</div><div class="stat-label">Universities</div><span class="stat-cited">public</span></div>
+            <div class="stat-tile"><div class="stat-val">1000+</div><div class="stat-label">Heritage sites</div><span class="stat-verify">to verify</span></div>
+            <div class="stat-tile"><div class="stat-val">—</div><div class="stat-label">Hospitals</div><span class="stat-verify">to verify</span></div>
+          </div>
+
+          <div class="section-head"><div class="label">Landmarks &amp; heritage</div></div>
+          <div class="chip-row">
+            <span class="lm-chip">Table Mountain</span>
+            <span class="lm-chip">Robben Island</span>
+            <span class="lm-chip">Castle of Good Hope</span>
+            <span class="lm-chip">District Six</span>
+            <span class="lm-chip">Bo-Kaap</span>
+            <span class="lm-chip">V&amp;A Waterfront</span>
+          </div>
+
+          <div class="city-archive">
+            <div class="ca-mic"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div style="flex:1"><div class="ca-h">Your Cape Town</div><div class="ca-s">Record a family memory of this place</div></div>
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--gold)"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          <div class="src-note">
+            <div class="sn-h"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> How we source this</div>
+            <div class="sn-t">Every date, name and figure traces to a public record — StatsSA Census 2022, the Dept. of Basic Education, and the City of Cape Town. Items marked <b>to verify</b> are placeholders pending a citation. Nothing is invented — including the Khoikhoi &amp; San history that predates the colonial founding.</div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="presidents">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+          <div class="scr-head">
+            <div class="top"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div><div><div class="kicker">Democratic South Africa</div><h1>The<br>Presidents</h1></div></div>
+          </div>
+          <p class="scr-intro">Since the first free election in 1994, five presidents have led South Africa — each through a different chapter, from liberation to the work still unfinished.</p>
+          <div class="pres-list">
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">01</span><span class="mono">NM</span></div><div class="pres-b"><div class="pres-name">Nelson Mandela</div><div class="pres-term">1994 – 1999</div><div class="pres-role">Anti-apartheid icon; 27 years imprisoned; the first democratically-elected president.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">02</span><span class="mono">TM</span></div><div class="pres-b"><div class="pres-name">Thabo Mbeki</div><div class="pres-term">1999 – 2008</div><div class="pres-role">"I am an African"; the African Renaissance; a decade of economic growth.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">03</span><span class="mono">KM</span></div><div class="pres-b"><div class="pres-name">Kgalema Motlanthe</div><div class="pres-term">2008 – 2009</div><div class="pres-role">Caretaker president; trade unionist and Robben Island veteran.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">04</span><span class="mono">JZ</span></div><div class="pres-b"><div class="pres-name">Jacob Zuma</div><div class="pres-term">2009 – 2018</div><div class="pres-role">Umkhonto we Sizwe veteran; a presidency later marked by state-capture controversy.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait"><span class="pnum">05</span><span class="mono">CR</span></div><div class="pres-b"><div class="pres-name">Cyril Ramaphosa</div><div class="pres-term">2018 – present</div><div class="pres-role">Founder of the mineworkers' union and chief negotiator of the 1996 Constitution.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.5)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+
+          <div class="section-head" style="margin-top:8px">
+            <div class="label">Before democracy</div>
+            <div class="sub">Leaders of the Union and the apartheid state, 1910–1994. Knowing this history is part of reclaiming the story — recorded honestly, neither erased nor celebrated.</div>
+          </div>
+          <div class="pres-list">
+            <div class="pres-row"><div class="pres-portrait hist"><span class="pnum">1910</span><span class="mono">LB</span></div><div class="pres-b"><div class="pres-name">Louis Botha</div><div class="pres-term hist">Prime Minister · 1910–1919</div><div class="pres-role">First Prime Minister of the Union; Boer general turned statesman.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JS</span></div><div class="pres-b"><div class="pres-name">Jan Smuts</div><div class="pres-term hist">Prime Minister · 1919–24 &amp; 1939–48</div><div class="pres-role">A global statesman abroad who upheld segregation at home.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JH</span></div><div class="pres-b"><div class="pres-name">J.B.M. Hertzog</div><div class="pres-term hist">Prime Minister · 1924–1939</div><div class="pres-role">Afrikaner nationalism; laws that stripped Black South Africans' rights.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">DM</span></div><div class="pres-b"><div class="pres-name">D.F. Malan</div><div class="pres-term hist">Prime Minister · 1948–1954</div><div class="pres-role">The National Party's 1948 victory — apartheid becomes law.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">JGS</span></div><div class="pres-b"><div class="pres-name">J.G. Strijdom</div><div class="pres-term hist">Prime Minister · 1954–1958</div><div class="pres-role">Entrenched white-minority rule; removed Coloured voters from the roll.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">HV</span></div><div class="pres-b"><div class="pres-name">H.F. Verwoerd</div><div class="pres-term hist">Prime Minister · 1958–1966</div><div class="pres-role">The "architect of apartheid"; Bantu Education; assassinated in 1966.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">BV</span></div><div class="pres-b"><div class="pres-name">B.J. Vorster</div><div class="pres-term hist">Prime Minister · 1966–1978</div><div class="pres-role">A security state — detention without trial and hard repression.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="mono">PW</span></div><div class="pres-b"><div class="pres-name">P.W. Botha</div><div class="pres-term hist">PM / State President · 1978–1989</div><div class="pres-role">"Die Groot Krokodil"; the states of emergency of the 1980s.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+            <div class="pres-row"><div class="pres-portrait hist"><span class="pnum">1994</span><span class="mono">FW</span></div><div class="pres-b"><div class="pres-name">F.W. de Klerk</div><div class="pres-term hist">State President · 1989–1994</div><div class="pres-role">Unbanned the ANC, freed Mandela and negotiated apartheid's end; shared the 1993 Nobel Peace Prize.</div></div><svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:rgba(255,255,255,0.4)"><path d="m9 18 6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="view" data-view="president">
+    <div class="phone">
+        <div class="notch"></div>
+        <div class="screen bw">
+          <div class="statusbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+
+          <div class="pres-hero">
+            <div class="p-back"><div class="back-dark"><svg class="ico" width="19" height="19" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></div></div>
+            <div class="big-mono">NM</div>
+            <div class="ph-name2">Nelson Mandela</div>
+            <div class="ph-clan">Madiba · Tata</div>
+            <div class="ph-term2">1st President · 1994 – 1999</div>
+          </div>
+
+          <div class="stat-grid" style="padding-top:16px">
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">1918</div><div class="stat-label">Born · Mvezo, E. Cape</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">2013</div><div class="stat-label">Died · Johannesburg</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">1994–99</div><div class="stat-label">In office</div></div>
+            <div class="stat-tile"><div class="stat-val" style="font-size:18px">ANC</div><div class="stat-label">Party</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">The struggle</div></div>
+          <p class="city-para">Mandela joined the ANC in 1944 and helped found its Youth League. As apartheid hardened, he co-founded Umkhonto we Sizwe, the movement's armed wing. Convicted at the 1964 Rivonia Trial, he was sentenced to life and spent 27 years in prison — much of it on Robben Island. Released on 11 February 1990, he shared the 1993 Nobel Peace Prize with F.W. de Klerk and, in 1994, became South Africa's first democratically-elected president.</p>
+
+          <div class="section-head"><div class="label">A life</div></div>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1918</div><div class="tl-name">Born in Mvezo</div><div class="tl-role">Eastern Cape (Transkei); of the Thembu royal house</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1944</div><div class="tl-name">Joins the ANC</div><div class="tl-role">Co-founds the ANC Youth League</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1964</div><div class="tl-name">Rivonia Trial</div><div class="tl-role">Sentenced to life; imprisoned for 27 years</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1990</div><div class="tl-name">Released</div><div class="tl-role">Walks free on 11 February</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-body"><div class="tl-when">1994</div><div class="tl-name">Elected President</div><div class="tl-role">South Africa's first free election</div></div></div>
+            <div class="tl-item"><div class="tl-rail"><div class="tl-dot past"></div></div><div class="tl-body"><div class="tl-when muted">2013</div><div class="tl-name">Dies in Johannesburg</div><div class="tl-role">Aged 95</div></div></div>
+          </div>
+
+          <div class="section-head"><div class="label">Family</div></div>
+          <div class="fam-row">
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Evelyn Mase · 1944–58</div></div>
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Winnie Madikizela-Mandela · 1958–96</div></div>
+            <div class="fam-chip"><div class="fc-rel">Spouse</div><div class="fc-name">Graça Machel · 1998</div></div>
+            <div class="fam-chip"><div class="fc-rel">Children</div><div class="fc-name">Six, across his marriages</div></div>
+          </div>
+
+          <div class="section-head"><div class="label">What every South African should know</div></div>
+          <div class="know-list">
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>His clan name is <b style="color:#fff">Madiba</b>; he is affectionately called <b style="color:#fff">Tata</b> — father of the nation.</span></div>
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>He chose reconciliation over revenge — championing the Truth &amp; Reconciliation Commission.</span></div>
+            <div class="kn"><svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><span>He served a single term by choice, stepping down to strengthen the young democracy.</span></div>
+          </div>
+
+          <div class="quote">
+            <div class="q-text">"It always seems impossible until it's done."</div>
+            <div class="q-attr">— Nelson Mandela</div>
+          </div>
+
+          <div class="city-archive" style="margin-top:20px">
+            <div class="ca-mic"><svg class="ico" width="20" height="20" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg></div>
+            <div style="flex:1"><div class="ca-h">Your memory of Madiba</div><div class="ca-s">Record where you were, what he meant to your family</div></div>
+            <svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--gold)"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+
+          <div class="src-note">
+            <div class="sn-h"><svg class="ico" width="12" height="12" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg> How we source this</div>
+            <div class="sn-t">Dates and facts trace to the public record — Mandela's <i>Long Walk to Freedom</i> and the Nelson Mandela Foundation. Hard chapters (imprisonment, divorce, the AIDS debate under later presidents) are told honestly, never sanitised.</div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+  <nav class="appbar hidden" id="appbar" aria-label="Main">
+    <button data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+    <button data-tab="provinces"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Provinces</button>
+    <button data-tab="presidents"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Leaders</button>
+    <button data-tab="archive"><svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>Archive</button>
+  </nav>
+
+<script>
+(function(){
+  var views = {};
+  document.querySelectorAll('.view').forEach(function(v){ views[v.dataset.view] = v; });
+  var appbar = document.getElementById('appbar');
+  var tabs = appbar.querySelectorAll('button');
+  var stack = ['launch'];
+  var section = {home:'home', reader:'home', ledger:'home',
+                 provinces:'provinces', province:'provinces', city:'provinces',
+                 presidents:'presidents', president:'presidents', archive:'archive'};
+
+  function cur(){ return stack[stack.length-1]; }
+  function render(){
+    var id = cur();
+    for (var k in views){ views[k].classList.toggle('active', k === id); }
+    var scr = views[id].querySelector('.screen'); if (scr) scr.scrollTop = 0;
+    appbar.classList.toggle('hidden', id === 'launch');
+    var sec = section[id] || '';
+    tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab === sec); });
+  }
+  function go(id){ if (id === cur()) return; stack.push(id); history.pushState({n:stack.length}, ''); render(); }
+  function back(){ if (stack.length > 1){ stack.pop(); render(); } }
+  function root(id){ stack = (id === 'home') ? ['launch','home'] : ['launch','home',id]; history.pushState({n:stack.length}, ''); render(); }
+  window.addEventListener('popstate', function(){ if (stack.length > 1){ stack.pop(); render(); } });
+  function each(root, sel, fn){ (root||document).querySelectorAll(sel).forEach(fn); }
+  function esc(s){ return s; }
+
+  var PROV={"gauteng": {"name": "Gauteng", "capital": "Johannesburg", "pop": "~15.1M", "langs": "isiZulu · Sesotho · Eng", "hero": "pexels-sizwe-shabalala-1225168-2464890.jpg", "overview": "Drawn in 1994 from the old Transvaal, Gauteng is the smallest province by land and the largest by people. Its story is written in gold — the 1886 rush that built Johannesburg — and in the townships that became the front line of the struggle.", "cities": ["johannesburg", "pretoria", "soweto"]}, "westerncape": {"name": "Western Cape", "capital": "Cape Town", "pop": "~7.0M", "langs": "Afrikaans · isiXhosa · Eng", "hero": "landing-bg.jpg", "overview": "The provinces were drawn in 1994, but the Western Cape's story runs from the Khoikhoi and San, through the 1652 Dutch station at the Cape, the wine-lands and the Overberg, to the cities of today.", "cities": ["capetown", "stellenbosch", "george"]}, "kwazulunatal": {"name": "KwaZulu-Natal", "capital": "Pietermaritzburg", "pop": "~12.4M", "langs": "isiZulu · English", "hero": "pexels-ygtphoto-13422789.jpg", "overview": "The garden province and the home of the Zulu Kingdom, whose kings and battlefields shaped the 19th century. From the royal capital at oNdini to the busy port of Durban, its coast has drawn peoples from across the Indian Ocean.", "cities": ["durban", "pietermaritzburg", "ulundi"]}, "easterncape": {"name": "Eastern Cape", "capital": "Bhisho", "pop": "~7.2M", "langs": "isiXhosa · Afrikaans · Eng", "hero": "pexels-khulani-36419398.jpg", "overview": "The Xhosa heartland and the cradle of much of the country's leadership — Mandela, Tambo, Sisulu and Hani all came from here. Its coast saw the 1820 Settlers; its interior, the long Frontier Wars.", "cities": ["gqeberha", "eastlondon", "mthatha", "makhanda"]}, "northerncape": {"name": "Northern Cape", "capital": "Kimberley", "pop": "~1.36M", "langs": "Afrikaans · Setswana · isiXhosa", "hero": "pexels-jann-bader-411133784-17176393.jpg", "overview": "The largest province by land and the smallest by people — a vast, arid expanse of Griqua, San and Tswana history, the Kalahari, and the diamond fields that made Kimberley. Home ground of Sol Plaatje, author of Mhudi.", "cities": ["kimberley", "upington"]}, "freestate": {"name": "Free State", "capital": "Bloemfontein", "pop": "~2.96M", "langs": "Sesotho · Afrikaans · isiXhosa", "hero": "pexels-ygtphoto-13408565.jpg", "overview": "The Highveld heartland — maize fields, the Basotho, and the old Orange Free State republic. In its capital, Bloemfontein, the ANC was founded in 1912.", "cities": ["bloemfontein", "welkom"]}, "limpopo": {"name": "Limpopo", "capital": "Polokwane", "pop": "~6.57M", "langs": "Sepedi · Xitsonga · Tshivenda", "hero": "pexels-gwejeofafrica-38223519.jpg", "overview": "The country's far north, named for the great river on its border. This is the land of the Bapedi, Vhavenda and Vatsonga — and of Mapungubwe, a sophisticated kingdom that traded gold across the Indian Ocean a thousand years ago.", "cities": ["polokwane", "thohoyandou"]}, "mpumalanga": {"name": "Mpumalanga", "capital": "Mbombela", "pop": "~5.14M", "langs": "siSwati · isiZulu · Xitsonga", "hero": "jennifer-latuperisa-andresen-Pg6dgmTaqtM-unsplash.jpg", "overview": "'The place where the sun rises.' The Lowveld and the great escarpment — the Panorama Route, the Blyde River Canyon, and the southern half of the Kruger National Park.", "cities": ["mbombela", "emalahleni"]}, "northwest": {"name": "North West", "capital": "Mahikeng", "pop": "~3.80M", "langs": "Setswana · Afrikaans", "hero": "pexels-kaybee-photography-664870201-33687401.jpg", "overview": "The Tswana heartland along the Molopo — the world of Sol Plaatje's Mhudi and the Barolong. Beneath its plains lies the world's richest platinum reef, and with it the hard memory of Marikana.", "cities": ["mahikeng", "rustenburg"]}};
+  var CITY={"capetown": {"prov": "Western Cape · City", "name": "Cape Town", "year": "1652", "sub": "iKapa — 'the Mother City'", "hero": "landing-bg.jpg", "blurb": "The Mother City — VOC station, Table Mountain, seat of Parliament.", "before": "Long before any harbour, the Cape was home to the Khoikhoi herders and San hunter-gatherers — among them the Goringhaiqua and Gorachouqua. Autshumato, a leader and interpreter, was among the first to broker with passing ships.", "origins": "In 1652 the Dutch East India Company, under Jan van Riebeeck, set up a refreshment station to resupply ships on the spice route — the first colonial town in southern Africa. It grew at the meeting point, and collision, of Khoikhoi, European and enslaved Southeast Asian and African peoples.", "leaders": [{"when": "Until the 1650s", "muted": true, "name": "Khoikhoi & San peoples", "role": "Indigenous inhabitants of the Cape Peninsula"}, {"when": "1652 – 1662", "name": "Jan van Riebeeck", "role": "VOC Commander · founding administrator"}, {"when": "1662 – 1910", "muted": true, "name": "VOC & British governors", "role": "Colonial administration"}, {"when": "2011 – 2018", "name": "Patricia de Lille", "role": "Executive Mayor"}, {"when": "2021 – present", "now": true, "name": "Geordin Hill-Lewis", "role": "Executive Mayor"}], "stats": [{"v": "1652", "l": "Founded (VOC)", "badge": "archives"}, {"v": "~4.8M", "l": "Metro population", "badge": "Census 2022"}, {"v": "3", "l": "Universities", "badge": "public"}, {"v": "iKapa", "l": "Khoi/Xhosa name", "badge": ""}], "landmarks": ["Table Mountain", "Robben Island", "Castle of Good Hope", "District Six", "Bo-Kaap", "V&A Waterfront"], "archH": "Your Cape Town", "archS": "Record a family memory of this place", "src": "Every date, name and figure traces to a public record — StatsSA Census 2022 and the City of Cape Town. Nothing is invented, including the Khoikhoi &amp; San history that predates the colonial founding."}, "stellenbosch": {"prov": "Western Cape · City", "name": "Stellenbosch", "year": "1679", "sub": "Founded by Simon van der Stel", "hero": "pexels-taryn-elliott-9385208.jpg", "blurb": "Second-oldest colonial town; the wine-lands and a major university.", "origins": "The second-oldest colonial town in South Africa, laid out in 1679 by governor Simon van der Stel on the Eerste River. Today it is the heart of the wine-lands and home to a major university.", "stats": [{"v": "1679", "l": "Founded", "badge": "record"}, {"v": "1918", "l": "University", "badge": "founded"}], "landmarks": ["Stellenbosch University", "Dorp Street", "the wine estates", "Jonkershoek"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "george": {"prov": "Western Cape · City", "name": "George", "year": "1811", "sub": "Named for King George III", "hero": "tobias-reich--7ZwuyDx2rI-unsplash.jpg", "blurb": "Garden Route town beneath the Outeniqua mountains.", "origins": "Established in 1811 beneath the Outeniqua mountains, George is the largest town on the Garden Route — a forestry and farming centre between mountain and sea.", "stats": [{"v": "1811", "l": "Founded", "badge": "record"}, {"v": "Garden Route", "l": "Region", "badge": ""}], "landmarks": ["Outeniqua Pass", "the Garden Route", "George Museum"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "johannesburg": {"prov": "Gauteng · City", "name": "Johannesburg", "year": "1886", "sub": "eGoli — 'place of gold'", "hero": "pexels-sizwe-shabalala-1225168-2464890.jpg", "blurb": "eGoli — the city of gold and the industrial heart of the country.", "before": "Sotho-Tswana communities farmed the Highveld long before the gold rush, on the ridges of the Witwatersrand.", "origins": "In 1886 gold was found on the Witwatersrand — the prospector George Harrison is credited — and a mining camp exploded into a city within a decade. Johannesburg drew migrant labour from across the region, becoming the industrial heart of the country and a crucible of the struggle.", "leaders": [{"when": "Pre-1886", "muted": true, "name": "Sotho-Tswana communities", "role": "Highveld farmers before the reef"}, {"when": "1886", "name": "The gold rush", "role": "George Harrison credited with the find"}, {"when": "2016 – 2019", "now": true, "name": "Herman Mashaba", "role": "Executive Mayor — the office has been notably unstable since 2016"}], "stats": [{"v": "1886", "l": "Founded (gold)", "badge": "record"}, {"v": "~4.8M", "l": "City population", "badge": "Census 2022"}, {"v": "2", "l": "Universities (Wits, UJ)", "badge": "public"}, {"v": "eGoli", "l": "'Place of gold'", "badge": ""}], "landmarks": ["Constitution Hill", "Apartheid Museum", "Hector Pieterson Memorial", "Mandela House", "Gold Reef City"], "src": "Facts trace to public record and StatsSA Census 2022. The mayoral instability since 2016 is stated plainly rather than smoothed over."}, "pretoria": {"prov": "Gauteng · City", "name": "Pretoria / Tshwane", "year": "1855", "sub": "Named for Voortrekker Andries Pretorius", "hero": "pexels-skylight-views-2151863365-34735591.jpg", "blurb": "Jacaranda city and the country's administrative capital.", "origins": "Founded in 1855 by Marthinus Pretorius and named for his father Andries, Pretoria became the capital of the South African Republic and today is the country's administrative capital — seat of the Union Buildings.", "stats": [{"v": "1855", "l": "Founded", "badge": "record"}, {"v": "Admin", "l": "National capital", "badge": ""}, {"v": "Union Bldgs", "l": "Seat of government", "badge": ""}], "landmarks": ["Union Buildings", "Voortrekker Monument", "Freedom Park", "Church Square"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "soweto": {"prov": "Gauteng · Township-city", "name": "Soweto", "year": "1931", "sub": "South Western Townships → SOWETO (1963)", "hero": "pexels-omar-photographer-686423191-33212386.jpg", "blurb": "Township-city of the 1976 uprising; Vilakazi Street's two Nobel laureates.", "origins": "Orlando, the first township, was laid out in 1931; the cluster was named the South Western Townships — SOWETO — in 1963. On 16 June 1976 the Soweto Uprising, sparked by the forced use of Afrikaans in schools, became a turning point in the struggle. Vilakazi Street is the only street to have housed two Nobel laureates — Nelson Mandela and Desmond Tutu.", "stats": [{"v": "1931", "l": "Orlando laid out", "badge": "record"}, {"v": "1976", "l": "Soweto Uprising", "badge": "16 June"}, {"v": "2", "l": "Nobel laureates, one street", "badge": ""}], "landmarks": ["Vilakazi Street", "Hector Pieterson Memorial", "Mandela House", "Regina Mundi Church", "Orlando Towers"], "src": "The 1976 uprising is recorded honestly — a turning point, told from the public historical record."}, "durban": {"prov": "KwaZulu-Natal · City", "name": "Durban", "year": "1824", "sub": "eThekwini — 'the bay'", "hero": "pexels-ygtphoto-13422789.jpg", "blurb": "Africa's busiest port; warm Indian-Ocean city of many cultures.", "before": "The bay was long known to the Zulu and earlier Nguni peoples as eThekwini.", "origins": "British traders settled the bay in 1824, naming it Port Natal and then Durban, after Cape governor Benjamin D'Urban. It grew into Africa's busiest port and home to the largest Indian-descended community outside India, shaped by 19th-century indentured labour.", "stats": [{"v": "1824", "l": "Founded (Port Natal)", "badge": "record"}, {"v": "Busiest", "l": "Port in Africa", "badge": ""}], "landmarks": ["Golden Mile", "uShaka Marine World", "Moses Mabhida Stadium", "Victoria Street Market", "Phoenix Settlement"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "pietermaritzburg": {"prov": "KwaZulu-Natal · Capital", "name": "Pietermaritzburg", "year": "1838", "sub": "'Maritzburg' — the Voortrekker capital", "hero": "pexels-khulani-36419398.jpg", "blurb": "KZN's capital, where Gandhi's resistance began in 1893.", "origins": "Founded by the Voortrekkers in 1838 as the capital of the short-lived Natalia Republic. In 1893 a young Mohandas Gandhi was thrown off a train here for sitting in a whites-only carriage — a moment that shaped his philosophy of resistance.", "stats": [{"v": "1838", "l": "Founded", "badge": "record"}, {"v": "1893", "l": "Gandhi's train stand", "badge": ""}], "landmarks": ["Gandhi statue", "City Hall", "Tatham Art Gallery", "the Comrades Marathon"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "ulundi": {"prov": "KwaZulu-Natal · City", "name": "Ulundi", "year": "1873", "sub": "oNdini — the Zulu royal capital", "hero": "pexels-magda-ehlers-pexels-3193548.jpg", "blurb": "oNdini — royal capital of the Zulu Kingdom.", "origins": "Ulundi (oNdini) was the capital of the Zulu Kingdom under King Cetshwayo. Here, in July 1879, the Anglo-Zulu War ended with the burning of the royal homestead. It later served as capital of the KwaZulu homeland.", "stats": [{"v": "1873", "l": "Zulu capital (oNdini)", "badge": "record"}, {"v": "1879", "l": "End of Anglo-Zulu War", "badge": ""}], "landmarks": ["oNdini cultural museum", "the battlefields", "King Cetshwayo's grave"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "gqeberha": {"prov": "Eastern Cape · City", "name": "Gqeberha", "year": "1820", "sub": "Port Elizabeth — renamed Gqeberha in 2021", "hero": "pexels-taryn-elliott-9385208.jpg", "blurb": "Algoa Bay city of the 1820 Settlers; renamed from Port Elizabeth.", "origins": "The 1820 British Settlers landed here, and the town grew around Algoa Bay as a colonial port. In 2021 it was officially renamed Gqeberha, its Xhosa name.", "stats": [{"v": "1820", "l": "British Settlers", "badge": "record"}, {"v": "2021", "l": "Renamed Gqeberha", "badge": ""}], "landmarks": ["Donkin Reserve", "Route 67", "Algoa Bay", "Addo (nearby)"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "eastlondon": {"prov": "Eastern Cape · City", "name": "East London", "year": "1836", "sub": "eMonti — the only river port in SA", "hero": "tobias-reich--7ZwuyDx2rI-unsplash.jpg", "blurb": "South Africa's only river port, on the Buffalo River.", "origins": "Founded at the mouth of the Buffalo River in 1836, East London is the country's only river port. It sits on the coast of the former Ciskei and Transkei — the Xhosa heartland.", "stats": [{"v": "1836", "l": "Founded", "badge": "record"}, {"v": "Only", "l": "River port in SA", "badge": ""}], "landmarks": ["Buffalo River", "the Esplanade", "East London Museum (the coelacanth)"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "mthatha": {"prov": "Eastern Cape · City", "name": "Mthatha", "year": "1882", "sub": "Heart of the former Transkei", "hero": "pexels-khulani-36419398.jpg", "blurb": "Gateway to Mandela's Qunu, heart of the former Transkei.", "origins": "Mthatha grew as the administrative centre of the Transkei. Nearby Mvezo and Qunu are the birthplace and childhood home of Nelson Mandela — the region is the cradle of much of the ANC's leadership.", "stats": [{"v": "1882", "l": "Founded", "badge": "record"}, {"v": "Qunu", "l": "Mandela's home nearby", "badge": ""}], "landmarks": ["Nelson Mandela Museum", "Qunu", "Bumbane Great Place"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "makhanda": {"prov": "Eastern Cape · City", "name": "Makhanda", "year": "1812", "sub": "Grahamstown — renamed for the prophet Makhanda", "hero": "pexels-omar-photographer-686423191-33212386.jpg", "blurb": "Frontier city of festivals; renamed for the prophet Makhanda.", "origins": "Established in 1812 as a frontier garrison, the town was a flashpoint of the Frontier Wars. In 2018 it was renamed Makhanda, for the Xhosa warrior-prophet who led the 1819 attack on the town. It is now a university and festival city.", "stats": [{"v": "1812", "l": "Founded", "badge": "record"}, {"v": "2018", "l": "Renamed Makhanda", "badge": ""}], "landmarks": ["Rhodes University", "the National Arts Festival", "the 1820 Settlers Monument"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "kimberley": {"prov": "Northern Cape · Capital", "name": "Kimberley", "year": "~1871", "sub": "The 'New Rush' — city of diamonds", "hero": "pexels-jann-bader-411133784-17176393.jpg", "blurb": "City of diamonds and the Big Hole; Sol Plaatje's home.", "before": "The region was home to the Griqua under Nicolaas Waterboer, the San, and Tswana peoples of the diamond fields.", "origins": "A diamond rush from about 1871 turned the Colesberg Kopje into the Big Hole — the deepest hand-dug excavation on earth. Named in 1873 after the British Colonial Secretary, Lord Kimberley, the city drew Sol Plaatje, author of Mhudi, who edited newspapers here and helped found the SANNC (forerunner of the ANC).", "leaders": [{"when": "Pre-1871", "muted": true, "name": "Griqua, San & Tswana", "role": "Nicolaas Waterboer led the Griqua of the fields"}, {"when": "1871", "name": "The New Rush", "role": "Colesberg Kopje becomes the Big Hole"}, {"when": "present", "now": true, "name": "Sol Plaatje Local Municipality", "role": "Named for the Mhudi author"}], "stats": [{"v": "~1871", "l": "Diamond rush", "badge": "record"}, {"v": "2014", "l": "Sol Plaatje University", "badge": "founded"}, {"v": "Big Hole", "l": "Deepest hand-dug mine", "badge": ""}], "landmarks": ["The Big Hole & Mine Museum", "Sol Plaatje House", "McGregor Museum", "William Humphreys Gallery"], "archH": "Your Kimberley", "archS": "Record a memory — and see the Mhudi story it ties to", "src": "Kimberley ties directly to the app's first pillar: Sol Plaatje wrote Mhudi and lived here. Facts trace to SA History Online and the McGregor Museum."}, "upington": {"prov": "Northern Cape · City", "name": "Upington", "year": "1884", "sub": "On the Gariep (Orange River)", "hero": "pexels-ygtphoto-13408565.jpg", "blurb": "Green-Kalahari town on the Gariep (Orange) River.", "origins": "A mission station on the banks of the Gariep (Orange) River, Upington grew into the centre of the Green Kalahari — vineyards and dates in a semi-desert, and the gateway to the Kgalagadi and Augrabies.", "stats": [{"v": "1884", "l": "Mission founded", "badge": "record"}, {"v": "Gariep", "l": "On the Orange River", "badge": ""}], "landmarks": ["Augrabies Falls", "Kgalagadi Transfrontier Park", "the Orange River vineyards"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "bloemfontein": {"prov": "Free State · Capital", "name": "Bloemfontein", "year": "1846", "sub": "Mangaung — 'place of cheetahs'", "hero": "pexels-ygtphoto-13408565.jpg", "blurb": "Judicial capital; birthplace of the ANC in 1912.", "origins": "Founded in 1846, Bloemfontein became capital of the Orange Free State republic and is today South Africa's judicial capital, seat of the Supreme Court of Appeal. In 1912 the SANNC — which became the ANC — was founded here in Mangaung.", "stats": [{"v": "1846", "l": "Founded", "badge": "record"}, {"v": "1912", "l": "ANC founded here", "badge": ""}, {"v": "Judicial", "l": "National capital", "badge": ""}], "landmarks": ["Naval Hill", "Supreme Court of Appeal", "Waaihoek (ANC founding site)", "University of the Free State"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "welkom": {"prov": "Free State · City", "name": "Welkom", "year": "1947", "sub": "A planned gold-mining city", "hero": "pexels-ygtphoto-13408565.jpg", "blurb": "A gold city planned before it was built.", "origins": "One of the few South African cities planned before it was built, Welkom rose in 1947 on the Free State goldfields — laid out with wide curving roads and, famously, almost no traffic lights.", "stats": [{"v": "1947", "l": "Planned & built", "badge": "record"}, {"v": "Gold", "l": "Free State fields", "badge": ""}], "landmarks": ["the goldfields", "the flamingo pans", "Oppenheimer Park"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "polokwane": {"prov": "Limpopo · Capital", "name": "Polokwane", "year": "1886", "sub": "Pietersburg — 'place of safety'", "hero": "pexels-gwejeofafrica-38223519.jpg", "blurb": "Commercial hub of the far north.", "origins": "Founded in 1886 as Pietersburg and renamed Polokwane ('place of safety' in Sepedi), it is the commercial hub of the far north, on the trade routes toward Zimbabwe.", "stats": [{"v": "1886", "l": "Founded (Pietersburg)", "badge": "record"}, {"v": "Far north", "l": "Commercial hub", "badge": ""}], "landmarks": ["Bakone Malapa museum", "Mapungubwe (nearby, UNESCO)", "Polokwane Game Reserve"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "thohoyandou": {"prov": "Limpopo · City", "name": "Thohoyandou", "year": "1979", "sub": "'Head of the elephant' — the Venda capital", "hero": "pexels-gwejeofafrica-38223519.jpg", "blurb": "Former Venda capital in the sacred north.", "origins": "Thohoyandou was built as the capital of the Venda homeland; its name honours a great Venda king. The surrounding region holds the sacred Lake Fundudzi and the Thathe Vondo forest of Venda tradition.", "stats": [{"v": "1979", "l": "Built as Venda capital", "badge": "record"}, {"v": "Lake Fundudzi", "l": "Sacred site nearby", "badge": ""}], "landmarks": ["Lake Fundudzi", "the Dzata ruins", "Thathe Vondo forest"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "mbombela": {"prov": "Mpumalanga · Capital", "name": "Mbombela", "year": "1895", "sub": "Nelspruit — gateway to the Kruger", "hero": "jennifer-latuperisa-andresen-Pg6dgmTaqtM-unsplash.jpg", "blurb": "Lowveld gateway to the Kruger National Park.", "origins": "Founded in 1895 as Nelspruit in the Lowveld and renamed Mbombela, it is the gateway to the Kruger National Park and the fertile subtropical farms below the escarpment.", "stats": [{"v": "1895", "l": "Founded (Nelspruit)", "badge": "record"}, {"v": "Kruger", "l": "Gateway to the park", "badge": ""}], "landmarks": ["Kruger National Park", "the Panorama Route", "God's Window", "the Lowveld Botanical Garden"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "emalahleni": {"prov": "Mpumalanga · City", "name": "eMalahleni", "year": "1890", "sub": "'Place of coal' — formerly Witbank", "hero": "pexels-ygtphoto-13408565.jpg", "blurb": "Place of coal — engine of the country's power.", "origins": "Formerly Witbank, eMalahleni ('place of coal') sits on the country's richest coalfields, feeding the Highveld power stations — a place of both industry and hard environmental questions.", "stats": [{"v": "1890", "l": "Founded (Witbank)", "badge": "record"}, {"v": "Coal", "l": "Highveld fields", "badge": ""}], "landmarks": ["the coalfields", "the Highveld power stations"], "src": "Founding dates and names here are public record — municipal histories and StatsSA. Items still being confirmed are marked <b>to verify</b>; nothing is invented, including the indigenous history that predates the colonial founding."}, "mahikeng": {"prov": "North West · Capital", "name": "Mahikeng", "year": "1885", "sub": "Mafikeng — 'place of stones'", "hero": "pexels-kaybee-photography-664870201-33687401.jpg", "blurb": "Barolong town of the Mhudi story and the famous siege.", "before": "This is the land of the Barolong boo Ratshidi — the Tswana people whose story frames Sol Plaatje's Mhudi.", "origins": "Founded in 1885 beside the older Barolong town, Mahikeng became world-famous for the 217-day Siege of Mafeking in the South African War (1899–1900). It later served as capital of the Bophuthatswana homeland, and is Sol Plaatje's home ground.", "leaders": [{"when": "Before 1885", "muted": true, "name": "Barolong boo Ratshidi", "role": "Tswana people of the Molopo — the world of Mhudi"}, {"when": "1899 – 1900", "name": "The Siege of Mafeking", "role": "217 days in the South African War"}, {"when": "1977 – 1994", "muted": true, "name": "Bophuthatswana capital", "role": "Homeland administration"}], "stats": [{"v": "1885", "l": "Founded", "badge": "record"}, {"v": "217 days", "l": "Siege of Mafeking", "badge": ""}], "landmarks": ["Mafikeng Museum", "Lotlamoreng Dam", "Cookes Lake", "the Cape-to-Cairo rail"], "archH": "Your Mahikeng", "archS": "Record a memory — the Barolong land of Mhudi", "src": "Mahikeng ties to the app's first pillar: the Barolong of Mhudi. Facts trace to SA History Online and the Mafikeng Museum."}, "rustenburg": {"prov": "North West · City", "name": "Rustenburg", "year": "1851", "sub": "'Town of rest'", "hero": "pexels-kaybee-photography-664870201-33687401.jpg", "blurb": "Platinum city at the foot of the Magaliesberg.", "origins": "Founded in 1851 at the foot of the Magaliesberg, Rustenburg sits on the world's richest platinum reef. It is near Marikana, where the 2012 mine shooting became a defining tragedy of the democratic era — remembered honestly.", "stats": [{"v": "1851", "l": "Founded", "badge": "record"}, {"v": "Platinum", "l": "World's richest reef", "badge": ""}], "landmarks": ["the Magaliesberg", "the platinum belt", "Sun City (nearby)", "the Marikana koppie"], "src": "The 2012 Marikana shooting is named plainly, as the record requires — neither erased nor sensationalised."}};
+  var PRES={"mandela": {"mono": "NM", "name": "Nelson Mandela", "clan": "Madiba · Tata", "term": "1st President · 1994 – 1999", "stats": [{"v": "1918", "l": "Born · Mvezo, E. Cape"}, {"v": "2013", "l": "Died · Johannesburg"}, {"v": "1994–99", "l": "In office"}, {"v": "ANC", "l": "Party"}], "struggle": "Mandela joined the ANC in 1944 and helped found its Youth League. As apartheid hardened, he co-founded Umkhonto we Sizwe, the movement's armed wing. Convicted at the 1964 Rivonia Trial, he was sentenced to life and spent 27 years in prison — much of it on Robben Island. Released on 11 February 1990, he shared the 1993 Nobel Peace Prize with F.W. de Klerk and, in 1994, became South Africa's first democratically-elected president.", "life": [{"when": "1918", "name": "Born in Mvezo", "role": "Eastern Cape; of the Thembu royal house"}, {"when": "1944", "name": "Joins the ANC", "role": "Co-founds the ANC Youth League"}, {"when": "1964", "name": "Rivonia Trial", "role": "Sentenced to life; imprisoned for 27 years"}, {"when": "1990", "name": "Released", "role": "Walks free on 11 February"}, {"when": "1994", "name": "Elected President", "role": "South Africa's first free election"}, {"when": "2013", "muted": true, "name": "Dies in Johannesburg", "role": "Aged 95"}], "family": [{"rel": "Spouse", "name": "Evelyn Mase · 1944–58"}, {"rel": "Spouse", "name": "Winnie Madikizela-Mandela · 1958–96"}, {"rel": "Spouse", "name": "Graça Machel · 1998"}, {"rel": "Children", "name": "Six, across his marriages"}], "know": ["His clan name is <b style=\"color:#fff\">Madiba</b>; he is affectionately called <b style=\"color:#fff\">Tata</b> — father of the nation.", "He chose reconciliation over revenge — championing the Truth &amp; Reconciliation Commission.", "He served a single term by choice, stepping down to strengthen the young democracy."], "quote": {"t": "It always seems impossible until it's done.", "by": "— Nelson Mandela"}, "archH": "Your memory of Madiba", "archS": "Record where you were, what he meant to your family", "src": "Dates and facts trace to the public record — Mandela's <i>Long Walk to Freedom</i> and the Nelson Mandela Foundation. Hard chapters are told honestly, never sanitised."}, "mbeki": {"mono": "TM", "name": "Thabo Mbeki", "clan": "", "term": "2nd President · 1999 – 2008", "stats": [{"v": "1942", "l": "Born · Mbewuleni, E. Cape"}, {"v": "Living", "l": "—"}, {"v": "1999–2008", "l": "In office"}, {"v": "ANC", "l": "Party"}], "struggle": "Mbeki spent nearly three decades in exile, becoming one of the ANC's sharpest diplomats and a key figure in the negotiations that ended apartheid. As Mandela's deputy and then president, he championed the 'African Renaissance' and drove a decade of strong economic growth.", "life": [{"when": "1942", "name": "Born in Mbewuleni", "role": "Eastern Cape"}, {"when": "1962", "name": "Into exile", "role": "ANC abroad for nearly 30 years"}, {"when": "1990", "name": "Returns home", "role": "As apartheid negotiations begin"}, {"when": "1999", "name": "Elected President", "role": "Succeeds Mandela"}, {"when": "2008", "muted": true, "name": "Resigns", "role": "Recalled by the ANC in September"}], "family": [{"rel": "Spouse", "name": "Zanele Mbeki (née Dlamini)"}], "know": ["His 1996 'I am an African' speech, at the adoption of the Constitution, remains one of the country's great orations.", "He championed the African Renaissance and NEPAD, and oversaw a decade of growth.", "Told honestly: his government's HIV/AIDS denialism and 'quiet diplomacy' on Zimbabwe drew serious, lasting criticism."], "quote": {"t": "I am an African.", "by": "— Thabo Mbeki, 1996"}, "archH": "Your memory of this era", "archS": "Record what these years meant to your family", "src": "Facts trace to the Presidency archives and Mark Gevisser's biography, <i>A Legacy of Liberation</i>. The AIDS policy and Zimbabwe are recorded factually, not sanitised."}, "motlanthe": {"mono": "KM", "name": "Kgalema Motlanthe", "clan": "", "term": "3rd President · 2008 – 2009 · caretaker", "stats": [{"v": "1949", "l": "Born · Boksburg"}, {"v": "Living", "l": "—"}, {"v": "2008–09", "l": "In office"}, {"v": "ANC", "l": "Party"}], "struggle": "A trade unionist and secretary-general of the National Union of Mineworkers, Motlanthe was imprisoned on Robben Island in the late 1970s for ANC activity. He served as caretaker president after Mbeki's resignation, steadying the country through a tense handover.", "life": [{"when": "1949", "name": "Born in Boksburg", "role": "East Rand"}, {"when": "c.1977", "name": "Imprisoned on Robben Island", "role": "For ANC activity"}, {"when": "1990s", "name": "Union & ANC leadership", "role": "Secretary-general of the NUM, then the ANC"}, {"when": "2008", "name": "Sworn in as caretaker President", "role": "After Mbeki's resignation"}, {"when": "2009", "muted": true, "name": "Hands over", "role": "After the general election"}], "family": null, "know": ["He was a stabilising steward during a fragile transfer of power.", "Widely respected as a unifier, he later chaired the High-Level Panel reviewing post-1994 legislation."], "quote": null, "archH": "Your memory of this era", "archS": "Record what these years meant to your family", "src": "Facts trace to the Presidency and SA History Online. Details left unstated here are pending a reliable source rather than guessed."}, "zuma": {"mono": "JZ", "name": "Jacob Zuma", "clan": "Msholozi", "term": "4th President · 2009 – 2018", "stats": [{"v": "1942", "l": "Born · Nkandla, KZN"}, {"v": "Living", "l": "—"}, {"v": "2009–2018", "l": "In office"}, {"v": "ANC", "l": "Party"}], "struggle": "Zuma joined Umkhonto we Sizwe and was imprisoned on Robben Island for ten years (1963–1973), later running ANC intelligence in exile. A gifted orator with deep struggle credentials, he rose to the presidency in 2009.", "life": [{"when": "1942", "name": "Born in Nkandla", "role": "KwaZulu-Natal"}, {"when": "1963", "name": "Imprisoned on Robben Island", "role": "Ten years"}, {"when": "1990", "name": "Returns from exile", "role": "ANC intelligence"}, {"when": "2009", "name": "Elected President", "role": ""}, {"when": "2018", "muted": true, "name": "Resigns", "role": "Under pressure from his own party"}], "family": [{"rel": "Family", "name": "A polygamist in Zulu tradition — several wives and many children"}], "know": ["Told honestly: his presidency was dominated by controversy — the arms-deal and corruption charges, the Nkandla upgrades, and 'state capture'.", "These were later examined by the Zondo Commission; in 2021 he was jailed for contempt of court, triggering unrest.", "The record is stated factually, from the commission's report and court documents — neither erased nor sensationalised."], "quote": null, "archH": "Your memory of this era", "archS": "Record what these years meant to your family", "src": "Facts trace to the Zondo Commission report, the Presidency and court records. This is where honest grounding matters most — the record is given plainly, without editorialising."}, "ramaphosa": {"mono": "CR", "name": "Cyril Ramaphosa", "clan": "", "term": "5th President · 2018 – present", "stats": [{"v": "1952", "l": "Born · Soweto"}, {"v": "Living", "l": "—"}, {"v": "2018–", "l": "In office"}, {"v": "ANC", "l": "Party"}], "struggle": "Ramaphosa founded the National Union of Mineworkers in 1982 and was the ANC's chief negotiator at CODESA, chairing the assembly that produced the 1996 Constitution. After years in business, he returned to lead the country on an anti-corruption platform.", "life": [{"when": "1952", "name": "Born in Soweto", "role": "Johannesburg"}, {"when": "1982", "name": "Founds the NUM", "role": "The National Union of Mineworkers"}, {"when": "1991–96", "name": "Chief negotiator", "role": "Chairs the Constitutional Assembly"}, {"when": "1996", "name": "Constitution adopted", "role": "One of the world's most progressive"}, {"when": "2018", "name": "Elected President", "role": ""}], "family": [{"rel": "Spouse", "name": "Dr Tshepo Motsepe"}], "know": ["He built the country's most powerful union, then helped write its Constitution.", "Told honestly: his role as a Lonmin director around the 2012 Marikana massacre remains a serious point of scrutiny."], "quote": null, "archH": "Your memory of this era", "archS": "Record what these years meant to your family", "src": "Facts trace to the Presidency and Anthony Butler's biography. The Marikana question is included deliberately — grounding means not omitting the hard parts."}};
+  var PROV_ORDER=["gauteng", "westerncape", "kwazulunatal", "easterncape", "northerncape", "freestate", "limpopo", "mpumalanga", "northwest"];
+  var PRES_ORDER=["mandela", "mbeki", "motlanthe", "zuma", "ramaphosa"];
+
+
+  // ---------- builders ----------
+  var CHECK='<svg class="ico" width="14" height="14" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>';
+  var CHEVS='<svg class="ico" width="18" height="18" viewBox="0 0 24 24" style="color:var(--slate)"><path d="m9 18 6-6-6-6"/></svg>';
+  function tl(items){
+    return items.map(function(it,i){
+      var dot = it.now ? 'now' : (it.muted ? 'past' : '');
+      var line = (i < items.length-1) ? '<div class="tl-line"></div>' : '';
+      var when = '<div class="tl-when'+(it.muted?' muted':'')+'">'+it.when+'</div>';
+      var role = it.role ? '<div class="tl-role">'+it.role+'</div>' : '';
+      return '<div class="tl-item"><div class="tl-rail"><div class="tl-dot '+dot+'"></div>'+line+'</div>'+
+             '<div class="tl-body">'+when+'<div class="tl-name">'+it.name+'</div>'+role+'</div></div>';
+    }).join('');
+  }
+  function statTiles(arr, big){
+    return arr.map(function(s){
+      var b = s.badge ? '<span class="'+(s.badge==='to verify'?'stat-verify':'stat-cited')+'">'+s.badge+'</span>' : '';
+      var st = big ? ' style="font-size:18px"' : '';
+      return '<div class="stat-tile"><div class="stat-val"'+st+'>'+s.v+'</div><div class="stat-label">'+s.l+'</div>'+b+'</div>';
+    }).join('');
+  }
+  function famChips(arr){ return arr.map(function(f){ return '<div class="fam-chip"><div class="fc-rel">'+f.rel+'</div><div class="fc-name">'+f.name+'</div></div>'; }).join(''); }
+  function knowList(arr){ return arr.map(function(t){ return '<div class="kn">'+CHECK+'<span>'+t+'</span></div>'; }).join(''); }
+  function lms(arr){ return arr.map(function(x){ return '<span class="lm-chip">'+x+'</span>'; }).join(''); }
+  function cityRows(cids){
+    return cids.map(function(id){ var c=CITY[id]; if(!c) return '';
+      return '<div class="city-row" data-city="'+id+'"><img src="'+c.hero+'" alt=""><div class="cr-b">'+
+             '<div class="cr-name">'+c.name+'</div><div class="cr-meta">Founded '+c.year+'</div>'+
+             '<div class="cr-blurb">'+c.blurb+'</div></div>'+CHEVS+'</div>';
+    }).join('');
+  }
+
+  // ---------- open detail screens ----------
+  function openProvince(id){
+    var p = PROV[id]; if(!p) return;
+    var v = views.province;
+    var img = v.querySelector('.prov-hero img'); img.src = p.hero; img.alt = p.name;
+    v.querySelector('.ph-name').textContent = p.name;
+    v.querySelector('.prov-mini').innerHTML =
+      '<div class="pm"><div class="v">'+p.capital+'</div><div class="l">Capital</div></div>'+
+      '<div class="pm"><div class="v">'+p.pop+'</div><div class="l">People · 2022</div></div>'+
+      '<div class="pm"><div class="v">'+p.langs+'</div><div class="l">Top languages</div></div>';
+    v.querySelector('.city-para').textContent = p.overview;
+    var cont = v.querySelector('#pv-cities');
+    cont.innerHTML = cityRows(p.cities);
+    each(cont, '.city-row', function(el){ el.addEventListener('click', function(){ openCity(el.dataset.city); }); });
+    go('province');
+  }
+  function openCity(id){
+    var c = CITY[id]; if(!c) return;
+    var v = views.city;
+    var img = v.querySelector('.city-hero img'); img.src = c.hero; img.alt = c.name;
+    v.querySelector('.ch-est').textContent = 'Est. '+c.year;
+    v.querySelector('.ch-kick').textContent = c.prov;
+    v.querySelector('.ch-name').textContent = c.name;
+    v.querySelector('.ch-sub').textContent = c.sub;
+    var band = v.querySelector('.city-band');
+    if (c.before){ band.style.display=''; v.querySelector('.cb-text').textContent = c.before; }
+    else band.style.display='none';
+    v.querySelector('.city-para').textContent = c.origins;
+    var lh = v.querySelector('#ct-leaders-head'), lt = v.querySelector('.timeline');
+    if (c.leaders){ lh.style.display=''; lt.style.display=''; lt.innerHTML = tl(c.leaders); }
+    else { lh.style.display='none'; lt.style.display='none'; }
+    v.querySelector('.stat-grid').innerHTML = statTiles(c.stats, false);
+    v.querySelector('.chip-row').innerHTML = lms(c.landmarks);
+    v.querySelector('.ca-h').textContent = c.archH || ('Your '+c.name);
+    v.querySelector('.ca-s').textContent = c.archS || 'Record a family memory of this place';
+    v.querySelector('.sn-t').innerHTML = c.src;
+    go('city');
+  }
+  function openPresident(id){
+    var p = PRES[id]; if(!p) return;
+    var v = views.president;
+    v.querySelector('.big-mono').textContent = p.mono;
+    v.querySelector('.ph-name2').textContent = p.name;
+    var clan = v.querySelector('.ph-clan');
+    if (p.clan){ clan.style.display=''; clan.textContent = p.clan; } else clan.style.display='none';
+    v.querySelector('.ph-term2').textContent = p.term;
+    v.querySelector('.stat-grid').innerHTML = statTiles(p.stats, true);
+    v.querySelector('.city-para').textContent = p.struggle;
+    v.querySelector('.timeline').innerHTML = tl(p.life);
+    // family (section-head is the sibling right before .fam-row)
+    var fam = v.querySelector('.fam-row'); var famHead = fam.previousElementSibling;
+    if (p.family){ fam.style.display=''; if(famHead) famHead.style.display=''; fam.innerHTML = famChips(p.family); }
+    else { fam.style.display='none'; if(famHead) famHead.style.display='none'; }
+    v.querySelector('.know-list').innerHTML = knowList(p.know);
+    var q = v.querySelector('.quote');
+    if (p.quote){ q.style.display=''; q.querySelector('.q-text').textContent = '"'+p.quote.t+'"'; q.querySelector('.q-attr').textContent = p.quote.by; }
+    else q.style.display='none';
+    v.querySelector('.ca-h').textContent = p.archH; v.querySelector('.ca-s').textContent = p.archS;
+    v.querySelector('.sn-t').innerHTML = p.src;
+    go('president');
+  }
+
+  // ---------- launch ----------
+  views.launch.querySelector('.screen').addEventListener('click', function(){ go('home'); });
+
+  // ---------- home ----------
+  var home = views.home;
+  each(home, '.pcard', function(el){ el.addEventListener('click', function(){ go('reader'); }); });
+  home.querySelector('.hero').addEventListener('click', function(){ go('reader'); });
+  each(home, '.prov-mini-card, .prov-all', function(el){ el.addEventListener('click', function(){ go('provinces'); }); });
+  each(home, '.pres-mini', function(el){ el.addEventListener('click', function(){ go('presidents'); }); });
+  home.querySelector('.archive').addEventListener('click', function(){ go('archive'); });
+  var lg = home.querySelector('.ledger'); if (lg) lg.addEventListener('click', function(){ go('ledger'); });
+
+  // ---------- provinces grid -> province ----------
+  each(views.provinces, '.prov-card', function(el, i){});
+  views.provinces.querySelectorAll('.prov-card').forEach(function(el, i){
+    el.addEventListener('click', function(){ openProvince(PROV_ORDER[i]); });
+  });
+
+  // ---------- presidents list -> president (democratic five only) ----------
+  var demoList = views.presidents.querySelector('.pres-list');
+  demoList.querySelectorAll('.pres-row').forEach(function(el, i){
+    if (i < PRES_ORDER.length){
+      el.classList.add('tappable');
+      el.addEventListener('click', function(){ openPresident(PRES_ORDER[i]); });
+    }
+  });
+
+  // ---------- universal back ----------
+  each(document, '.back-dark, .back-btn', function(el){
+    el.addEventListener('click', function(e){ e.stopPropagation(); back(); });
+  });
+
+  // ---------- tab bar ----------
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ root(t.dataset.tab); }); });
+
+  // ---------- archive consent sheet ----------
+  var sheet = views.archive.querySelector('.sheet-backdrop');
+  if (sheet){
+    each(views.archive, '.choice, .notnow', function(el){
+      el.addEventListener('click', function(e){ e.stopPropagation(); sheet.classList.add('closed'); });
+    });
+    var rec = views.archive.querySelector('.record-btn');
+    if (rec) rec.addEventListener('click', function(){ sheet.classList.remove('closed'); });
+  }
+
+  // ---------- reader Adult/Child ----------
+  each(views.reader, '.seg button', function(b){
+    b.addEventListener('click', function(){
+      views.reader.querySelectorAll('.seg button').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
