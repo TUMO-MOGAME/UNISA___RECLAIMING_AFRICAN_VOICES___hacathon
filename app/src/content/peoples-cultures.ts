@@ -96,7 +96,7 @@ export const peoplesCultures: Module = {
       },
       imagePrompt:
         "Xhosa homesteads on the green rolling hills of the Eastern Cape, people in ochre umbhaco cloth, cattle, coastal light, cinematic, painterly, artistic interpretation, no text",
-      seed: 6505,
+      seed: 6506,
       sourceNote: "Project history document, 'The Xhosa'; links to the Ityala Lamawele module (Mqhayi).",
     },
     {

@@ -22,7 +22,6 @@ import { CinematicReader } from "./src/components/CinematicReader";
 import { AboutSourcesScreen } from "./src/components/AboutSourcesScreen";
 import { ArchiveScreen } from "./src/components/ArchiveScreen";
 import { HeritageLedgerScreen } from "./src/components/HeritageLedgerScreen";
-import { LaunchScreen } from "./src/components/LaunchScreen";
 import { AtlasScreen } from "./src/components/AtlasScreen";
 import { ProvincesScreen, ProvinceScreen, CityScreen } from "./src/components/ProvincesScreens";
 import { provinceById, cityById } from "./src/content/provinces";
@@ -78,7 +77,6 @@ export default function App() {
       return [...s, r];
     });
   const back = () => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s));
-  const [launchDone, setLaunchDone] = useState(false);
 
   // Android hardware/gesture back pops the in-app route stack instead of exiting the app.
   // Only handled while there is somewhere to go back to, so back on Home still exits normally.
@@ -107,10 +105,9 @@ export default function App() {
     Montserrat_800ExtraBold,
     Montserrat_900Black,
   });
-  // Don't let a font-loading failure (e.g. offline) trap the user on the launch screen.
+  // Don't let a font-loading failure (e.g. offline) block rendering.
   const ready = fontsLoaded || !!fontError;
 
-  const showLaunch = !ready || !launchDone;
   const routeKey =
     route.name === "reader" || route.name === "province" || route.name === "city" || route.name === "president"
       ? `${route.name}:${route.id}`
@@ -200,7 +197,6 @@ export default function App() {
               )}
             </Fade>
           )}
-          {showLaunch && <LaunchScreen onDone={() => setLaunchDone(true)} />}
         </View>
       </View>
     </SafeAreaProvider>

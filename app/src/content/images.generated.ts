@@ -1,15 +1,43 @@
-// GENERATED FILE — do not edit by hand. Regenerate: npm run gen:images
-// Maps "<moduleId>:<sceneId>" -> a bundled local image asset (Gemini). AI interpretations, labelled
-// as such in the Reader — never real photos.
+// GENERATED FILE — do not edit by hand. Regenerate: npm run gen:images / npm run cache:images
+// Maps "<moduleId>:<sceneId>" -> a bundled local image asset (Gemini or cached Pollinations).
+// AI interpretations, labelled as such in the Reader — never real photos.
 export const GENERATED_IMAGES: Record<string, number> = {
   "mhudi:forest-home": require("../../assets/generated/mhudi-forest-home.webp"),
+  "mhudi:the-lion": require("../../assets/generated/mhudi-the-lion.webp"),
   "ityala-lamawele:the-lawsuit": require("../../assets/generated/ityala-lamawele-the-lawsuit.webp"),
+  "ityala-lamawele:wisdom-of-the-inkundla": require("../../assets/generated/ityala-lamawele-wisdom-of-the-inkundla.webp"),
   "indaba:ninavanhu-ma": require("../../assets/generated/indaba-ninavanhu-ma.webp"),
+  "indaba:keeping-the-story-alive": require("../../assets/generated/indaba-keeping-the-story-alive.webp"),
   "vilakazi:mouth-to-page": require("../../assets/generated/vilakazi-mouth-to-page.webp"),
+  "vilakazi:why-preservation": require("../../assets/generated/vilakazi-why-preservation.webp"),
   "unsung-heroes:galeshewe": require("../../assets/generated/unsung-heroes-galeshewe.webp"),
+  "unsung-heroes:nyabela": require("../../assets/generated/unsung-heroes-nyabela.webp"),
+  "unsung-heroes:moleli-anta": require("../../assets/generated/unsung-heroes-moleli-anta.webp"),
+  "unsung-heroes:youth-1976": require("../../assets/generated/unsung-heroes-youth-1976.webp"),
   "marriage-rites:lobola": require("../../assets/generated/marriage-rites-lobola.webp"),
+  "marriage-rites:patlo": require("../../assets/generated/marriage-rites-patlo.webp"),
+  "marriage-rites:umtshato": require("../../assets/generated/marriage-rites-umtshato.webp"),
+  "marriage-rites:umabo": require("../../assets/generated/marriage-rites-umabo.webp"),
   "peopling-of-sa:first-people": require("../../assets/generated/peopling-of-sa-first-people.webp"),
+  "peopling-of-sa:great-migration": require("../../assets/generated/peopling-of-sa-great-migration.webp"),
+  "peopling-of-sa:highveld-peoples": require("../../assets/generated/peopling-of-sa-highveld-peoples.webp"),
+  "peopling-of-sa:coastal-peoples": require("../../assets/generated/peopling-of-sa-coastal-peoples.webp"),
   "peoples-cultures:two-families": require("../../assets/generated/peoples-cultures-two-families.webp"),
+  "peoples-cultures:tswana": require("../../assets/generated/peoples-cultures-tswana.webp"),
+  "peoples-cultures:pedi": require("../../assets/generated/peoples-cultures-pedi.webp"),
+  "peoples-cultures:sotho": require("../../assets/generated/peoples-cultures-sotho.webp"),
+  "peoples-cultures:xhosa": require("../../assets/generated/peoples-cultures-xhosa.webp"),
+  "peoples-cultures:zulu": require("../../assets/generated/peoples-cultures-zulu.webp"),
+  "peoples-cultures:ndebele": require("../../assets/generated/peoples-cultures-ndebele.webp"),
+  "peoples-cultures:venda-tsonga": require("../../assets/generated/peoples-cultures-venda-tsonga.webp"),
   "traditions:ancestors": require("../../assets/generated/traditions-ancestors.webp"),
+  "traditions:coming-of-age": require("../../assets/generated/traditions-coming-of-age.webp"),
+  "traditions:death-passage": require("../../assets/generated/traditions-death-passage.webp"),
+  "traditions:healers": require("../../assets/generated/traditions-healers.webp"),
+  "traditions:sacred-land": require("../../assets/generated/traditions-sacred-land.webp"),
   "food:braai": require("../../assets/generated/food-braai.webp"),
+  "food:staples": require("../../assets/generated/food-staples.webp"),
+  "food:biltong": require("../../assets/generated/food-biltong.webp"),
+  "food:cape-malay": require("../../assets/generated/food-cape-malay.webp"),
+  "food:durban-curry": require("../../assets/generated/food-durban-curry.webp"),
 };

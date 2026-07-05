@@ -27,7 +27,7 @@ export type NationalDay = {
 export const nationalDays: NationalDay[] = [
   {
     id: "human-rights-day",
-    image: require("../../assets/days/human-rights-day.jpg"),
+    image: require("../../assets/days/human-rights-day.webp"),
     date: "21 March",
     name: "Human Rights Day",
     commemorates: "The Sharpeville massacre, 1960",
@@ -36,7 +36,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "freedom-day",
-    image: require("../../assets/days/freedom-day.jpg"),
+    image: require("../../assets/days/freedom-day.webp"),
     date: "27 April",
     name: "Freedom Day",
     commemorates: "The first democratic election, 1994",
@@ -45,7 +45,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "workers-day",
-    image: require("../../assets/days/workers-day.jpg"),
+    image: require("../../assets/days/workers-day.webp"),
     date: "1 May",
     name: "Workers' Day",
     commemorates: "The workers and unions who fought for dignity",
@@ -54,7 +54,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "youth-day",
-    image: require("../../assets/days/youth-day.jpg"),
+    image: require("../../assets/days/youth-day.webp"),
     date: "16 June",
     name: "Youth Day",
     commemorates: "The Soweto Uprising, 1976",
@@ -65,7 +65,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "mandela-day",
-    image: require("../../assets/days/mandela-day.jpg"),
+    image: require("../../assets/days/mandela-day.webp"),
     date: "18 July",
     name: "Nelson Mandela International Day",
     commemorates: "Madiba's birthday — 67 minutes of service",
@@ -75,7 +75,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "womens-day",
-    image: require("../../assets/days/womens-day.jpg"),
+    image: require("../../assets/days/womens-day.webp"),
     date: "9 August",
     name: "National Women's Day",
     commemorates: "The Women's March to the Union Buildings, 1956",
@@ -86,7 +86,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "heritage-day",
-    image: require("../../assets/days/heritage-day.jpg"),
+    image: require("../../assets/days/heritage-day.webp"),
     date: "24 September",
     name: "Heritage Day",
     commemorates: "The cultures, languages and traditions of all South Africans",
@@ -95,7 +95,7 @@ export const nationalDays: NationalDay[] = [
   },
   {
     id: "reconciliation-day",
-    image: require("../../assets/days/reconciliation-day.jpg"),
+    image: require("../../assets/days/reconciliation-day.webp"),
     date: "16 December",
     name: "Day of Reconciliation",
     commemorates: "Turning a divided past into a shared future",
