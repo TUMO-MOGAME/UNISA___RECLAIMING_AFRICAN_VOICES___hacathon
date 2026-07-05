@@ -77,7 +77,8 @@ const s = StyleSheet.create({
   titleWide: { fontSize: 44, lineHeight: 46 },
   imageWrap: { width: "100%", borderRadius: radius.md, overflow: "hidden", backgroundColor: "#000000", marginBottom: spacing.lg },
   lead: { color: "rgba(255,255,255,0.74)", fontFamily: fonts.body, fontSize: 16, lineHeight: 26, marginBottom: spacing.lg },
-  leadWide: { fontSize: 18, lineHeight: 29, maxWidth: 660 },
+  // full column width — the lead's right edge aligns with the visual card above it
+  leadWide: { fontSize: 18, lineHeight: 29 },
   readRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
   readText: { color: "#FFFFFF", fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1.5 },
 });

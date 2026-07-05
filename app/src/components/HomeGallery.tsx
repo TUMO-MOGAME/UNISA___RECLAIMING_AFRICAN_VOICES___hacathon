@@ -339,7 +339,7 @@ export function HomeGallery({
                       the navy footer (logos kept in their own brand colours — not recoloured). */}
                   <View style={styles.partnerPlate}>
                     <Image
-                      source={require("../../assets/brand/unisa.png")}
+                      source={require("../../assets/brand/unisa.webp")}
                       style={styles.unisaLogo}
                       resizeMode="contain"
                       accessibilityLabel="University of South Africa (UNISA)"
@@ -347,7 +347,7 @@ export function HomeGallery({
                   </View>
                   <View style={styles.partnerPlate}>
                     <Image
-                      source={require("../../assets/brand/botlhale-chip.png")}
+                      source={require("../../assets/brand/botlhale-chip.webp")}
                       style={styles.botlhaleChip}
                       resizeMode="contain"
                       accessibilityLabel="Botlhale AI"
@@ -369,7 +369,7 @@ export function HomeGallery({
                   accessibilityLabel="African Tribe Echoes on YouTube — opens in browser"
                 >
                   <Image
-                    source={require("../../assets/brand/african-tribe-echoes.png")}
+                    source={require("../../assets/brand/african-tribe-echoes.webp")}
                     style={styles.creditAvatar}
                     resizeMode="cover"
                   />

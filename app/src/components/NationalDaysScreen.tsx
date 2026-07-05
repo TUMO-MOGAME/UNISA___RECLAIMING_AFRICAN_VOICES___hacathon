@@ -184,7 +184,8 @@ const s = StyleSheet.create({
   phNote: { color: "rgba(255,255,255,0.45)", fontFamily: fonts.body, fontSize: 12, marginTop: spacing.md, letterSpacing: 0.4 },
 
   lead: { color: "rgba(255,255,255,0.74)", fontFamily: fonts.body, fontSize: type.body, lineHeight: 26 },
-  leadWide: { fontSize: 17, lineHeight: 28, maxWidth: 660 },
+  // full column width — the text's right edge aligns with the media card above it
+  leadWide: { fontSize: 17, lineHeight: 28 },
 
   flagRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
   flagText: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase" },
