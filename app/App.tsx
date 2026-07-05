@@ -36,6 +36,17 @@ import { Lang } from "./src/content/types";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
 
+// Web: harden the page frame beyond Expo's default reset — zero body margins, full-width root,
+// black backdrop and no horizontal overflow. Guarantees no screen can ever show a pale rim, a
+// side gap, or a stray horizontal scrollbar (e.g. from Ken Burns scale) on any browser size.
+if (Platform.OS === "web" && typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent =
+    "html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow-x:hidden}" +
+    "#root{width:100%;min-height:100%;background:#000}";
+  document.head.appendChild(style);
+}
+
 type Route =
   | { name: "home" }
   | { name: "reader"; id: string }

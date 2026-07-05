@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, ImageBackground, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Animated, ImageBackground, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
+
+// On web, pin the splash to the BROWSER VIEWPORT itself (fixed + 100vw/100vh) rather than to its
+// React ancestors — on the very first paint of a static export the root containers can measure a
+// frame late, which briefly left a black strip beside the splash. Fixed-to-viewport can't.
+const WEB_FULLSCREEN =
+  Platform.OS === "web" ? ({ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh" } as any) : null;
 
 // Branded opening frame — the first thing a judge (and the demo video) sees. It uses the SAME hero
 // photo, slate scrim and "Ubuntu / Heritage" wordmark as the Home landing page, so the splash melts
@@ -43,7 +49,7 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
   }, []);
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, { opacity: cover }]}>
+    <Animated.View style={[StyleSheet.absoluteFill, WEB_FULLSCREEN, { opacity: cover }]}>
       <Pressable style={StyleSheet.absoluteFill} onPress={finish} accessibilityRole="button" accessibilityLabel="Enter Ubuntu Heritage">
         {/* Same wide savanna hero the Home page opens on — consistent, and not tightly cropped. */}
         <ImageBackground
