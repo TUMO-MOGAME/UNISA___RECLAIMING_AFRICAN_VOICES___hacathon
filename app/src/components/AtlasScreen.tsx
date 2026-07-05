@@ -5,7 +5,7 @@ import { Lang } from "../content/types";
 import { atlasModules } from "../content";
 import { sceneImageSource } from "../content/images";
 import { t } from "../i18n";
-import { Screen, ScreenHeader, Icon } from "../ui";
+import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { SceneImage } from "./SceneImage";
 import { PressScale } from "./Motion";
 import { SideIndexScroll } from "./SideIndexScroll";
@@ -123,7 +123,7 @@ export function AtlasScreen({
 
   const masthead = (
     <View style={s.pad}>
-      <ScreenHeader kicker={t(UI.kicker, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} />
+      <ScreenHeader kicker={t(UI.kicker, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} showBack={!wide} />
       <Text style={s.intro}>{t(UI.intro, lang)}</Text>
       <Pressable style={s.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
         <Icon.Play size={17} color="#000000" fill="#000000" />
@@ -193,6 +193,8 @@ export function AtlasScreen({
       <SideIndexScroll
         contentsLabel={t(UI.contents, lang)}
         masthead={masthead}
+        onBack={onBack}
+        backLabel={backLabelFor(lang)}
         stickyHeader={stickyHeader}
         items={filtered.map((m) => ({ key: m.id, label: m.title }))}
         emptyState={emptyState}

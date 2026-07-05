@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, Modal, StyleSheet, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
-import { Screen, ScreenHeader, Icon } from "../ui";
+import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { PlayOnceRow } from "./PlayOnceRow";
 import { democraticPresidents, pre1994Leaders, President, LifeEvent } from "../content/presidents";
 import { colors, spacing, radius, fonts, type } from "../theme/tokens";
@@ -138,7 +138,7 @@ export function PresidentsScreen({ onBack, onOpen, lang }: { onBack: () => void;
   const demCount = democraticPresidents.length;
   const masthead = (
     <View style={s.pad}>
-      <ScreenHeader kicker={t(UI.kicker, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} />
+      <ScreenHeader kicker={t(UI.kicker, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} showBack={!wide} />
       <View style={s.coverWrap}>
         <Image source={presCover} style={s.cover} contentFit="cover" transition={200} cachePolicy="disk" accessibilityLabel={t(UI.title, lang)} />
       </View>
@@ -195,6 +195,8 @@ export function PresidentsScreen({ onBack, onOpen, lang }: { onBack: () => void;
       <SideIndexScroll
         contentsLabel={t(UI.contents, lang)}
         masthead={masthead}
+        onBack={onBack}
+        backLabel={backLabelFor(lang)}
         items={all.map((p) => ({ key: p.id, label: p.name }))}
         renderItem={renderLeader}
       />

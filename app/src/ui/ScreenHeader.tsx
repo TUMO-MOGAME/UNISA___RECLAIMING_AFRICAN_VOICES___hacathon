@@ -14,6 +14,11 @@ const BACK = {
   nso: "Morago", st: "Morao", ss: "Emuva", ts: "Endzhaku", nr: "Emuva", ve: "Murahu",
 };
 
+// The localized "‹ Back" label — reused by SideIndexScroll so the sidebar back link reads identically.
+export function backLabelFor(lang?: LangCode) {
+  return `‹ ${t(BACK, lang ?? "en")}`;
+}
+
 export function ScreenHeader({
   title,
   kicker,
@@ -21,6 +26,7 @@ export function ScreenHeader({
   lang,
   onBack,
   onDark,
+  showBack = true,
 }: {
   title: string;
   kicker?: string;
@@ -28,12 +34,16 @@ export function ScreenHeader({
   lang?: LangCode;
   onBack: () => void;
   onDark?: boolean;
+  /** Hide the header's own back link (e.g. on wide index pages where the sidebar carries it). */
+  showBack?: boolean;
 }) {
   return (
     <View style={styles.wrap}>
-      <Pressable onPress={onBack} hitSlop={12} style={styles.back}>
-        <Text style={styles.backText}>{backLabel ?? `‹ ${t(BACK, lang ?? "en")}`}</Text>
-      </Pressable>
+      {showBack ? (
+        <Pressable onPress={onBack} hitSlop={12} style={styles.back}>
+          <Text style={styles.backText}>{backLabel ?? backLabelFor(lang)}</Text>
+        </Pressable>
+      ) : null}
       {kicker ? <Kicker>{kicker}</Kicker> : null}
       <Display onDark={onDark} style={styles.title}>
         {title}

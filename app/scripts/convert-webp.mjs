@@ -14,6 +14,7 @@ const targets = [
   { dir: "assets/places", maxW: 1600, q: 78 },
   { dir: "assets/generated", maxW: 1280, q: 80 },
   { dir: "assets/brand", maxW: 1600, q: 80 },
+  { dir: "assets/animals", maxW: 1400, q: 80 },
 ];
 
 let before = 0, after = 0, n = 0;

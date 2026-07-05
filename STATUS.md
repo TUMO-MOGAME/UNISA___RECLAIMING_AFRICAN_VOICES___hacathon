@@ -123,6 +123,20 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-05** — **Totems & Clans — new Cultural Atlas compendium (grounded).** Added a full "Totems &
+  Clans" screen (`TotemsScreen.tsx` + `content/totems.ts`) on the shared sidebar layout: the
+  zoo-cosmological system of Southern African totemism — 22 animal totems (Sotho-Tswana / Nguni /
+  Tshivenḓa terms, clans, meaning, oral genesis stories), two opening essays (ontology; lineage fission)
+  and three governance lessons (conservation-by-distributed-taboo; kinship/hospitality; exogamy).
+  **Grounding:** grokipedia dropped per the project's integrity rule; claims cited to reputable sources
+  (National Museum Publications, BeingAfrican, SAHO, Wikipedia, Barolong official site, EcoTraining, MSU,
+  Bennett, Noyam, U. Bologna, SA Tourism); oral origins framed as tradition. Home entry + route wired;
+  11-language chrome. **Images:** 22 real photos → `assets/animals/*.webp` (52.6MB→6.3MB, 88% smaller);
+  each shown at uniform width + its own natural height (measured on load) so nothing is cropped; cards
+  laid out image-left / text-right on wide. **Shared UI:** the sidebar back link now sits atop the
+  CONTENTS index on every index page (Atlas/Provinces/Presidents/Days/Totems) via `SideIndexScroll`
+  `onBack` + `ScreenHeader` `showBack`. `tsc` clean · **66/66 tests** · web export green · ran locally &
+  reviewed. **Needs Tumo:** Setswana + cultural review of the totems text (English-fallback for now).
 - **2026-07-05** — **Mantswe a Batho pure core (Living Archive step 4, buildable half).** Built the
   no-key, testable heart of the oral-history consensus feature in `src/services/mantswe/`:
   **de-identify** (POPIA deterministic belt — strips SA phone/ID/email by regex, keeps historical

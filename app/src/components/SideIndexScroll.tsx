@@ -19,6 +19,8 @@ export function SideIndexScroll({
   items,
   renderItem,
   emptyState,
+  onBack,
+  backLabel,
   wideBreakpoint = 900,
   maxWidth = 1180,
 }: {
@@ -28,6 +30,9 @@ export function SideIndexScroll({
   items: IndexEntry[];
   renderItem: (item: IndexEntry, index: number) => React.ReactNode;
   emptyState?: React.ReactNode;
+  /** When set, a Back link sits at the top of the sidebar (wide screens) above the contents label. */
+  onBack?: () => void;
+  backLabel?: string;
   wideBreakpoint?: number;
   maxWidth?: number;
 }) {
@@ -85,6 +90,11 @@ export function SideIndexScroll({
   return (
     <View style={[s.wideRow, { maxWidth }]}>
       <View style={s.sidebar}>
+        {onBack ? (
+          <Pressable onPress={onBack} hitSlop={12} style={s.sideBack} accessibilityRole="button">
+            <Text style={s.sideBackText}>{backLabel ?? "‹ Back"}</Text>
+          </Pressable>
+        ) : null}
         <Text style={s.sideLabel}>{contentsLabel.toUpperCase()}</Text>
         <ScrollView showsVerticalScrollIndicator={false}>
           {items.map((it, i) => {
@@ -114,7 +124,9 @@ const s = StyleSheet.create({
   flex: { flex: 1 },
   wideRow: { flex: 1, flexDirection: "row", width: "100%", alignSelf: "center" },
   sidebar: { width: 268, paddingTop: spacing.xxl, paddingHorizontal: spacing.lg, borderRightWidth: 1, borderRightColor: "rgba(255,255,255,0.1)" },
-  sideLabel: { color: "rgba(255,255,255,0.4)", fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 2.5, marginBottom: spacing.md, marginTop: spacing.lg },
+  sideBack: { marginTop: spacing.lg, marginBottom: spacing.lg },
+  sideBackText: { color: "rgba(255,255,255,0.65)", fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1.5, textTransform: "uppercase" },
+  sideLabel: { color: "rgba(255,255,255,0.4)", fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 2.5, marginBottom: spacing.md },
   navItem: { flexDirection: "row", gap: spacing.sm, alignItems: "flex-start", paddingVertical: 9, paddingLeft: spacing.sm, borderLeftWidth: 2, borderLeftColor: "transparent" },
   navItemActive: { borderLeftColor: BLUE },
   navNum: { color: "rgba(255,255,255,0.35)", fontFamily: fonts.display, fontSize: 14, lineHeight: 19, width: 24 },

@@ -85,6 +85,31 @@ const UI = {
     en: "Explore the atlas", tn: "Sekaseka atlase", af: "Verken die atlas", zu: "Hlola i-athrasi", xh: "Phonononga i-atlasi",
     nso: "Utolla athlase", st: "Hlahloba atlase", ss: "Hlola i-athlasi", ts: "Kambela atlasi", nr: "Hlola i-atlasi", ve: "Ṱolisisa athilasi",
   },
+  totemsKicker: {
+    en: "The Living World", tn: "Lefatshe le le Tshelang", af: "Die Lewende Wêreld", zu: "Izwe Eliphilayo", xh: "Ilizwe Eliphilayo",
+    nso: "Lefase le le Phelago", st: "Lefatshe le Phelang", ss: "Live Leliphilako", ts: "Misava leyi Hanyaka", nr: "Iphasi Eliphilako", ve: "Shango ḽi Tshilaho",
+  },
+  totems: {
+    en: "Totems & Clans", tn: "Diboko le Meritlo", af: "Totems & Stamme", zu: "Iziboko Nezizwe", xh: "Iziduko Nezizwe",
+    nso: "Diboko le Dikgoro", st: "Diboko le Meloko", ss: "Tiboko Netizwe", ts: "Swiharhi swa Tinyimba", nr: "Iimbongo Nezizwe", ve: "Mitupo na Vhorabulasi",
+  },
+  totemsSub: {
+    en: "How wild animals became ancestral guardians, clan markers and a living code of ecological care.",
+    tn: "Ka fa diphologolo tsa naga di neng tsa nna badisa ba badimo, matshwao a meritlo le molao o o tshelang wa tlhokomelo ya tikologo.",
+    af: "Hoe wilde diere voorouerlike beskermers, stam-merkers en 'n lewende kode van ekologiese sorg geword het.",
+    zu: "Indlela izilwane zasendle ezaba ngabalondolozi bokhokho, izimpawu zezizwe nekhodi ephilayo yokunakekela imvelo.",
+    xh: "Indlela izilwanyana zasendle ezaba ngabakhuseli beenkokeli, iimpawu zezizwe nekhowudi ephilayo yokhathalelo lwendalo.",
+    nso: "Ka fao diphoofolo tša naga di ilego tša ba badišabadimo, maswao a dikgoro le molao wo o phelago wa tlhokomelo ya tikologo.",
+    st: "Kamoo liphoofolo tsa naha li ileng tsa fetoha balebeli ba balimo, matšoao a meloko le molao o phelang oa tlhokomelo ea tikoloho.",
+    ss: "Indlela tilwane tesiganga letaba ngabavikeli bekhokho, timphawu tetizwe nekhodi lephilako yekunakekela imvelo.",
+    ts: "Ndlela leyi swiharhi swa nhoveni swi veke vasirheleri va vakokwana, swikombiso swa tinyimba na nawu lowu hanyaka wa nkhathalelo wa mbango.",
+    nr: "Indlela iinlwana zeganga ezaba ngabavikeli bakhokho, iimpawu zezizwe nekhodi ephilako yokutlhogomela imvelo.",
+    ve: "Nḓila ye zwipuka zwa ḓaka zwa vha vhalindi vha vhomakhulu, zwiga zwa vhorabulasi na mulayo u tshilaho wa ṱhogomelo ya mupo.",
+  },
+  totemsCta: {
+    en: "Enter the compendium", tn: "Tsena mo kokoanyong", af: "Betree die kompendium", zu: "Ngena kwikhompendiyamu", xh: "Ngena kwikhompendiyam",
+    nso: "Tsena ka kgoboketšo", st: "Kena ka kokoano", ss: "Ngena kunhlanganiso", ts: "Nghena eka nhlengeleto", nr: "Ngena kihlanganiso", ve: "Dzhenani kha khoboledzo",
+  },
   provKicker: {
     en: "The Land", tn: "Naga", af: "Die Land", zu: "Umhlaba", xh: "Umhlaba",
     nso: "Naga", st: "Naha", ss: "Umhlaba", ts: "Misava", nr: "Umhlaba", ve: "Shango",
@@ -206,6 +231,7 @@ export function HomeGallery({
   onPresidents,
   onAtlas,
   onDays,
+  onTotems,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -217,6 +243,7 @@ export function HomeGallery({
   onPresidents: () => void;
   onAtlas: () => void;
   onDays: () => void;
+  onTotems: () => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
@@ -273,6 +300,17 @@ export function HomeGallery({
           intro={t(UI.atlasSub, lang)}
         >
           <CtaButton label={t(UI.atlasCta, lang)} onPress={onAtlas} />
+        </Section>
+
+        {/* ── TOTEMS & CLANS (slate) ─────────────────────────────────────────── */}
+        <Section
+          tone="slate"
+          image={require("../../assets/animals/lion.webp")}
+          kicker={t(UI.totemsKicker, lang)}
+          title={t(UI.totems, lang)}
+          intro={t(UI.totemsSub, lang)}
+        >
+          <CtaButton label={t(UI.totemsCta, lang)} onPress={onTotems} />
         </Section>
 
         {/* ── THE NINE PROVINCES (slate) ─────────────────────────────────────── */}

@@ -28,6 +28,7 @@ import { provinceById, cityById } from "./src/content/provinces";
 import { PresidentsScreen, PresidentScreen } from "./src/components/PresidentsScreens";
 import { presidentById } from "./src/content/presidents";
 import { NationalDaysScreen } from "./src/components/NationalDaysScreen";
+import { TotemsScreen } from "./src/components/TotemsScreen";
 import { Fade } from "./src/components/Motion";
 import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
@@ -58,7 +59,8 @@ type Route =
   | { name: "city"; id: string }
   | { name: "presidents" }
   | { name: "president"; id: string }
-  | { name: "days" };
+  | { name: "days" }
+  | { name: "totems" };
 
 export default function App() {
   // Default language is always English (the guaranteed base for every string); the picker switches it
@@ -149,6 +151,8 @@ export default function App() {
       }
       case "days":
         return <NationalDaysScreen onBack={back} lang={lang} />;
+      case "totems":
+        return <TotemsScreen onBack={back} lang={lang} />;
       default:
         return (
           <HomeGallery
@@ -162,6 +166,7 @@ export default function App() {
             onPresidents={() => push({ name: "presidents" })}
             onAtlas={() => push({ name: "atlas" })}
             onDays={() => push({ name: "days" })}
+            onTotems={() => push({ name: "totems" })}
           />
         );
     }
@@ -177,7 +182,8 @@ export default function App() {
     route.name === "provinces" ||
     route.name === "presidents" ||
     route.name === "president" || // wide layout: important-dates sidebar + content
-    route.name === "days";
+    route.name === "days" ||
+    route.name === "totems"; // wide layout: totems sidebar + content
 
   return (
     <SafeAreaProvider>

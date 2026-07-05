@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable, ScrollView, Modal, StyleSheet, useWindowDimensions } from "react-native";
 import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { Screen, ScreenHeader, Icon } from "../ui";
+import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { provinces, Province, City, Stat, Leader } from "../content/provinces";
 import { colors, spacing, radius, fonts, type } from "../theme/tokens";
 import { t } from "../i18n";
@@ -101,7 +101,7 @@ export function ProvincesScreen({ onBack, onOpenProvince, lang }: { onBack: () =
   const [journeyOpen, setJourneyOpen] = useState(false);
   const masthead = (
     <View style={s.pad}>
-      <ScreenHeader kicker={t(UI.southAfrica, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} />
+      <ScreenHeader kicker={t(UI.southAfrica, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} showBack={!wide} />
       <View style={s.coverWrap}>
         <ExpoImage source={provCover} style={s.cover} contentFit="cover" transition={200} cachePolicy="disk" accessibilityLabel={t(UI.title, lang)} />
       </View>
@@ -148,6 +148,8 @@ export function ProvincesScreen({ onBack, onOpenProvince, lang }: { onBack: () =
       <SideIndexScroll
         contentsLabel={t(UI.contents, lang)}
         masthead={masthead}
+        onBack={onBack}
+        backLabel={backLabelFor(lang)}
         items={provinces.map((p) => ({ key: p.id, label: p.name }))}
         renderItem={renderProvince}
       />
