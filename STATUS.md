@@ -123,6 +123,18 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-05** — **Ingestion Library v1 infra (Living Archive step 3).** Built `npm run ingest` — the
+  build-time CLI that turns a rights-cleared public-domain plain-text book into a **draft literary
+  `Module`** in the app's exact shape, grounded in and citing the source. Pure, golden-fixture-tested
+  core in `src/services/ingest/`: **rights** (SA life+50 gate — v1 ingests only public-domain/licensed,
+  blocks unverified), **extract** (strip Project Gutenberg boilerplate, de-hyphenate line breaks,
+  normalise), **segment** (chapter detection), **draft** (one anchored scene stub per chapter; adult/
+  child text emitted as `[NEEDS ADAPTATION]` behind the human-review gate — no fact invented). CLI
+  writes `src/content/sources/<id>/` → `source.txt` (verbatim), `draft-module.json`, `review.md`
+  (checklist). Verified end-to-end on a Gutenberg-format fixture (boilerplate stripped, `govern-\nment`
+  → `government`, 2 chapters, anchored sourceNotes). `tsc` clean · **58/58 tests** (+11). Deferred:
+  PDF/OCR extraction, the Gemini adapt→scenes stage (needs key). **Needs Tumo:** pick the first
+  public-domain title to ingest for real.
 - **2026-07-05** — **Living Archive plan + device-persistent recordings (Living Archive step 2).**
   Wrote [docs/12-living-archive-plan.md](docs/12-living-archive-plan.md) — the crowdsourced,
   AI-synthesised archive: **Mantswe a Batho** ("Voices of the People", oral history + AI consensus that
