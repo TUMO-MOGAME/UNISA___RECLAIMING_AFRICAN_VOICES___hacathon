@@ -48,3 +48,9 @@ test("speech codes resolve to the expected xx-ZA forms", () => {
 test("unknown codes fall back to the default language", () => {
   assert.equal(languageByCode("xx").code, DEFAULT_LANG);
 });
+
+test("English is the default language and the first choice in the picker", () => {
+  assert.equal(DEFAULT_LANG, "en");
+  assert.equal(LANGUAGES[0].code, "en");
+  assert.ok(languageByCode(DEFAULT_LANG).reviewedContent, "the default language must have real content");
+});

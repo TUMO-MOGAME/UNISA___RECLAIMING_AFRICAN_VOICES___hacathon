@@ -1,5 +1,6 @@
 import React from "react";
-import { View, ScrollView, SafeAreaView, StyleSheet, StyleProp, ViewStyle } from "react-native";
+import { View, ScrollView, StyleSheet, StyleProp, ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, spacing } from "../theme/tokens";
 
@@ -23,13 +24,16 @@ export function Screen({
   // "Modern South Africa" deck world — every screen sits on the deep-navy ground.
   const bg = tone === "dark" ? colors.dsNavyDeep : colors.dsNavy;
   const pad = padded ? styles.padded : null;
+  // Real insets on BOTH platforms — the core SafeAreaView is a no-op on Android, which was putting
+  // full-bleed screens under the status bar/notch. Returns zeros on web.
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.root, { backgroundColor: bg }]}>
       {tone === "paper" && (
         <LinearGradient colors={[colors.glowGold, "transparent"]} style={styles.wash} pointerEvents="none" />
       )}
-      <SafeAreaView style={styles.flex}>
+      <View style={[styles.flex, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right }]}>
         {scroll ? (
           <ScrollView contentContainerStyle={[pad, contentStyle]} showsVerticalScrollIndicator={false}>
             {children}
@@ -37,7 +41,7 @@ export function Screen({
         ) : (
           <View style={[styles.flex, pad, contentStyle]}>{children}</View>
         )}
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

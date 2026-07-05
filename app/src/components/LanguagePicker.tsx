@@ -1,9 +1,29 @@
 import React, { useState } from "react";
 import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
-import { LANGUAGES, languageByCode } from "../i18n";
+import { LANGUAGES, languageByCode, t } from "../i18n";
 import { Lang } from "../content/types";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
+
+const UI = {
+  heading: {
+    en: "Choose a language", tn: "Tlhopha puo", af: "Kies 'n taal", zu: "Khetha ulimi", xh: "Khetha ulwimi",
+    nso: "Kgetha leleme", st: "Kgetha puo", ss: "Khetsa lulwimi", ts: "Hlawula ririmi", nr: "Khetha ilimi", ve: "Khethani luambo",
+  },
+  footnote: {
+    en: "A tick marks a full translation · others show English text for now, with native audio where available.",
+    tn: "Letshwao le supa phetolelo e e feletseng · tse dingwe di bontsha mafoko a Seesemane gonepa jaana, ka modumo wa puo ya bo yona fa o le teng.",
+    af: "'n Regmerkie dui 'n volledige vertaling aan · ander wys voorlopig Engelse teks, met inheemse klank waar beskikbaar.",
+    zu: "Uphawu lokuhlola lukhombisa ukuhumusha okuphelele · ezinye zikhombisa umbhalo wesiNgisi okwamanje, nomsindo wolimi lwendabuko lapho utholakala.",
+    xh: "Uphawu lokukhangela lubonisa uguqulelo olupheleleyo · ezinye zibonisa umbhalo wesiNgesi okwangoku, ngesandi solwimi lwenkobe apho lufumaneka khona.",
+    nso: "Leswao le laetša phetolelo ye e feletšego · tše dingwe di laetša sengwalwa sa Seisemane ga bjale, ka modumo wa leleme la setlogo mo o hwetšagalago.",
+    st: "Letshwao le bontsha phetolelo e felletseng · tse ding di bontsha mongolo oa Senyesemane hajoale, ka molumo oa puo ea matsoalloa moo o fumanehang.",
+    ss: "Luphawu lokubeka lukhombisa kuhumusha lokuphelele · letinye tikhombisa umbhalo wesiNgisi okwanyalo, nemsindvo welulwimi lwendzabuko lapho lutfolakala khona.",
+    ts: "Xikombiso xa ku hlola xi kombisa vuhundzuluxeri lebyi heleleke · swin'wana swi kombisa matsalwa ya Xinghezi sweswi, ni mpfumawulo wa ririmi ra xikaya laha swi kumekaka.",
+    nr: "Uphawu lokukhamba lutjengisa ukuhlathulula okuphelele · ezinye zitjengisa umtlolo wesiNgisi okwanjesi, nomsindo welimi lomdabu lapho utholakala khona.",
+    ve: "Tshiga tsha u tola tshi sumbedza u ṱalutshedzela ho fhelelaho · zwiṅwe zwi sumbedza maṅwalwa a Tshiisimane zwino, na mubvumo wa luambo lwa hayani hune zwa wanala.",
+  },
+};
 
 // First-class language chooser for all 11 official SA languages (setswana-i18n skill: indigenous
 // languages are peers, not a "secondary" dropdown). Lists each language by its own name (endonym).
@@ -39,8 +59,8 @@ export function LanguagePicker({
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           <View style={styles.sheet} onStartShouldSetResponder={() => true}>
-            <Text style={styles.heading}>Choose a language · Tlhopha puo</Text>
-            <ScrollView style={{ maxHeight: 440 }}>
+            <Text style={styles.heading}>{t(UI.heading, lang)}</Text>
+            <ScrollView style={{ maxHeight: 340 }}>
               {LANGUAGES.map((l) => {
                 const active = l.code === lang;
                 return (
@@ -63,9 +83,7 @@ export function LanguagePicker({
                 );
               })}
             </ScrollView>
-            <Text style={styles.footnote}>
-              A tick marks a full translation · others show English text for now, with native audio where available.
-            </Text>
+            <Text style={styles.footnote}>{t(UI.footnote, lang)}</Text>
           </View>
         </Pressable>
       </Modal>
@@ -89,14 +107,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.scrimStrong,
     justifyContent: "center",
+    alignItems: "center",
     padding: spacing.lg,
   },
   sheet: {
+    width: "100%",
+    maxWidth: 380,
     backgroundColor: "#0D0D0D",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.12)",
     borderRadius: radius.lg,
-    padding: spacing.lg,
+    padding: spacing.md,
   },
   heading: {
     color: colors.gold,
@@ -110,13 +131,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    paddingVertical: spacing.md,
+    paddingVertical: 9,
     paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
   },
   rowActive: { backgroundColor: "rgba(255,255,255,0.08)" },
-  endonym: { color: "#fff", fontFamily: fonts.bodySemi, fontSize: type.body },
-  english: { color: colors.muted, fontFamily: fonts.body, fontSize: type.small, marginTop: 1 },
+  endonym: { color: "#fff", fontFamily: fonts.bodySemi, fontSize: 15 },
+  english: { color: colors.muted, fontFamily: fonts.body, fontSize: 12, marginTop: 1 },
   reviewed: { color: colors.gold, fontSize: type.body, fontWeight: "800" },
   check: { color: colors.ember, fontSize: type.body },
   footnote: {

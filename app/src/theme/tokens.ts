@@ -4,49 +4,51 @@
 // whole app inherits the new look; new code should prefer the `ds*` (design-system) tokens below.
 
 export const colors = {
-  // ── "Modern South Africa" landing-page palette (sa-blue / sa-slate) ────────────────────
-  dsBlue: "#1A85A7", // sa-blue — the accent + blue section ground
+  // ── Pure-black ground. sa-blue stays ONLY as a foreground accent (rules, links, icons) — never
+  //    as a background fill. Every "ground" token is #000; elevated surfaces are a hair-lifted
+  //    near-black so cards stay distinguishable on black. ────────────────────
+  dsBlue: "#1A85A7", // sa-blue — accent only (text, rules, icons), not a background
   dsBlueDeep: "#156D8A", // pressed / deeper blue (hover)
-  dsSlate: "#233342", // sa-slate — dark section ground
-  dsNavy: "#233342", // alias → slate is the dark ground
-  dsNavyDeep: "#1A2732", // deeper slate (footer/bands)
-  dsCloud: "#F8FAFC", // slate-50 light sections
+  dsSlate: "#000000", // ground → pure black
+  dsNavy: "#000000", // ground → pure black
+  dsNavyDeep: "#000000", // deepest ground (footer/bands) → pure black
+  dsCloud: "#F8FAFC", // light accent (rarely used as a full ground now)
   dsWhite: "#FFFFFF",
-  dsInk: "#1A2732",
-  dsGray: "#94A3B8", // gray-300/400 muted text on dark
-  // legacy accent alias kept so nothing breaks; now points to blue
+  dsInk: "#000000",
+  dsGray: "#94A3B8", // gray-300/400 muted text on black
+  // legacy accent alias kept so nothing breaks; points to blue accent
   dsYellow: "#1A85A7",
   dsYellowText: "#1A85A7",
 
-  // ── Legacy semantic keys, repointed to the sa-blue/sa-slate palette (existing screens inherit) ──
-  paper: "#233342", // slate ground
-  paperCard: "#2C3E50", // elevated block on slate
+  // ── Legacy semantic keys, repointed to the pure-black ground (existing screens inherit) ──
+  paper: "#000000", // ground → pure black
+  paperCard: "#141414", // elevated block on black
   paperLine: "rgba(255,255,255,0.16)",
-  navy: "#233342",
-  navyDeep: "#1A2732",
-  orange: "#1A85A7", // primary accent → sa-BLUE now
-  gold: "#1A85A7", // secondary accent → blue
+  navy: "#000000",
+  navyDeep: "#000000",
+  orange: "#1A85A7", // primary accent → sa-BLUE (foreground only)
+  gold: "#1A85A7", // secondary accent → blue (foreground only)
   slate: "rgba(255,255,255,0.72)",
 
-  night: "#233342",
-  ink: "#1A2732",
-  card: "#2C3E50",
+  night: "#000000",
+  ink: "#000000",
+  card: "#141414",
   sand: "#FFFFFF",
   ember: "#1A85A7",
   muted: "rgba(255,255,255,0.66)",
-  scrim: "rgba(26,39,50,0.55)",
-  scrimStrong: "rgba(26,39,50,0.82)",
+  scrim: "rgba(0,0,0,0.55)",
+  scrimStrong: "rgba(0,0,0,0.82)",
 
   line: "rgba(255,255,255,0.16)",
   lineStrong: "rgba(255,255,255,0.32)",
-  glowEmber: "rgba(26,133,167,0.14)",
-  glowGold: "rgba(26,133,167,0.12)",
+  glowEmber: "transparent", // no coloured glow wash
+  glowGold: "transparent", // no coloured glow wash
 
-  bg: "#233342",
-  bgDeep: "#1A2732",
-  bgTop: "#2A3D4E",
-  surface: "#2C3E50",
-  surface2: "#2C3E5000",
+  bg: "#000000",
+  bgDeep: "#000000",
+  bgTop: "#000000",
+  surface: "#141414",
+  surface2: "#00000000",
   hairline: "rgba(255,255,255,0.16)",
   hairlineSoft: "rgba(255,255,255,0.09)",
   orangeDeep: "#156D8A",

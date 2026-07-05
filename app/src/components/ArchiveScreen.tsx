@@ -28,22 +28,94 @@ type Recording = {
 };
 
 const UI = {
-  title: { en: "Community Archive", tn: "Polokelo ya Setšhaba" },
+  title: {
+    en: "Community Archive", tn: "Polokelo ya Setšhaba", af: "Gemeenskapsargief", zu: "Ingobo Yomphakathi", xh: "Uvimba Woluntu",
+    nso: "Polokelo ya Setšhaba", st: "Polokelo ya Setjhaba", ss: "Ingobo Yemmango", ts: "Vuhlayiselo bya Vaaki", nr: "Ingobo Yomphakathi", ve: "Vhulondoloti ha Tshitshavha",
+  },
   intro: {
     en: "Record an elder's story, a memory, or a tradition in your own words. Your voice, your history — kept on your terms.",
     tn: "Gatisa kanegelo ya motsofe, kgakologelo, kgotsa ngwao ka mafoko a gago. Lentswe la gago, hisitori ya gago — e bolokwa ka fa o batlang ka teng.",
+    af: "Neem 'n ouer se storie, 'n herinnering of 'n tradisie in jou eie woorde op. Jou stem, jou geskiedenis — bewaar op jou voorwaardes.",
+    zu: "Qopha indaba yomdala, inkumbulo, noma isiko ngamazwi akho. Izwi lakho, umlando wakho — kugcinwe ngendlela oyifunayo.",
+    xh: "Rekhoda ibali lomdala, inkumbulo, okanye isithethe ngamazwi akho. Ilizwi lakho, imbali yakho — kugcinwe ngokwemigaqo yakho.",
+    nso: "Gatiša kanegelo ya mogolo, kgopolo, goba setšo ka mantšu a gago. Lentšu la gago, histori ya gago — go bolokwa ka fao o ratago.",
+    st: "Rekota pale ya moholo, mohopolo, kapa moetlo ka mantswe a hao. Lentswe la hao, histori ya hao — e bolokoa ka tsela ya hao.",
+    ss: "Bhala indzaba yalomdzala, inkhumbulo, nome lisiko ngemavi akho. Livi lakho, umlandvo wakho — kugcinwe ngendlela loyifunako.",
+    ts: "Rhekhoda ntsheketo wa mukhalabye, xitsundzuxo, kumbe ndhavuko hi marito ya wena. Rito ra wena, matimu ya wena — swi hlayisiwa hi ku ya hi wena.",
+    nr: "Bhala indaba yomdala, inkumbulo, namkha isiko ngamezwi wakho. Ilizwi lakho, umlando wakho — kugcinwe ngendlela oyifunako.",
+    ve: "Rekhoda tshiitwa tsha muhulwane, tshihumbulo, kana sialala nga maipfi aṋu. Ipfi ḽaṋu, ḓivhazwakale yaṋu — tshi vhulungwa nga nḓila yaṋu.",
   },
-  record: { en: "Record a story", tn: "Gatisa kanegelo" },
-  stop: { en: "Stop recording", tn: "Emisa go gatisa" },
-  recording: { en: "Recording…", tn: "E a gatisa…" },
-  empty: { en: "No recordings yet. Tap “Record a story” to add the first voice.", tn: "Ga go na dikgatiso. Tobetsa “Gatisa kanegelo” go tsenya lentswe la ntlha." },
-  play: { en: "Play", tn: "Bapala" },
-  del: { en: "Delete", tn: "Phimola" },
-  privateBadge: { en: "Private", tn: "Sephiri" },
-  publicBadge: { en: "Shared", tn: "E abetswe" },
-  placeholder: { en: "Untitled story", tn: "Kanegelo e e se nang setlhogo" },
-  permDenied: { en: "Microphone permission is needed to record. You can enable it in settings.", tn: "Tetla ya microphone e a tlhokega go gatisa. O ka e tshwaya mo dithulaganyong." },
-  unsupported: { en: "Recording isn't available on this device/browser. Try the app on a phone via Expo Go.", tn: "Go gatisa ga go a nna teng mo sedirisweng se. Leka app mo founong ka Expo Go." },
+  record: {
+    en: "Record a story", tn: "Gatisa kanegelo", af: "Neem 'n storie op", zu: "Qopha indaba", xh: "Rekhoda ibali",
+    nso: "Gatiša kanegelo", st: "Rekota pale", ss: "Bhala indzaba", ts: "Rhekhoda ntsheketo", nr: "Bhala indaba", ve: "Rekhoda tshiitwa",
+  },
+  stop: {
+    en: "Stop recording", tn: "Emisa go gatisa", af: "Stop opname", zu: "Misa ukuqopha", xh: "Yeka ukurekhoda",
+    nso: "Emiša go gatiša", st: "Emisa ho rekota", ss: "Yima kubhala", ts: "Yimisa ku rhekhoda", nr: "Misa ukubhala", ve: "Ima u rekhoda",
+  },
+  recording: {
+    en: "Recording…", tn: "E a gatisa…", af: "Neem op…", zu: "Iyaqopha…", xh: "Iyarekhoda…",
+    nso: "E a gatiša…", st: "E a rekota…", ss: "Iyabhala…", ts: "Ya rhekhoda…", nr: "Iyabhala…", ve: "I khou rekhoda…",
+  },
+  empty: {
+    en: "No recordings yet. Tap “Record a story” to add the first voice.",
+    tn: "Ga go na dikgatiso. Tobetsa “Gatisa kanegelo” go tsenya lentswe la ntlha.",
+    af: "Nog geen opnames nie. Tik “Neem 'n storie op” om die eerste stem by te voeg.",
+    zu: "Akukho okuqoshiwe okwamanje. Thepha “Qopha indaba” ukungeza izwi lokuqala.",
+    xh: "Akukho zirekhodi okwangoku. Cofa “Rekhoda ibali” ukongeza ilizwi lokuqala.",
+    nso: "Ga go na direkoto go fihla ga bjale. Kgotla “Gatiša kanegelo” go tsenya lentšu la mathomo.",
+    st: "Ha ho direkoto hajoale. Tobetsa “Rekota pale” ho eketsa lentswe la pele.",
+    ss: "Atikho tirekhodi okwanyalo. Cindzetela “Bhala indzaba” kwengeta livi lekucala.",
+    ts: "A ku na tirhakhodo sweswi. Tinya “Rhekhoda ntsheketo” ku engetela rito ro sungula.",
+    nr: "Awakho amarekhodi okwanjesi. Gandelela “Bhala indaba” ukungezelela ilizwi lokuthoma.",
+    ve: "A hu na zwirekhodo zwa zwino. Kwamani “Rekhoda tshiitwa” u engedza ipfi ḽa u thoma.",
+  },
+  play: {
+    en: "Play", tn: "Bapala", af: "Speel", zu: "Dlala", xh: "Dlala",
+    nso: "Bapala", st: "Bapala", ss: "Dlala", ts: "Tlanga", nr: "Dlala", ve: "Tamba",
+  },
+  del: {
+    en: "Delete", tn: "Phimola", af: "Vee uit", zu: "Susa", xh: "Cima",
+    nso: "Phumola", st: "Hlakola", ss: "Susa", ts: "Sula", nr: "Sula", ve: "Sisa",
+  },
+  privateBadge: {
+    en: "Private", tn: "Sephiri", af: "Privaat", zu: "Okuyimfihlo", xh: "Okuyimfihlo",
+    nso: "Sephiri", st: "Lekunutu", ss: "Kuyimfihlo", ts: "Xihundla", nr: "Okuyimfihlo", ve: "Tsha tshiphiri",
+  },
+  publicBadge: {
+    en: "Shared", tn: "E abetswe", af: "Gedeel", zu: "Kwabelwe", xh: "Kwabelwane",
+    nso: "Go abetšwe", st: "E arolelanwe", ss: "Kwabiwe", ts: "Swi averiwile", nr: "Kwabelwe", ve: "Zwo kovhelwa",
+  },
+  placeholder: {
+    en: "Untitled story", tn: "Kanegelo e e se nang setlhogo", af: "Storie sonder titel", zu: "Indaba engenasihloko", xh: "Ibali elingenasihloko",
+    nso: "Kanegelo ye e se nago sehlogo", st: "Pale e senang sehlooho", ss: "Indzaba lengenasihloko", ts: "Ntsheketo lowu nga riki na nhloko", nr: "Indaba engenasihloko", ve: "Tshiitwa tshi si na tshiṱoho",
+  },
+  permDenied: {
+    en: "Microphone permission is needed to record. You can enable it in settings.",
+    tn: "Tetla ya microphone e a tlhokega go gatisa. O ka e tshwaya mo dithulaganyong.",
+    af: "Mikrofoontoestemming word benodig om op te neem. Jy kan dit in instellings aktiveer.",
+    zu: "Kudingeka imvume yemakrofoni ukuze uqophe. Ungayivula kuzilungiselelo.",
+    xh: "Kufuneka imvume yemakrofoni ukuze urekhode. Ungayivula kwiisetingi.",
+    nso: "Tumelelo ya microphone e a nyakega go gatiša. O ka e bula ka dipeakanyong.",
+    st: "Tumello ya microphone e hlokahala ho rekota. O ka e bula ditlhophisong.",
+    ss: "Kudzingeka imvume yemakrofoni kutsi ubhale. Ungayivula kutilungiselelo.",
+    ts: "Ku laveka mpfumelelo wa microphone ku rhekhoda. U nga wu pfula eka switlhamiselo.",
+    nr: "Kudingeka imvume yemakrofoni bona ubhale. Ungayivula kuhlelo.",
+    ve: "Hu ṱoḓea thendelo ya microphone u rekhoda. Ni nga i vula kha mavhekanyele.",
+  },
+  unsupported: {
+    en: "Recording isn't available on this device/browser. Try the app on a phone via Expo Go.",
+    tn: "Go gatisa ga go a nna teng mo sedirisweng se. Leka app mo founong ka Expo Go.",
+    af: "Opname is nie op hierdie toestel/blaaier beskikbaar nie. Probeer die app op 'n foon via Expo Go.",
+    zu: "Ukuqopha akutholakali kule divayisi/isiphequluli. Zama uhlelo lokusebenza efonini nge-Expo Go.",
+    xh: "Ukurekhoda akufumaneki kwesi sixhobo/sikhangeli. Zama usetyenziso efowunini nge-Expo Go.",
+    nso: "Go gatiša ga go gona mo sedirišweng se/sephetleki. Leka app founong ka Expo Go.",
+    st: "Ho rekota ha ho fumanehe sesebedisweng sena/sebatling. Leka app fonong ka Expo Go.",
+    ss: "Kubhala akutfolakali kulendivayisi/isiphequluli. Zama luhlelo efonini nge-Expo Go.",
+    ts: "Ku rhekhoda a swi kumeki eka xitirhisiwa lexi/xikambeli. Ringeta app eka riqingho hi Expo Go.",
+    nr: "Ukubhala akutholakali kwesi sitjhini/isiphequluli. Linga i-app efonini nge-Expo Go.",
+    ve: "U rekhoda a zwi wanali kha tshishumiswa itshi/buronza. Lingedzani app kha luṱingo nga Expo Go.",
+  },
 };
 
 export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
@@ -125,8 +197,8 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
 
       {isRecording ? (
         <Pressable style={[styles.recordBtn, styles.stopBtn]} onPress={stopRecording}>
-          <Icon.Square size={15} color={colors.orange} fill={colors.orange} />
-          <Text style={styles.recordText}>{t(UI.stop, lang)}</Text>
+          <Icon.Square size={15} color="#FFFFFF" fill="#FFFFFF" />
+          <Text style={[styles.recordText, styles.stopText]}>{t(UI.stop, lang)}</Text>
         </Pressable>
       ) : (
         <PressScale style={styles.recordBtn} onPress={() => setConsentVisible(true)}>
@@ -183,7 +255,7 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
 const styles = StyleSheet.create({
   intro: { marginBottom: spacing.lg },
   recordBtn: {
-    backgroundColor: colors.orange,
+    backgroundColor: "#FFFFFF",
     borderRadius: radius.pill,
     paddingVertical: spacing.md,
     flexDirection: "row",
@@ -191,7 +263,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: spacing.sm,
   },
-  stopBtn: { backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 2, borderColor: colors.orange },
+  // Recording state: dark outline pill (distinct from the white "record" button).
+  stopBtn: { backgroundColor: "rgba(255,255,255,0.06)", borderWidth: 2, borderColor: "rgba(255,255,255,0.5)" },
+  stopText: { color: "#FFFFFF" },
   recordText: {
     color: colors.paper,
     fontFamily: fonts.bodyBold,

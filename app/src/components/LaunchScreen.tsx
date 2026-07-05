@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, ImageBackground, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, spacing, fonts } from "../theme/tokens";
+import { colors, spacing, radius, fonts } from "../theme/tokens";
 
-// Branded opening frame — the first thing a judge (and the demo video) sees. A dramatic
-// black-and-white South African image with the "UBUNTU HERITAGE" wordmark. TAP anywhere to enter the
-// app (a gentle auto-advance is the fallback so it never gets stuck). Uses ImageBackground so the photo
-// reliably fills on web + native.
+// Branded opening frame — the first thing a judge (and the demo video) sees. It uses the SAME hero
+// photo, slate scrim and "Ubuntu / Heritage" wordmark as the Home landing page, so the splash melts
+// seamlessly into Home and reads as one product. TAP anywhere to enter (a gentle auto-advance is the
+// fallback so a hands-free demo never stalls). ImageBackground so the photo reliably fills web + native.
 
 export function LaunchScreen({ onDone }: { onDone: () => void }) {
+  const { width } = useWindowDimensions();
+  const wide = width >= 768;
+
   const wordmark = useRef(new Animated.Value(0)).current;
   const rise = useRef(new Animated.Value(12)).current;
   const hint = useRef(new Animated.Value(0)).current;
@@ -42,26 +45,26 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
   return (
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: cover }]}>
       <Pressable style={StyleSheet.absoluteFill} onPress={finish} accessibilityRole="button" accessibilityLabel="Enter Ubuntu Heritage">
+        {/* Same wide savanna hero the Home page opens on — consistent, and not tightly cropped. */}
         <ImageBackground
-          source={require("../../assets/brand/launch-bg.webp")}
+          source={require("../../assets/generated/mhudi-forest-home.webp")}
           style={styles.bg}
           resizeMode="cover"
         >
-          {/* Light scrim — enough for legible type, but the zebra stays clearly visible. */}
+          {/* Matches the Home hero scrim exactly (slate, top-light → bottom-dark). */}
           <LinearGradient
-            colors={["rgba(8,6,4,0.45)", "rgba(8,6,4,0.05)", "rgba(8,6,4,0.35)", "rgba(8,6,4,0.9)"]}
-            locations={[0, 0.38, 0.7, 1]}
+            colors={["rgba(0,0,0,0.4)", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.9)"]}
+            locations={[0, 0.45, 1]}
             style={StyleSheet.absoluteFill}
             pointerEvents="none"
           />
 
           <Animated.View style={{ opacity: wordmark, transform: [{ translateY: rise }], alignItems: "center" }}>
-            <Text style={styles.kicker}>Reclaiming African Voices</Text>
-            <Text style={styles.brandLine}>Ubuntu</Text>
-            <Text style={styles.brandLine}>Heritage</Text>
-            <Text style={styles.country}>South Africa</Text>
-            <View style={styles.rule} />
-            <Text style={styles.tagline}>Mantswe a maloba — Voices of Yesterday</Text>
+            <Text style={[styles.brandTitle, wide && styles.brandTitleWide]}>Ubuntu{"\n"}Heritage</Text>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Reclaiming African Voices</Text>
+              <Text style={styles.cardSub}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
+            </View>
           </Animated.View>
 
           <Animated.Text style={[styles.hint, { opacity: hint }]}>Tap to enter</Animated.Text>
@@ -71,55 +74,46 @@ export function LaunchScreen({ onDone }: { onDone: () => void }) {
   );
 }
 
-const shadow = { textShadowColor: "rgba(0,0,0,0.75)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 16 };
-
 const styles = StyleSheet.create({
-  bg: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#0d0b0a" },
-  kicker: {
-    color: colors.gold,
-    fontFamily: fonts.bodySemi,
-    fontSize: 12,
-    letterSpacing: 4,
-    textTransform: "uppercase",
-    marginBottom: spacing.lg,
-    ...shadow,
-  },
-  brandLine: {
-    color: colors.sand,
+  bg: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors.dsSlate },
+  // Mirrors HomeGallery's hero title.
+  brandTitle: {
+    color: "#FFFFFF",
     fontFamily: fonts.display,
     fontSize: 60,
-    lineHeight: 58,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    ...shadow,
+    lineHeight: 60,
+    letterSpacing: -1,
+    textAlign: "center",
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 18,
   },
-  country: {
-    color: colors.gold,
-    fontFamily: fonts.bodyBold,
-    fontSize: 14,
-    letterSpacing: 6,
-    textTransform: "uppercase",
-    marginTop: spacing.md,
-    ...shadow,
+  brandTitleWide: { fontSize: 120, lineHeight: 116, letterSpacing: -2 },
+  // Mirrors HomeGallery's hero caption card.
+  card: {
+    alignSelf: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.42)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.22)",
+    borderRadius: radius.md,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    marginTop: spacing.xl,
   },
-  rule: { width: 56, height: 2, backgroundColor: colors.orange, borderRadius: 2, marginTop: spacing.md },
-  tagline: {
-    color: colors.sand,
-    fontFamily: fonts.serifItalic,
-    fontSize: 15,
-    marginTop: spacing.md,
-    opacity: 0.92,
-    ...shadow,
-  },
+  cardTitle: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 20, textAlign: "center" },
+  cardSub: { color: "rgba(255,255,255,0.9)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, marginTop: 8, textAlign: "center" },
   hint: {
     position: "absolute",
     bottom: 46,
     alignSelf: "center",
-    color: colors.sand,
+    color: "#FFFFFF",
     fontFamily: fonts.bodySemi,
     fontSize: 12,
     letterSpacing: 3,
     textTransform: "uppercase",
-    ...shadow,
+    textShadowColor: "rgba(0,0,0,0.75)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 16,
   },
 });

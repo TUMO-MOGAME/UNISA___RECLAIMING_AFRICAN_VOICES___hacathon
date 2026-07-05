@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { resolveText, t } from "./localize.ts";
+import { LANGUAGES } from "./languages.ts";
 
 const SAMPLE = { en: "Yesterday", tn: "Maloba" };
 
@@ -40,4 +41,23 @@ test("empty/whitespace translations fall back to English", () => {
 test("t() returns just the resolved string", () => {
   assert.equal(t(SAMPLE, "tn"), "Maloba");
   assert.equal(t(SAMPLE, "ve"), "Yesterday");
+});
+
+test("EVERY language resolves to non-empty text — reviewed where it exists, honest English fallback otherwise", () => {
+  for (const l of LANGUAGES) {
+    const r = resolveText(SAMPLE, l.code);
+    assert.ok(r.text.trim().length > 0, `${l.code} resolved to empty text`);
+    if (l.code === "en" || l.code === "tn") {
+      assert.equal(r.status, "reviewed", `${l.code} should be reviewed`);
+    } else {
+      assert.deepEqual(r, { text: "Yesterday", lang: "en", status: "fallback" }, `${l.code} should fall back to English`);
+    }
+  }
+});
+
+test("a value with only English never breaks for any language", () => {
+  const enOnly = { en: "Only English here" };
+  for (const l of LANGUAGES) {
+    assert.equal(t(enOnly, l.code), "Only English here", `${l.code} broke on English-only value`);
+  }
 });
