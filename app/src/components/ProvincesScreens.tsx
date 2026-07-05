@@ -1,71 +1,194 @@
-import React from "react";
-import { View, Text, Image, Pressable, ScrollView, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Pressable, ScrollView, Modal, StyleSheet, useWindowDimensions } from "react-native";
+import { Image as ExpoImage } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Screen, ScreenHeader, Icon } from "../ui";
 import { provinces, Province, City, Stat, Leader } from "../content/provinces";
 import { colors, spacing, radius, fonts, type } from "../theme/tokens";
+import { t } from "../i18n";
+import type { LangCode } from "../i18n";
 import { PressScale } from "./Motion";
+import { SideIndexScroll } from "./SideIndexScroll";
+import { FeatureEntry } from "./FeatureEntry";
+import { Journey } from "./Journey";
+import { provincesJourney, CARD_ASPECT } from "../content/journey";
 
 // Provinces → City history. Black & white + gold-for-emphasis, colour photography (never grayscaled).
 // Content is grounded (src/content/provinces.ts); stats flagged "cited" (green) vs "to verify" (orange).
+// Chrome (labels) is localized into all 11 languages; the histories themselves stay English for now.
+
+// The heritage-series cover card — shown as the masthead hero and reused as the first slide of the
+// Provinces journey.
+const provCover = require("../../assets/journey/prov-cover.webp");
+
+
+// One AI-illustrated heritage card per province (same cards the Journey plays), keyed by content id.
+// Used as each province's picture in the overview list; detail pages keep their real photography.
+const provinceCards: Record<string, number> = {
+  "western-cape": require("../../assets/journey/prov-western-cape.webp"),
+  gauteng: require("../../assets/journey/prov-gauteng.webp"),
+  "northern-cape": require("../../assets/journey/prov-northern-cape.webp"),
+  "eastern-cape": require("../../assets/journey/prov-eastern-cape.webp"),
+  "kwazulu-natal": require("../../assets/journey/prov-kwazulu-natal.webp"),
+  "free-state": require("../../assets/journey/prov-free-state.webp"),
+  limpopo: require("../../assets/journey/prov-limpopo.webp"),
+  mpumalanga: require("../../assets/journey/prov-mpumalanga.webp"),
+  "north-west": require("../../assets/journey/prov-north-west.webp"),
+};
+
+const UI = {
+  southAfrica: {
+    en: "South Africa", tn: "Aforika Borwa", af: "Suid-Afrika", zu: "iNingizimu Afrika", xh: "uMzantsi Afrika",
+    nso: "Afrika Borwa", st: "Afrika Borwa", ss: "iNingizimu Afrika", ts: "Afrika-Dzonga", nr: "iSewula Afrika", ve: "Afrika Tshipembe",
+  },
+  title: {
+    en: "The Provinces", tn: "Diporofense", af: "Die Provinsies", zu: "Izifundazwe", xh: "Amaphondo",
+    nso: "Diprofense", st: "Diprofinse", ss: "Tifundza", ts: "Swifundzha", nr: "Iimfunda", ve: "Mavundu",
+  },
+  intro: {
+    en: "All nine provinces — each with its own founders, leaders and living history. Tap a province to explore its famous cities.",
+    tn: "Diporofense tsotlhe tse robmongwe — nngwe le nngwe e na le bathei, baeteledipele le hisitori ya yona. Tobetsa porofense go sekaseka metse ya yona e e itsegeng.",
+    af: "Al nege provinsies — elk met sy eie stigters, leiers en lewende geskiedenis. Tik 'n provinsie om sy bekende stede te verken.",
+    zu: "Zonke izifundazwe eziyisishiyagalolunye — ngayinye inabasunguli bayo, abaholi nomlando ophilayo. Thepha isifundazwe ukuze uhlole amadolobha aso adumile.",
+    xh: "Onke amaphondo alithoba — nganye inabasunguli bayo, iinkokeli nembali ephilayo. Cofa iphondo ukuze uphonononge izixeko zalo ezidumileyo.",
+    nso: "Diprofense ka moka tše senyane — se sengwe le se sengwe se na le bathei ba sona, baetapele le histori e phelago. Kgotla profense go utolla metse ya yona e e tumilego.",
+    st: "Diprofinse tsohle tse robong — e nngwe le e nngwe e na le bathehi ba yona, baetapele le histori e phelang. Tobetsa profinse ho hlahloba metse ya yona e tummeng.",
+    ss: "Tonkhe tifundza letiyimfica — leyinye naleyinye inebasunguli bayo, baholi nemlandvo lophilako. Cindzetela sifundza kuhlola emadolobha aso ladvumile.",
+    ts: "Swifundzha hinkwaswo swa kaye — xin'wana ni xin'wana xi ni vatumbuluxi va xona, varhangeri ni matimu lama hanyaka. Tinya xifundzha ku kambela madoroba ya xona lama dumeke.",
+    nr: "Zoke iimfunda eziyithoba — ngayinye inabasunguli bayo, abarholi nomlando ophilako. Gandelela ifunda ukuhlola amadorobho wayo adumileko.",
+    ve: "Mavundu oṱhe a ṱahe — ḽiṅwe na ḽiṅwe ḽi na vhavhumbi vhaḽo, vharangaphanḓa na ḓivhazwakale i tshilaho. Kwamani vundu u ṱolisisa miḓi yaḽo yo ḓivheaho.",
+  },
+  province: { en: "Province", tn: "Porofense", af: "Provinsie", zu: "Isifundazwe", xh: "Iphondo", nso: "Profense", st: "Profinse", ss: "Sifundza", ts: "Xifundzha", nr: "Ifunda", ve: "Vundu" },
+  capital: { en: "Capital", tn: "Motsemogolo", af: "Hoofstad", zu: "Inhloko-dolobha", xh: "Ikomkhulu", nso: "Motsemošate", st: "Motsemoholo", ss: "Inhlokodolobha", ts: "Ntsindza", nr: "Ihlokodorobho", ve: "Ḓorobo khulu" },
+  people2022: { en: "People · 2022", tn: "Batho · 2022", af: "Mense · 2022", zu: "Abantu · 2022", xh: "Abantu · 2022", nso: "Batho · 2022", st: "Batho · 2022", ss: "Bantfu · 2022", ts: "Vanhu · 2022", nr: "Abantu · 2022", ve: "Vhathu · 2022" },
+  languages: { en: "Languages", tn: "Dipuo", af: "Tale", zu: "Izilimi", xh: "Iilwimi", nso: "Maleme", st: "Dipuo", ss: "Tilwimi", ts: "Tindzimi", nr: "Iinlimi", ve: "Nyambo" },
+  aboutProvince: { en: "About the province", tn: "Ka ga porofense", af: "Oor die provinsie", zu: "Mayelana nesifundazwe", xh: "Malunga nephondo", nso: "Ka ga profense", st: "Mabapi le profinse", ss: "Mayelana nesifundza", ts: "Mayelana ni xifundzha", nr: "Malunga nefunda", ve: "Nga ha vundu" },
+  famousCities: { en: "Famous cities", tn: "Metse e e itsegeng", af: "Bekende stede", zu: "Amadolobha adumile", xh: "Izixeko ezidumileyo", nso: "Metse ye e tumilego", st: "Metse e tummeng", ss: "Emadolobha ladvumile", ts: "Madoroba lama dumeke", nr: "Amadorobho adumileko", ve: "Miḓi yo ḓivheaho" },
+  tapCity: {
+    en: "Tap a city for its full history.", tn: "Tobetsa motse go bona hisitori ya wona e e feletseng.", af: "Tik 'n stad vir sy volledige geskiedenis.", zu: "Thepha idolobha ukuze uthole umlando walo ophelele.", xh: "Cofa isixeko ukuze ufumane imbali yaso epheleleyo.",
+    nso: "Kgotla motse go hwetša histori ya wona ka botlalo.", st: "Tobetsa motse ho fumana histori ya oona e felletseng.", ss: "Cindzetela lidolobha kutfola umlandvo walo lophelele.", ts: "Tinya doroba ku kuma matimu ya rona hinkwawo.", nr: "Gandelela idorobho ukuthola umlando walo ophelele.", ve: "Kwamani ḓorobo u wana ḓivhazwakale yaḽo yoṱhe.",
+  },
+  founded: { en: "Founded", tn: "E thailwe", af: "Gestig", zu: "Yasungulwa", xh: "Yasekwa", nso: "E hlomilwe", st: "E thehiloe", ss: "Yasungulwa", ts: "Yi simekiwile", nr: "Yasungulwa", ve: "Yo thomiwa" },
+  city: { en: "City", tn: "Motse", af: "Stad", zu: "Idolobha", xh: "Isixeko", nso: "Motse", st: "Toropo", ss: "Lidolobha", ts: "Doroba", nr: "Idorobho", ve: "Ḓorobo" },
+  beforeCity: { en: "Before the city", tn: "Pele ga motse", af: "Voor die stad", zu: "Ngaphambi kwedolobha", xh: "Phambi kwesixeko", nso: "Pele ga motse", st: "Pele ho toropo", ss: "Ngaphambi kwelidolobha", ts: "Emahlweni ka doroba", nr: "Ngaphambi kwedorobho", ve: "Phanḓa ha ḓorobo" },
+  howItCame: { en: "How it came to be", tn: "Ka moo o simologileng ka teng", af: "Hoe dit ontstaan het", zu: "Indlela elavela ngayo", xh: "Indlela esavela ngayo", nso: "Ka moo o thomilego ka gona", st: "Kamoo o thehiloeng ka teng", ss: "Indlela lasungulwa ngayo", ts: "Ndlela leyi ri vekaka ha yona", nr: "Indlela elavela ngayo", ve: "Nḓila ye ya thoma ngayo" },
+  thoseWhoLed: { en: "Those who led", tn: "Ba ba eteletseng pele", af: "Dié wat gelei het", zu: "Labo abahola", xh: "Abo bakhokelayo", nso: "Bao ba etilego pele", st: "Ba neng ba etella pele", ss: "Labo labahola", ts: "Lava rhangeke", nr: "Labo abakhokhelako", ve: "Vhe vha ranga phanḓa" },
+  fromWhen: {
+    en: "From when to when — traditional and civic.", tn: "Go simolola leng go fihla leng — ka setso le ka setšhaba.", af: "Van wanneer tot wanneer — tradisioneel en burgerlik.", zu: "Kusukela nini kuya nini — ngokwesiko nangokomphakathi.", xh: "Ukususela nini ukuya nini — ngokwesithethe nangokoluntu.",
+    nso: "Go tloga neng go fihla neng — ka setšo le ka setšhaba.", st: "Ho tloha neng ho isa neng — ka moetlo le ka setjhaba.", ss: "Kusukela nini kuya nini — ngekwesiko nangekwemmango.", ts: "Ku sukela rini ku ya rini — hi ndhavuko ni hi vaaki.", nr: "Kusukela nini kuya nini — ngokwesiko nangokomphakathi.", ve: "U bva lini u swika lini — nga sialala na nga tshitshavha.",
+  },
+  byTheNumbers: { en: "By the numbers", tn: "Ka dipalo", af: "In syfers", zu: "Ngezinombolo", xh: "Ngamanani", nso: "Ka dipalo", st: "Ka dinomoro", ss: "Ngetinombolo", ts: "Hi tinhlayo", nr: "Ngeenombolo", ve: "Nga nomboro" },
+  landmarks: { en: "Landmarks & heritage", tn: "Mafelo a botlhokwa le boswa", af: "Landmerke & erfenis", zu: "Izindawo ezibalulekile namagugu", xh: "Iindawo ezibonakalayo nelifa", nso: "Mafelo a bohlokwa le bohwa", st: "Libaka tsa bohlokwa le lefa", ss: "Tindzawo letibalulekile nemagugu", ts: "Tindhawu ta xiyimo ni ndzhaka", nr: "Iindawo eziqakathekileko namagugu", ve: "Fhethu ha ndeme na ifa" },
+  yourVersion: { en: "Your family's version", tn: "Kanegelo ya lelapa la gago", af: "Jou familie se weergawe", zu: "Umlando womndeni wakho", xh: "Ibali losapho lwakho", nso: "Kanegelo ya lapa la gago", st: "Pale ya lelapa la hao", ss: "Indzaba yemndeni wakho", ts: "Ntsheketo wa ndyangu wa wena", nr: "Umlando womndeni wakho", ve: "Tshiitwa tsha muṱa waṋu" },
+  memoryHint: {
+    en: "Record a family memory of this place", tn: "Gatisa kgakologelo ya lelapa ya lefelo le", af: "Neem 'n familie-herinnering van hierdie plek op", zu: "Qopha inkumbulo yomndeni yale ndawo", xh: "Rekhoda inkumbulo yosapho yale ndawo",
+    nso: "Gatiša kgopolo ya lapa ya lefelo le", st: "Rekota mohopolo wa lelapa wa sebaka sena", ss: "Bhala inkhumbulo yemndeni yalendzawo", ts: "Rhekhoda xitsundzuxo xa ndyangu xa ndhawu leyi", nr: "Bhala inkumbulo yomndeni yale ndawo", ve: "Rekhoda tshihumbulo tsha muṱa tsha fhethu hafha",
+  },
+  howWeSource: { en: "How we source this", tn: "Ka moo re bonang se ka gone", af: "Hoe ons dit bekom", zu: "Indlela esithola ngayo lokhu", xh: "Indlela esifumana ngayo oku", nso: "Ka moo re hwetšago se ka gona", st: "Kamoo re fumanang sena ka teng", ss: "Indlela lesitfola ngayo loku", ts: "Ndlela leyi hi kumaka leswi ha yona", nr: "Indlela esikuthola ngayo lokhu", ve: "Nḓila ine ra wana ngayo hezwi" },
+  cited: { en: "cited", tn: "go tsopotswe", af: "aangehaal", zu: "kucashuniwe", xh: "kucatshuliwe", nso: "go tsopotšwe", st: "e qotsitsoe", ss: "kucashuniwe", ts: "swi tshahiwile", nr: "kucatjhuliwe", ve: "zwo redzwa" },
+  toVerify: { en: "to verify", tn: "go netefadiwa", af: "om te verifieer", zu: "okumele kuqinisekiswe", xh: "ekufuneka kuqinisekiswe", nso: "go netefatšwa", st: "ho netefatsoa", ss: "lokufanele kucinisekiswe", ts: "ku tiyisisiwa", nr: "okufanele kuqinisekiswe", ve: "u khwaṱhisedzwa" },
+  contents: { en: "Provinces", tn: "Diporofense", af: "Provinsies", zu: "Izifundazwe", xh: "Amaphondo", nso: "Diprofense", st: "Diprofinse", ss: "Tifundza", ts: "Swifundzha", nr: "Iimfunda", ve: "Mavundu" },
+  cityOne: { en: "city", tn: "motse", af: "stad", zu: "idolobha", xh: "isixeko", nso: "motse", st: "toropo", ss: "lidolobha", ts: "doroba", nr: "idorobho", ve: "ḓorobo" },
+  cityMany: { en: "cities", tn: "metse", af: "stede", zu: "amadolobha", xh: "izixeko", nso: "metse", st: "metse", ss: "emadolobha", ts: "madoroba", nr: "amadorobho", ve: "miḓi" },
+  explore: { en: "Explore the province", tn: "Sekaseka porofense", af: "Verken die provinsie", zu: "Hlola isifundazwe", xh: "Phonononga iphondo", nso: "Utolla profense", st: "Hlahloba profinse", ss: "Hlola sifundza", ts: "Kambela xifundzha", nr: "Hlola ifunda", ve: "Ṱolisisa vundu" },
+  playJourney: { en: "Play the Journey", tn: "Bona Loeto", af: "Speel die Reis", zu: "Dlala Uhambo", xh: "Dlala Uhambo", nso: "Bapala Leeto", st: "Bapala Leeto", ss: "Dlala Luhambo", ts: "Tlanga Riendzo", nr: "Dlala Ikhambo", ve: "Tambani Lwendo" },
+};
 
 // ---------- 1 · Provinces grid ----------
-export function ProvincesScreen({ onBack, onOpenProvince }: { onBack: () => void; onOpenProvince: (id: string) => void }) {
-  return (
-    <Screen tone="dark">
-      <ScreenHeader kicker="South Africa" title="The Provinces" onBack={onBack} />
-      <Text style={s.intro}>
-        All nine provinces — each with its own founders, leaders and living history. Tap a province to
-        explore its famous cities.
-      </Text>
-      <View style={s.grid}>
-        {provinces.map((p) => (
-          <PressScale key={p.id} style={s.provCard} onPress={() => onOpenProvince(p.id)} accessibilityLabel={`${p.name} — capital ${p.capital}`}>
-            <Image source={p.hero} style={StyleSheet.absoluteFill as any} resizeMode="cover" />
-            <LinearGradient colors={["rgba(0,0,0,0.2)", "rgba(0,0,0,0.5)", "rgba(0,0,0,0.9)"]} style={StyleSheet.absoluteFill} />
-            <View style={s.provCardText}>
-              <Text style={s.provName}>{p.name}</Text>
-              <Text style={s.provCap}>{p.capital}</Text>
-            </View>
-            <View style={s.provCount}><Text style={s.provCountText}>{p.cities.length} {p.cities.length === 1 ? "city" : "cities"}</Text></View>
-          </PressScale>
-        ))}
+export function ProvincesScreen({ onBack, onOpenProvince, lang }: { onBack: () => void; onOpenProvince: (id: string) => void; lang: LangCode }) {
+  const { width } = useWindowDimensions();
+  const wide = width >= 900;
+  const [journeyOpen, setJourneyOpen] = useState(false);
+  const masthead = (
+    <View style={s.pad}>
+      <ScreenHeader kicker={t(UI.southAfrica, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} />
+      <View style={s.coverWrap}>
+        <ExpoImage source={provCover} style={s.cover} contentFit="cover" transition={200} cachePolicy="disk" accessibilityLabel={t(UI.title, lang)} />
       </View>
+      <Text style={s.intro}>{t(UI.intro, lang)}</Text>
+      <Pressable style={s.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
+        <Icon.Play size={17} color="#000000" fill="#000000" />
+        <Text style={s.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
+      </Pressable>
+    </View>
+  );
+  const renderProvince = (_item: { key: string; label: string }, i: number) => {
+    const p = provinces[i];
+    const cityWord = p.cities.length === 1 ? t(UI.cityOne, lang) : t(UI.cityMany, lang);
+    const card = provinceCards[p.id];
+    return (
+      <FeatureEntry
+        index={i}
+        kicker={`${p.capital} · ${p.cities.length} ${cityWord}`}
+        title={p.name}
+        lead={p.overview}
+        leadLines={3}
+        ctaLabel={t(UI.explore, lang)}
+        onPress={() => onOpenProvince(p.id)}
+        wide={wide}
+        visualAspect={card ? CARD_ASPECT : undefined}
+        visual={
+          card ? (
+            // Explicit 100% sizing (not absoluteFill) — react-native-web can render an
+            // absolute-filled image at its native pixel size inside an aspect-ratio box,
+            // which crops the card. The masthead covers use this same pattern and show in full.
+            <ExpoImage source={card} style={s.cardImg} contentFit="cover" transition={200} cachePolicy="disk" accessibilityLabel={p.name} />
+          ) : (
+            <>
+              <ExpoImage source={p.hero} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="disk" />
+              <LinearGradient colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.35)"]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+            </>
+          )
+        }
+      />
+    );
+  };
+  return (
+    <Screen tone="dark" scroll={false} padded={false} contentStyle={s.flexFill}>
+      <SideIndexScroll
+        contentsLabel={t(UI.contents, lang)}
+        masthead={masthead}
+        items={provinces.map((p) => ({ key: p.id, label: p.name }))}
+        renderItem={renderProvince}
+      />
+      <Modal visible={journeyOpen} animationType="fade" onRequestClose={() => setJourneyOpen(false)}>
+        <Journey slides={provincesJourney} lang={lang} onClose={() => setJourneyOpen(false)} />
+      </Modal>
     </Screen>
   );
 }
 
 // ---------- 2 · Province detail ----------
-export function ProvinceScreen({ province, onBack, onOpenCity }: { province: Province; onBack: () => void; onOpenCity: (id: string) => void }) {
+export function ProvinceScreen({ province, onBack, onOpenCity, lang }: { province: Province; onBack: () => void; onOpenCity: (id: string) => void; lang: LangCode }) {
   return (
     <Screen tone="dark">
       <View style={s.provHero}>
-        <Image source={province.hero} style={StyleSheet.absoluteFill as any} resizeMode="cover" />
+        <ExpoImage source={province.hero} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="disk" />
         <LinearGradient colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.55)", "rgba(0,0,0,0.95)"]} style={StyleSheet.absoluteFill} />
         <Pressable style={s.heroBack} onPress={onBack} hitSlop={12}><Icon.ChevronLeft size={22} color="#fff" strokeWidth={2.4} /></Pressable>
         <View style={s.provHeroText}>
-          <Text style={s.kick}>Province</Text>
+          <Text style={s.kick}>{t(UI.province, lang)}</Text>
           <Text style={s.heroName}>{province.name}</Text>
         </View>
       </View>
 
       <View style={s.miniRow}>
-        <Mini v={province.capital} l="Capital" />
-        <Mini v={province.populationStat.value} l="People · 2022" />
-        <Mini v={province.languages.split(" · ")[0] + "…"} l="Languages" />
+        <Mini v={province.capital} l={t(UI.capital, lang)} />
+        <Mini v={province.populationStat.value} l={t(UI.people2022, lang)} />
+        <Mini v={province.languages.split(" · ")[0] + "…"} l={t(UI.languages, lang)} />
       </View>
 
-      <SectionLabel label="About the province" />
+      <SectionLabel label={t(UI.aboutProvince, lang)} />
       <Text style={s.para}>{province.overview}</Text>
 
-      <SectionLabel label="Famous cities" sub="Tap a city for its full history." />
+      <SectionLabel label={t(UI.famousCities, lang)} sub={t(UI.tapCity, lang)} />
       <View style={{ gap: spacing.md }}>
         {province.cities.map((c) => (
           <PressScale key={c.id} style={s.cityRow} onPress={() => onOpenCity(c.id)} accessibilityLabel={`${c.name} — founded ${c.founded}`}>
-            <Image source={c.hero} style={s.cityThumb} resizeMode="cover" />
+            <ExpoImage source={c.hero} style={s.cityThumb} contentFit="cover" transition={200} cachePolicy="disk" />
             <View style={{ flex: 1 }}>
               <Text style={s.cityRowName}>{c.name}</Text>
-              <Text style={s.cityRowMeta}>Founded {c.founded}</Text>
+              <Text style={s.cityRowMeta}>{t(UI.founded, lang)} {c.founded}</Text>
               {c.subtitle ? <Text style={s.cityRowSub} numberOfLines={2}>{c.subtitle}</Text> : null}
             </View>
             <Icon.ChevronRight size={20} color="rgba(255,255,255,0.5)" />
@@ -77,16 +200,16 @@ export function ProvinceScreen({ province, onBack, onOpenCity }: { province: Pro
 }
 
 // ---------- 3 · City detail ----------
-export function CityScreen({ city, onBack, onArchive }: { city: City; onBack: () => void; onArchive?: () => void }) {
+export function CityScreen({ city, onBack, onArchive, lang }: { city: City; onBack: () => void; onArchive?: () => void; lang: LangCode }) {
   return (
     <Screen tone="dark">
       <View style={s.cityHero}>
-        <Image source={city.hero} style={StyleSheet.absoluteFill as any} resizeMode="cover" />
+        <ExpoImage source={city.hero} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} cachePolicy="disk" />
         <LinearGradient colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.55)", "rgba(0,0,0,0.96)"]} style={StyleSheet.absoluteFill} />
         <Pressable style={s.heroBack} onPress={onBack} hitSlop={12}><Icon.ChevronLeft size={22} color="#fff" strokeWidth={2.4} /></Pressable>
         <View style={s.est}><Text style={s.estText}>Est. {city.founded}</Text></View>
         <View style={s.cityHeroText}>
-          <Text style={s.kick}>City</Text>
+          <Text style={s.kick}>{t(UI.city, lang)}</Text>
           <Text style={s.cityName}>{city.name}</Text>
           {city.subtitle ? <Text style={s.citySub}>{city.subtitle}</Text> : null}
         </View>
@@ -94,29 +217,29 @@ export function CityScreen({ city, onBack, onArchive }: { city: City; onBack: ()
 
       {city.beforeTheCity ? (
         <View style={s.band}>
-          <Text style={s.bandLabel}>Before the city</Text>
+          <Text style={s.bandLabel}>{t(UI.beforeCity, lang)}</Text>
           <Text style={s.bandText}>{city.beforeTheCity}</Text>
         </View>
       ) : null}
 
-      <SectionLabel label="How it came to be" />
+      <SectionLabel label={t(UI.howItCame, lang)} />
       <Text style={s.para}>{city.origins}</Text>
 
-      <SectionLabel label="Those who led" sub="From when to when — traditional and civic." />
+      <SectionLabel label={t(UI.thoseWhoLed, lang)} sub={t(UI.fromWhen, lang)} />
       <View style={{ marginTop: spacing.xs }}>
         {city.leaders.map((l, i) => (
           <Timeline key={i} item={l} last={i === city.leaders.length - 1} />
         ))}
       </View>
 
-      <SectionLabel label="By the numbers" />
+      <SectionLabel label={t(UI.byTheNumbers, lang)} />
       <View style={s.statGrid}>
         {city.stats.map((st, i) => (
-          <StatTile key={i} stat={st} />
+          <StatTile key={i} stat={st} lang={lang} />
         ))}
       </View>
 
-      <SectionLabel label="Landmarks & heritage" />
+      <SectionLabel label={t(UI.landmarks, lang)} />
       <View style={s.chipRow}>
         {city.landmarks.map((lm) => (
           <View key={lm} style={s.chip}><Text style={s.chipText}>{lm}</Text></View>
@@ -127,15 +250,15 @@ export function CityScreen({ city, onBack, onArchive }: { city: City; onBack: ()
         <PressScale style={s.cityArchive} onPress={onArchive}>
           <View style={s.caMicWrap}><Icon.Mic size={19} color={colors.gold} /></View>
           <View style={{ flex: 1 }}>
-            <Text style={s.caH}>Your {city.name}</Text>
-            <Text style={s.caS}>Record a family memory of this place</Text>
+            <Text style={s.caH}>{t(UI.yourVersion, lang)}</Text>
+            <Text style={s.caS}>{t(UI.memoryHint, lang)}</Text>
           </View>
           <Icon.ChevronRight size={20} color={colors.gold} />
         </PressScale>
       ) : null}
 
       <View style={s.srcNote}>
-        <Text style={s.srcH}>How we source this</Text>
+        <Text style={s.srcH}>{t(UI.howWeSource, lang)}</Text>
         <Text style={s.srcT}>{city.sources}</Text>
       </View>
     </Screen>
@@ -178,14 +301,14 @@ function Timeline({ item, last }: { item: Leader; last: boolean }) {
     </View>
   );
 }
-function StatTile({ stat }: { stat: Stat }) {
+function StatTile({ stat, lang }: { stat: Stat; lang: LangCode }) {
   return (
     <View style={s.statTile}>
       <Text style={s.statVal}>{stat.value}</Text>
       <Text style={s.statLabel}>{stat.label}</Text>
       <View style={[s.pill, stat.status === "cited" ? s.pillCited : s.pillVerify]}>
         <Text style={[s.pillText, { color: stat.status === "cited" ? "#3fbf6a" : colors.orange }]}>
-          {stat.status === "cited" ? "cited" : "to verify"}
+          {stat.status === "cited" ? t(UI.cited, lang) : t(UI.toVerify, lang)}
         </Text>
       </View>
     </View>
@@ -194,20 +317,21 @@ function StatTile({ stat }: { stat: Stat }) {
 
 const s = StyleSheet.create({
   intro: { color: "rgba(255,255,255,0.62)", fontFamily: fonts.serifItalic, fontSize: 15, lineHeight: 22, marginBottom: spacing.lg },
-  grid: { gap: spacing.md },
-  provCard: { width: "100%", height: 128, borderRadius: radius.md, overflow: "hidden", justifyContent: "flex-end", padding: spacing.md, backgroundColor: "#111" },
-  provCardText: {},
-  provName: { color: "#fff", fontFamily: fonts.serifSemi, fontSize: 26, letterSpacing: -0.3 },
-  provCap: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 1, textTransform: "uppercase", marginTop: 4 },
-  provCount: { position: "absolute", top: 12, right: 12, backgroundColor: colors.orange, paddingVertical: 4, paddingHorizontal: 9, borderRadius: radius.pill },
-  provCountText: { color: "#fff", fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 0.3, textTransform: "uppercase" },
+  // Masthead hero — the Provinces cover card. Native aspect ratio (≈16:9) so the baked-in border
+  // is never cropped; capped and centred so it stays a poster, not a billboard, on wide screens.
+  coverWrap: { width: "100%", maxWidth: 720, aspectRatio: CARD_ASPECT, alignSelf: "center", borderRadius: radius.lg, overflow: "hidden", backgroundColor: "#0e0e0e", marginTop: spacing.md, marginBottom: spacing.lg },
+  cover: { width: "100%", height: "100%" },
+  cardImg: { width: "100%", height: "100%" },
+  flexFill: { flex: 1 },
+  pad: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
+  journeyBtn: { flexDirection: "row", alignItems: "center", gap: spacing.sm, alignSelf: "flex-start", backgroundColor: "#FFFFFF", borderRadius: radius.pill, paddingVertical: 12, paddingHorizontal: 20 },
+  journeyBtnText: { color: "#000000", fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3 },
 
   provHero: { height: 172, borderRadius: radius.lg, overflow: "hidden", marginBottom: spacing.md, justifyContent: "flex-end", padding: spacing.md },
   provHeroText: {},
   cityHero: { height: 216, borderRadius: radius.lg, overflow: "hidden", marginBottom: spacing.md, justifyContent: "flex-end", padding: spacing.md },
   cityHeroText: {},
   heroBack: { position: "absolute", top: 12, left: 12, width: 36, height: 36, borderRadius: radius.pill, backgroundColor: "rgba(0,0,0,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.2)", alignItems: "center", justifyContent: "center", zIndex: 3 },
-  heroBackText: { color: "#fff", fontSize: 24, lineHeight: 26, marginTop: -2 },
   kick: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1.4, textTransform: "uppercase" },
   heroName: { color: "#fff", fontFamily: fonts.display, fontSize: 34, textTransform: "uppercase", marginTop: 4 },
   cityName: { color: "#fff", fontFamily: fonts.display, fontSize: 40, textTransform: "uppercase", marginTop: 4 },
@@ -232,7 +356,6 @@ const s = StyleSheet.create({
   cityRowName: { color: "#fff", fontFamily: fonts.serif, fontSize: 16 },
   cityRowMeta: { color: colors.orange, fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 0.6, textTransform: "uppercase", marginTop: 4 },
   cityRowSub: { color: "rgba(255,255,255,0.58)", fontFamily: fonts.body, fontSize: 12, marginTop: 4 },
-  chev: { color: "rgba(255,255,255,0.5)", fontSize: 24 },
 
   band: { marginTop: spacing.md, backgroundColor: "rgba(255,255,255,0.04)", borderWidth: 1, borderColor: "rgba(235,164,60,0.3)", borderRadius: radius.md, padding: spacing.md },
   bandLabel: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1.2, textTransform: "uppercase" },
@@ -263,7 +386,6 @@ const s = StyleSheet.create({
   caMicWrap: { width: 42, height: 42, borderRadius: 12, backgroundColor: "rgba(217,106,28,0.18)", borderWidth: 1, borderColor: "rgba(235,164,60,0.4)", alignItems: "center", justifyContent: "center" },
   caH: { color: "#fff", fontFamily: fonts.bodyBold, fontSize: 14 },
   caS: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 12, marginTop: 2 },
-  caChev: { color: colors.gold, fontSize: 24 },
 
   srcNote: { marginTop: spacing.lg, backgroundColor: "rgba(217,106,28,0.07)", borderLeftWidth: 3, borderLeftColor: colors.orange, borderRadius: 8, padding: spacing.md },
   srcH: { color: colors.orange, fontFamily: fonts.bodyBold, fontSize: 10, letterSpacing: 1, textTransform: "uppercase" },

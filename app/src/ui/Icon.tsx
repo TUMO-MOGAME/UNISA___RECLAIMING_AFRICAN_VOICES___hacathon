@@ -27,7 +27,14 @@ export const Icon = {
   ChevronRight: L.ChevronRight,
   ChevronLeft: L.ChevronLeft,
   ChevronDown: L.ChevronDown,
-  Sparkles: L.Sparkles,
-  Link2: L.Link2,
-  ShieldCheck: L.ShieldCheck,
+  // NOTE: this lucide build (v1.23) has no "Youtube" icon — Headphones fits the music credit and exists.
+  Headphones: L.Headphones,
+  Search: L.Search,
+  X: L.X,
+  Pause: L.Pause,
+  RotateCcw: L.RotateCcw,
+  ImageIcon: L.Image,
+  Film: L.Film,
+  Music: L.Music,
+  CalendarDays: L.Calendar,
 };

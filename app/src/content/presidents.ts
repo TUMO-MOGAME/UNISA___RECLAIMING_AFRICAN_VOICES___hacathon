@@ -42,7 +42,8 @@ export const presidents: President[] = [
     life: [
       { when: "1918", name: "Born in Mvezo", role: "Eastern Cape; of the Thembu royal house" },
       { when: "1944", name: "Joins the ANC", role: "Co-founds the ANC Youth League" },
-      { when: "1964", name: "Rivonia Trial", role: "Sentenced to life; imprisoned 27 years" },
+      { when: "1962", name: "Arrested", role: "Sentenced to five years; his 27 years in prison begin" },
+      { when: "1964", name: "Rivonia Trial", role: "Sentenced to life imprisonment" },
       { when: "1990", name: "Released", role: "Walks free on 11 February" },
       { when: "1994", name: "Elected President", role: "South Africa's first free election" },
       { when: "2013", name: "Dies in Johannesburg", role: "Aged 95", era: "past" },
@@ -58,7 +59,9 @@ export const presidents: President[] = [
       "He chose reconciliation over revenge — championing the Truth & Reconciliation Commission.",
       "He served a single term by choice, stepping down to strengthen the young democracy.",
     ],
-    quote: { text: "It always seems impossible until it's done.", attr: "Nelson Mandela" },
+    // From the dock at the Rivonia Trial — court record, 20 April 1964 (the popular "impossible
+    // until it's done" line is widely misattributed and has no verified Mandela source).
+    quote: { text: "It is an ideal which I hope to live for and to achieve. But if needs be, it is an ideal for which I am prepared to die.", attr: "Nelson Mandela · Rivonia Trial, 20 April 1964" },
     sources: "Long Walk to Freedom · the Nelson Mandela Foundation. Hard chapters are told honestly, never sanitised.",
   },
   {
