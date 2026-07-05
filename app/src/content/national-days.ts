@@ -18,7 +18,13 @@ export type NationalDay = {
   notPublicHoliday?: boolean;
   // ── media placeholders — wire when the files land in assets/days/ ──
   image?: number; // require("../../assets/days/<id>.webp")
+  /** Real archival photograph credit — when set, the image is a HISTORICAL PHOTO (shown
+   *  letterboxed and credited), NOT an AI interpretation, and is labelled accordingly. */
+  imageCredit?: string;
   video?: number; // require("../../assets/days/<id>.mp4")
+  /** YouTube video id — embedded (muted) in the media panel WHILE the day's poem plays;
+   *  the photograph returns when the poem ends. Web only; native keeps the photo. */
+  videoEmbed?: string;
   audio?: number; // a poem/recording for this day (plays once; listener replays)
   /** Attribution for the audio — the performer/poet's name, shown on the player. */
   audioBy?: string;
@@ -55,6 +61,8 @@ export const nationalDays: NationalDay[] = [
   {
     id: "youth-day",
     image: require("../../assets/days/youth-day.webp"),
+    imageCredit: "Photograph: Sam Nzima — Mbuyisa Makhubu carrying Hector Pieterson, 16 June 1976",
+    videoEmbed: "xa8NO0JmDik",
     date: "16 June",
     name: "Youth Day",
     commemorates: "The Soweto Uprising, 1976",

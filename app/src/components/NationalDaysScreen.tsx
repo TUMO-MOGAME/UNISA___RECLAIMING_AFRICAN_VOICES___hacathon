@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, useWindowDimensions, Platform } from "react-native";
 import { Image } from "expo-image";
 import { Screen, ScreenHeader, Icon } from "../ui";
 import { nationalDays } from "../content/national-days";
@@ -50,9 +50,25 @@ const UI = {
   },
 };
 
+// A muted YouTube embed shown in the media panel WHILE a day's poem plays (the poem carries the
+// audio; the film carries the picture). Web only — RN web renders DOM elements natively; native
+// keeps the photograph.
+function VideoEmbed({ youtubeId, title }: { youtubeId: string; title: string }) {
+  if (Platform.OS !== "web") return null;
+  return React.createElement("iframe" as any, {
+    src: `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&playsinline=1&loop=1&playlist=${youtubeId}`,
+    style: { width: "100%", height: "100%", border: "0" },
+    allow: "autoplay; encrypted-media; picture-in-picture",
+    allowFullScreen: true,
+    title,
+  });
+}
+
 export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang: LangCode }) {
   const { width } = useWindowDimensions();
   const wide = width >= 900;
+  // which day's poem is sounding right now — that day's panel shows its film instead of its photo
+  const [playingDay, setPlayingDay] = useState<string | null>(null);
 
   const masthead = (
     <View style={s.pad}>
@@ -74,12 +90,22 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
           <Text style={s.cat}>{d.date.toUpperCase()} · {d.commemorates.toUpperCase()}</Text>
           <Text style={[s.title, wide && s.titleWide]}>{d.name}</Text>
 
-          {/* media panel — illustrated interpretation when wired, honest placeholder until then */}
-          <View style={[s.mediaWrap, { height: wide ? 260 : 180 }]}>
-            {d.image ? (
+          {/* media panel — the day's film while its poem plays; otherwise the photograph
+              (letterboxed + credited when it's a real archival photo, never labelled as AI) */}
+          <View style={[s.mediaWrap, { height: wide ? (d.imageCredit ? 380 : 260) : (d.imageCredit ? 280 : 180) }]}>
+            {d.videoEmbed && playingDay === d.id && Platform.OS === "web" ? (
+              <VideoEmbed youtubeId={d.videoEmbed} title={d.name} />
+            ) : d.image ? (
               <>
-                <Image source={d.image} style={s.mediaImg} contentFit="cover" transition={200} cachePolicy="disk" accessibilityLabel={`${d.name} — ${t(UI.interpretation, lang)}`} />
-                <Text style={s.interpretTag}>{t(UI.interpretation, lang)}</Text>
+                <Image
+                  source={d.image}
+                  style={s.mediaImg}
+                  contentFit={d.imageCredit ? "contain" : "cover"}
+                  transition={200}
+                  cachePolicy="disk"
+                  accessibilityLabel={`${d.name} — ${d.imageCredit ?? t(UI.interpretation, lang)}`}
+                />
+                <Text style={s.interpretTag}>{d.imageCredit ?? t(UI.interpretation, lang)}</Text>
               </>
             ) : (
               <View style={s.placeholder}>
@@ -98,7 +124,17 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
 
           {d.audio ? (
             <View style={{ marginTop: spacing.md }}>
-              <PlayOnceRow source={d.audio} title={t(UI.poem, lang)} by={d.audioBy} lang={lang} />
+              <PlayOnceRow
+                source={d.audio}
+                title={t(UI.poem, lang)}
+                by={d.audioBy}
+                lang={lang}
+                onPhase={(phase) =>
+                  setPlayingDay((cur) =>
+                    phase === "playing" || phase === "paused" ? d.id : cur === d.id ? null : cur
+                  )
+                }
+              />
             </View>
           ) : null}
 

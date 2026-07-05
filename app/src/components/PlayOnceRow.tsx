@@ -29,6 +29,7 @@ export function PlayOnceRow({
   title,
   by,
   lang,
+  onPhase,
 }: {
   /** Bundled audio (require) — static asset, no API quota, no PII. */
   source: number;
@@ -37,6 +38,8 @@ export function PlayOnceRow({
   /** Attribution — the performer/poet's name. */
   by?: string;
   lang: LangCode;
+  /** Observe playback state — e.g. to show a video while the poem plays. */
+  onPhase?: (phase: "idle" | "playing" | "paused" | "done") => void;
 }) {
   const player = useAudioPlayer(source);
   const status = useAudioPlayerStatus(player);
@@ -44,6 +47,13 @@ export function PlayOnceRow({
   const duration = status?.duration ?? 0;
   const [phase, setPhase] = useState<"idle" | "playing" | "paused" | "done">("idle");
   const startAtRef = useRef(0); // playback position when play was pressed — drives the end timer
+
+  // report every phase change to the observer (covers presses, natural end, and focus-stealing)
+  const onPhaseRef = useRef(onPhase);
+  onPhaseRef.current = onPhase;
+  useEffect(() => {
+    onPhaseRef.current?.(phase);
+  }, [phase]);
 
   // stable identity for the focus registry; body always calls the latest state/player
   const stopImpl = useRef(() => {});
