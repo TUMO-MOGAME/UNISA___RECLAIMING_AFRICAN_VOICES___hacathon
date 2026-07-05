@@ -155,7 +155,7 @@ mirroring `partnersLabel` + `partnerMarks` in `HomeGallery.tsx` (~L357/384).
 | 1 | **Footer "Built with" row** — source official webp logos, render distinct row | hours + asset sourcing | tsc clean · tests green · web export green · eyeball |
 | 2 | **Device-persistent recordings** — recordings survive refresh, still no server | small | record → refresh → still there → delete works; tiny POPIA burden |
 | 3 | **Ingestion pipeline v1** — one public-domain book end-to-end | medium | golden fixtures on pure extract/segment; human-review the draft module | ✅ **infra built** — `npm run ingest` (rights gate → strip → normalise → segment → draft + review.md); pure core golden-tested (11); PDF/OCR + Gemini adaptation deferred; awaiting a first PD title |
-| 4 | **Mantswe a Batho** — Supabase + Lelapa; consensus/divergence | large | fixture testimonies → asserted consensus/divergence structure (deterministic, like `botlhale.test.ts`) + **POPIA delete-recomputes** test |
+| 4 | **Mantswe a Batho** — Supabase + Lelapa; consensus/divergence | large | fixture testimonies → asserted consensus/divergence structure (deterministic, like `botlhale.test.ts`) + **POPIA delete-recomputes** test | 🟡 **pure core built** — `services/mantswe/` de-identify (phone/ID/email regex) + consensus aggregation (counts, never adjudicates) + `withdraw()` recompute; 8 golden tests incl. delete-recomputes. UI + Supabase/Lelapa/Gemini I/O gated on keys |
 
 Step 1 is visible and safe *once assets are in hand*; step 2 is the smallest real code win with almost
 no POPIA burden; steps 3–4 are the differentiators.

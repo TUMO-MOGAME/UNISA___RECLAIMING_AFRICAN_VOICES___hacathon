@@ -123,6 +123,17 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-05** — **Mantswe a Batho pure core (Living Archive step 4, buildable half).** Built the
+  no-key, testable heart of the oral-history consensus feature in `src/services/mantswe/`:
+  **de-identify** (POPIA deterministic belt — strips SA phone/ID/email by regex, keeps historical
+  names/places as content; reports types+counts, never the removed values) and **consensus**
+  (`aggregate()` tallies claims across testimonies, links each back to its supporters, sorts most-voices
+  first — it COUNTS and never crowns a winner; contradictions coexist). `withdraw()` + re-`aggregate()`
+  implement the POPIA lifecycle: the aggregate is derived, so erasing a testimony recomputes it and its
+  unique detail vanishes. 8 golden tests incl. **delete-recomputes**. `tsc` clean · **66/66 tests** ·
+  web export green (services only, UI unaffected). **Gated on keys:** the Mantswe screen, Lelapa
+  transcription, Gemini claim-extraction/redaction, and Supabase storage — the pure core is ready to
+  wire the moment keys land.
 - **2026-07-05** — **Ingestion Library v1 infra (Living Archive step 3).** Built `npm run ingest` — the
   build-time CLI that turns a rights-cleared public-domain plain-text book into a **draft literary
   `Module`** in the app's exact shape, grounded in and citing the source. Pure, golden-fixture-tested
