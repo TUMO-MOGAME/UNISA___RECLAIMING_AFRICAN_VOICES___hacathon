@@ -3,7 +3,7 @@
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
 > of "done."
 
-_Last updated: 2026-07-02 — by Emma (via Claude)_
+_Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ---
 
@@ -16,7 +16,7 @@ _Last updated: 2026-07-02 — by Emma (via Claude)_
 | HomeGallery + nav across **4** grounded pillars | ✅ done |
 | Cinematic Reader: Child/Adult + EN/Setswana + scene nav + back | ✅ done |
 | "About the Sources" screen (credits + references + integrity note) | ✅ done |
-| **Community Archive**: POPIA consent → record → list → play → delete | ✅ done (session-state) |
+| **Community Archive**: POPIA consent → record → list → play → delete | ✅ done — **web: durable IndexedDB (survives refresh)**; native: session (T024) |
 | **Reader "Listen" (TTS)**: pluggable Botlhale AI → on-device fallback | ✅ done (device path live; Botlhale on key) |
 | **All 11 SA languages**: data-driven registry + picker + TTS + honest EN fallback | ✅ framework done (EN/TSW text authored) |
 | **Machine-draft translations** (Botlhale): service + draft-aware Reader + gen script | ✅ built, awaiting token+org_id to run |
@@ -123,6 +123,22 @@ _Last updated: 2026-07-02 — by Emma (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-05** — **Living Archive plan + device-persistent recordings (Living Archive step 2).**
+  Wrote [docs/12-living-archive-plan.md](docs/12-living-archive-plan.md) — the crowdsourced,
+  AI-synthesised archive: **Mantswe a Batho** ("Voices of the People", oral history + AI consensus that
+  *surfaces* agreement/divergence and never adjudicates), the **Ingestion Library** (public-domain books
+  → draft `Module`s, cited), and a footer **"Built with"** row (locked to *official logo images*). 4 decisions locked. **Footer step
+  1 (Solana):** sourced the official Solana horizontal logotype (`solana.com/branding`), converted it to
+  `assets/brand/solana.webp` (transparent), and added a **"Built with"** row to the HomeGallery footer —
+  distinct from "In partnership with", light logotype on the navy ground (Solana's high-contrast
+  guideline), links to solana.com. Supabase/Lelapa/Expo marks deferred until those land. Then shipped
+  **step 2**: recordings now
+  persist device-locally via a platform-split store (`src/services/archive/`) — **web = durable
+  IndexedDB** (audio Blob survives a refresh; delete is real erasure of the bytes), **native = in-session**
+  fallback (WatermelonDB is still T024, now honestly flagged `persists:false`). Playback resolves a fresh
+  object URL from the store, so it works after reload (the old `blob:` URL is dead). Pure list helpers
+  unit-tested (7 new). `tsc` clean · **47/47 tests** · `expo export --platform web` green. **Needs an
+  eyeball:** the mic-gated record→refresh→play→delete loop in a real browser (can't be automated here).
 - **2026-07-03** — **In-app Lucide icons + UI audit/alignment + tsc fix.** Installed `lucide-react-native`
   + `react-native-svg`; replaced **all emoji/unicode glyphs** across the app (Home, Reader, Archive,
   Consent, Heritage, LanguagePicker, Provinces, Presidents) with a central `ui/Icon` set — mic, chevrons,

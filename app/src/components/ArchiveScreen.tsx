@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
 import {
   useAudioRecorder,
@@ -13,19 +13,14 @@ import { ConsentSheet, Visibility } from "./ConsentSheet";
 import { PressScale } from "./Motion";
 import { Screen, ScreenHeader, Card, Body, Meta, Muted, Icon } from "../ui";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
+import { recordingsStore } from "../services/archive/store";
+import { RecordingMeta, prepend, removeById, renameById } from "../services/archive/recordings";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
 // behind a POPIA consent gate, keep them private or public, and can delete them at any time (erasure).
-// Recordings are kept in-session for this concept build; WatermelonDB persistence + Supabase/Lelapa
-// sync are the online stretch (T024/T027/T028). See popia-compliance skill. Built on the UI kit.
-
-type Recording = {
-  id: string;
-  uri: string;
-  visibility: Visibility;
-  title: string;
-  createdAt: string;
-};
+// Recordings are stored device-locally (web = durable IndexedDB, survives refresh; native = in-session
+// until the WatermelonDB stretch, T024). Supabase/Lelapa cloud sync is the online stretch (T027/T028).
+// See popia-compliance skill + docs/12. Built on the UI kit.
 
 const UI = {
   title: {
@@ -122,11 +117,22 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const player = useAudioPlayer();
 
-  const [recordings, setRecordings] = useState<Recording[]>([]);
+  const [recordings, setRecordings] = useState<RecordingMeta[]>([]);
   const [consentVisible, setConsentVisible] = useState(false);
   const [pendingVisibility, setPendingVisibility] = useState<Visibility | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Rehydrate any recordings saved on this device (durable on web via IndexedDB).
+  useEffect(() => {
+    let alive = true;
+    recordingsStore.load().then((saved) => {
+      if (alive) setRecordings(saved);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   async function beginRecording(visibility: Visibility) {
     setConsentVisible(false);
@@ -152,16 +158,15 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
       await recorder.stop();
       const uri = recorder.uri;
       if (uri && pendingVisibility) {
-        setRecordings((rs) => [
-          {
-            id: String(Date.now()),
-            uri,
-            visibility: pendingVisibility,
-            title: t(UI.placeholder, lang),
-            createdAt: new Date().toLocaleString(),
-          },
-          ...rs,
-        ]);
+        const meta: RecordingMeta = {
+          id: String(Date.now()),
+          visibility: pendingVisibility,
+          title: t(UI.placeholder, lang),
+          createdAt: new Date().toLocaleString(),
+        };
+        // Persist the audio bytes first (durable on web), then reflect it in the list.
+        await recordingsStore.save(meta, uri);
+        setRecordings((rs) => prepend(rs, meta));
       }
     } catch (e) {
       setError(t(UI.unsupported, lang));
@@ -171,8 +176,11 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     }
   }
 
-  function play(uri: string) {
+  async function play(id: string) {
     try {
+      // Resolve a fresh playable URI from the store — the original blob URL is dead after a refresh.
+      const uri = await recordingsStore.getPlaybackUri(id);
+      if (!uri) return;
       player.replace(uri);
       player.play();
     } catch (e) {
@@ -180,13 +188,15 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     }
   }
 
-  // Erasure (POPIA): removes the recording from the archive. Cloud erasure is wired when sync lands.
+  // Erasure (POPIA): permanently deletes the recording + its audio bytes. Cloud erasure follows on sync.
   function remove(id: string) {
-    setRecordings((rs) => rs.filter((r) => r.id !== id));
+    setRecordings((rs) => removeById(rs, id));
+    recordingsStore.remove(id).catch(() => {});
   }
 
   function rename(id: string, title: string) {
-    setRecordings((rs) => rs.map((r) => (r.id === id ? { ...r, title } : r)));
+    setRecordings((rs) => renameById(rs, id, title));
+    recordingsStore.rename(id, title).catch(() => {});
   }
 
   return (
@@ -229,7 +239,7 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
               placeholderTextColor="rgba(255,255,255,0.4)"
             />
             <View style={styles.itemActions}>
-              <Pressable style={styles.playBtn} onPress={() => play(r.uri)}>
+              <Pressable style={styles.playBtn} onPress={() => play(r.id)}>
                 <Icon.Play size={13} color="#000" fill="#000" />
                 <Text style={styles.playText}>{t(UI.play, lang)}</Text>
               </Pressable>

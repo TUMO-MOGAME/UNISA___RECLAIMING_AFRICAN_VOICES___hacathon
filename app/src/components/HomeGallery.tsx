@@ -22,6 +22,9 @@ const KICKER = "Reclaiming African Voices";
 // The ambient African music/soundscapes across the app are sampled from this YouTube channel —
 // credited + linked in the footer so listeners can hear the full pieces at the source.
 const SOUND_CREDIT_URL = "https://www.youtube.com/@AfricanTribeEchoes";
+// "Built with" tech credit — Solana anchors the on-chain Heritage Ledger. Links to the tech's site,
+// not an endorsement. Official logo used per Solana's brand guidelines (light logotype on a dark bg).
+const SOLANA_URL = "https://solana.com";
 const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 
 // UI chrome in all 11 official languages so the whole interface switches, not just EN/Setswana. These
@@ -383,7 +386,7 @@ export function HomeGallery({
                   <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
                 </Pressable>
               </View>
-              {/* Right: links */}
+              {/* Right: links + built-with (grouped here so the partners column stays compact) */}
               <View style={[styles.footerLinks, wide && styles.footerLinksWide]}>
                 <Pressable style={styles.footerLink} onPress={onAbout}>
                   <Text style={styles.footerLinkText}>{t(UI.about, lang)}</Text>
@@ -393,6 +396,29 @@ export function HomeGallery({
                   <View style={styles.liveDot} />
                   <Text style={styles.footerLinkText}>{t(UI.heritage, lang)}</Text>
                 </Pressable>
+                {/* Built with — the tech the app runs on. Sits under the on-chain Heritage Ledger link
+                    (Solana anchors it). Distinct from "In partnership with": tech used ≠ endorsement.
+                    Light Solana logotype on the navy ground (high-contrast, per Solana's guidelines). */}
+                <View style={[styles.builtWith, wide && styles.builtWithWide]}>
+                  <Text style={styles.partnersLabel}>Built with</Text>
+                  <Pressable
+                    onPress={() => Linking.openURL(SOLANA_URL)}
+                    style={({ pressed, hovered }: any) => [
+                      styles.builtWithPlate,
+                      hovered && styles.creditPlateHover,
+                      pressed && styles.creditPlatePressed,
+                    ]}
+                    accessibilityRole="link"
+                    accessibilityLabel="Built with Solana — opens solana.com in browser"
+                  >
+                    <Image
+                      source={require("../../assets/brand/solana.webp")}
+                      style={styles.solanaLogo}
+                      resizeMode="contain"
+                      accessibilityLabel="Solana"
+                    />
+                  </Pressable>
+                </View>
               </View>
             </View>
             {/* Bottom bar: fine print under a hairline */}
@@ -756,6 +782,19 @@ const styles = StyleSheet.create({
   },
   creditPlateHover: { backgroundColor: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.28)" },
   creditPlatePressed: { opacity: 0.8 },
+  // Built-with — grouped in the right column under the Heritage Ledger link so the footer stays short.
+  builtWith: { marginTop: spacing.md, gap: spacing.sm, alignItems: "flex-start" }, // left when narrow
+  builtWithWide: { alignItems: "flex-end" }, // right-align to match the links when wide
+  // Light border so it reads as a subtle credit chip; logo on the dark ground.
+  builtWithPlate: {
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.14)",
+    borderRadius: radius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  solanaLogo: { width: 132, height: 20 }, // 640x95 source ≈ 6.7:1
   creditAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1A1A1A" },
   creditText: { gap: 2 },
   creditName: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 14, letterSpacing: 0.2 },
