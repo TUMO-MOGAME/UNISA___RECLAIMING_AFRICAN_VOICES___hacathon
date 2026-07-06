@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, useWindowDimensions } from "react-native";
+import { View, Text, Pressable, Modal, StyleSheet, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import { Lang } from "../content/types";
 import { t } from "../i18n";
-import { Screen, ScreenHeader, backLabelFor } from "../ui";
+import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { SideIndexScroll } from "./SideIndexScroll";
+import { Journey } from "./Journey";
 import { totemsIntro, totems, totemsLessons, totemsSources, Totem, TotemEssay } from "../content/totems";
+import { totemsJourney } from "../content/journey";
 import { spacing, radius, fonts } from "../theme/tokens";
 
 // Totems & Clans — the Cultural Atlas compendium of Southern African totemism, on the shared sidebar
@@ -42,6 +44,10 @@ const UI = {
   contents: {
     en: "Contents", tn: "Diteng", af: "Inhoud", zu: "Okuqukethwe", xh: "Okuqulethweyo",
     nso: "Dikagare", st: "Dikahare", ss: "Lokucuketfwe", ts: "Leswi nga endzeni", nr: "Okungaphakathi", ve: "Zwi re ngomu",
+  },
+  playStory: {
+    en: "Play the story — hear the animals", tn: "Bona kanegelo — utlwa diphologolo", af: "Speel die storie — hoor die diere", zu: "Dlala indaba — uzwe izilwane", xh: "Dlala ibali — uve izilwanyana",
+    nso: "Bapala kanegelo — kwa diphoofolo", st: "Bapala pale — utloe liphoofolo", ss: "Dlala indzaba — uve tilwane", ts: "Tlanga ntsheketo — twana swiharhi", nr: "Dlala indaba — uzwe iinlwana", ve: "Tamba tshiitwa — pfa zwipuka",
   },
   clans: {
     en: "Clans", tn: "Meritlo", af: "Stamme", zu: "Izizwe", xh: "Izizwe",
@@ -85,6 +91,7 @@ export function TotemsScreen({ lang, onBack }: { lang: Lang; onBack: () => void 
   // Every photo shares the same WIDTH; its height follows its own real aspect ratio (measured on load)
   // so NOTHING is ever cropped. Default to a common portrait ratio to avoid a layout jump before load.
   const [aspects, setAspects] = useState<Record<string, number>>({});
+  const [journeyOpen, setJourneyOpen] = useState(false);
 
   const items: Item[] = [
     ...totemsIntro.map((e) => ({ kind: "essay" as const, key: e.id, label: e.title, essay: e })),
@@ -97,6 +104,10 @@ export function TotemsScreen({ lang, onBack }: { lang: Lang; onBack: () => void 
     <View style={s.pad}>
       <ScreenHeader kicker={t(UI.kicker, lang)} title={t(UI.title, lang)} lang={lang} onBack={onBack} showBack={!wide} />
       <Text style={s.intro}>{t(UI.intro, lang)}</Text>
+      <Pressable style={s.storyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playStory, lang)}>
+        <Icon.Play size={17} color="#000000" fill="#000000" />
+        <Text style={s.storyBtnText}>{t(UI.playStory, lang)}</Text>
+      </Pressable>
     </View>
   );
 
@@ -216,6 +227,9 @@ export function TotemsScreen({ lang, onBack }: { lang: Lang; onBack: () => void 
         renderItem={renderItem}
         maxWidth={1180}
       />
+      <Modal visible={journeyOpen} animationType="fade" onRequestClose={() => setJourneyOpen(false)}>
+        <Journey slides={totemsJourney} lang={lang} onClose={() => setJourneyOpen(false)} />
+      </Modal>
     </Screen>
   );
 }
@@ -224,6 +238,8 @@ const s = StyleSheet.create({
   flex: { flex: 1 },
   pad: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
   intro: { color: "rgba(255,255,255,0.62)", fontFamily: fonts.serifItalic, fontSize: 16, lineHeight: 24, marginTop: spacing.sm, marginBottom: spacing.md },
+  storyBtn: { flexDirection: "row", alignItems: "center", gap: spacing.sm, alignSelf: "flex-start", backgroundColor: "#FFFFFF", borderRadius: radius.pill, paddingVertical: 12, paddingHorizontal: 20, marginBottom: spacing.sm },
+  storyBtnText: { color: "#000000", fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3 },
 
   entry: { paddingHorizontal: spacing.lg, marginTop: spacing.xl, marginBottom: spacing.md },
   head: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.md },

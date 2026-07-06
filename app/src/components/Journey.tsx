@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, Animated, StyleSheet, SafeAreaView } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,12 +25,17 @@ const UI = {
   journey: { en: "The Journey", tn: "Loeto", af: "Die Reis", zu: "Uhambo", xh: "Uhambo", nso: "Leeto", st: "Leeto", ss: "Luhambo", ts: "Riendzo", nr: "Ikhambo", ve: "Lwendo" },
   replay: { en: "Replay", tn: "Boeletsa", af: "Speel weer", zu: "Phinda", xh: "Phinda", nso: "Boeletša", st: "Pheta", ss: "Phindza", ts: "Phindha", nr: "Buyelela", ve: "Dovholola" },
   note: { en: "Illustrated interpretations", tn: "Ditshwantsho tsa botaki", af: "Geïllustreerde interpretasies", zu: "Ukudweba okuhunyushiwe", xh: "Imizobo eguqulweyo", nso: "Ditshwantsho tša tlhathollo", st: "Ditshwantsho tsa tlhaloso", ss: "Imidvwebo lehunyushiwe", ts: "Swifaniso swo hlamuseriwa", nr: "Imidwebo ehlathululiweko", ve: "Zwifanyiso zwa ṱhalutshedzo" },
+  // Totems story — the animal photos are real; the sounds are AI-generated interpretations (labelled).
+  noteSound: { en: "Real photos · AI-generated sounds", tn: "Ditshwantsho tsa nnete · medumo e e dirilweng ke AI", af: "Werklike foto's · KI-gegenereerde klanke", zu: "Izithombe zangempela · imisindo eyenziwe yi-AI", xh: "Iifoto zokwenene · izandi ezenziwe yi-AI", nso: "Diswantšho tša nnete · medumo ye e dirilwego ke AI", st: "Dinepe tsa 'nete · medumo e entsoeng ke AI", ss: "Titfombe tangempela · imisindvo leyentiwe yi-AI", ts: "Swifaniso swa xiviri · mimpfumawulo leyi endliweke hi AI", nr: "Iifoto zamambala · imisindo eyenziwe yi-AI", ve: "Zwifanyiso zwa vhukuma · mibvumo yo itwaho nga AI" },
 };
 
 export function Journey({ slides, lang, onClose }: { slides: JourneySlide[]; lang: Lang; onClose: () => void }) {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(false);
+
+  // When slides carry their own sound (the Totems story), those play instead of the music bed.
+  const hasSound = useMemo(() => slides.some((sl) => !!sl.sound), [slides]);
 
   const ended = index === slides.length - 1 && !playing;
 
@@ -90,8 +95,36 @@ export function Journey({ slides, lang, onClose }: { slides: JourneySlide[]; lan
   const loaded = !!musicStatus?.isLoaded;
   const duration = musicStatus?.duration ?? 0;
   const currentTime = musicStatus?.currentTime ?? 0;
-  const wantAudio = playing && !muted; // the story is running with sound on (user intent)
+  const wantAudio = playing && !muted && !hasSound; // music bed only when slides have no own sound
   const armedRef = useRef(false); // true once the current clip is genuinely underway (guards one handoff per clip)
+
+  // ── per-slide sound (e.g. animal calls) — plays instead of the music bed ──────────────
+  const sfx = useAudioPlayer(null);
+  const sfxWant = playing && !muted && hasSound;
+  // Load + play the current slide's sound whenever the slide changes.
+  useEffect(() => {
+    if (!hasSound) return;
+    const snd = slides[index]?.sound;
+    if (snd == null) return;
+    try {
+      sfx.replace(snd);
+      if (sfxWant) sfx.play();
+    } catch {}
+    // sfxWant intentionally omitted — pause/resume is handled by the effect below.
+  }, [index, hasSound]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Pause/resume the current sound with the story's play state.
+  useEffect(() => {
+    if (!hasSound) return;
+    try {
+      if (sfxWant) sfx.play();
+      else sfx.pause();
+    } catch {}
+  }, [sfxWant, hasSound, sfx]);
+  useEffect(() => () => {
+    try {
+      sfx.pause();
+    } catch {}
+  }, [sfx]);
 
   useEffect(() => {
     setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
@@ -106,12 +139,12 @@ export function Journey({ slides, lang, onClose }: { slides: JourneySlide[]; lan
   useEffect(() => {
     if (!loaded) return;
     try {
-      if (playing && !muted) music.play();
+      if (wantAudio) music.play();
       else music.pause();
     } catch {
       // autoplay may be blocked until a tap — tapping the screen (pause/resume) starts it
     }
-  }, [loaded, playing, muted, music]);
+  }, [loaded, wantAudio, music]);
   // Hand off to the next clip just before the current one ends, so a journey longer than one clip
   // keeps playing instead of falling silent. We watch the clip's position rather than the player's
   // "didJustFinish"/ended flag: at the true end the audio element reports paused, which would tear
@@ -199,6 +232,7 @@ export function Journey({ slides, lang, onClose }: { slides: JourneySlide[]; lan
       {/* caption + controls */}
       <LinearGradient colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.8)"]} style={s.bottomScrim} pointerEvents="none" />
       <View style={s.bottom} pointerEvents="box-none">
+        {slides[index]?.title ? <Text style={s.title}>{slides[index].title}</Text> : null}
         {caption ? <Text style={s.caption}>{t(caption, lang)}</Text> : null}
         <View style={s.controls}>
           <Pressable onPress={goPrev} hitSlop={10} style={s.iconBtn} accessibilityLabel="Previous">
@@ -220,7 +254,7 @@ export function Journey({ slides, lang, onClose }: { slides: JourneySlide[]; lan
             {muted ? <Icon.VolumeX size={22} color="#FFFFFF" /> : <Icon.Volume2 size={22} color="#FFFFFF" />}
           </Pressable>
         </View>
-        <Text style={s.note}>{t(UI.note, lang)}</Text>
+        <Text style={s.note}>{hasSound ? t(UI.noteSound, lang) : t(UI.note, lang)}</Text>
       </View>
       </SafeAreaView>
     </View>
@@ -241,6 +275,7 @@ const s = StyleSheet.create({
 
   bottomScrim: { position: "absolute", bottom: 0, left: 0, right: 0, height: 240 },
   bottom: { position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, alignItems: "center" },
+  title: { color: "#FFFFFF", fontFamily: fonts.display, fontSize: 40, lineHeight: 44, letterSpacing: -0.5, textAlign: "center", textTransform: "uppercase", marginBottom: spacing.sm },
   caption: { color: "#FFFFFF", fontFamily: fonts.serifItalic, fontSize: 17, lineHeight: 25, textAlign: "center", marginBottom: spacing.lg, maxWidth: 620 },
   controls: { flexDirection: "row", alignItems: "center", gap: spacing.xl },
   iconBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center" },

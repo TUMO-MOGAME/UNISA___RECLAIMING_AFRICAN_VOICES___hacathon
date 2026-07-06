@@ -123,6 +123,15 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-06** — **Totems story — cinematic slideshow with per-animal sound.** Added a "Play the story"
+  Journey on the Totems screen: all 22 animals, each showing the photo + name + a grounded one-line
+  meaning while **its sound plays**. Extended the shared `Journey` (per-slide `sound`/`title`; the music
+  bed is muted while slide sounds play) and added `totemsJourney`. **Sounds:** curated recordings from
+  Tumo (`design/Animals sounds/`) imported + **web-optimized** via ffmpeg (`npm run import:sounds` →
+  mono, capped ~6s with fade, ~96kbps → ~50–71KB each); the one animal with no curated file (duiker)
+  keeps its **ElevenLabs**-generated sound (`npm run gen:sounds`, build-time only, key in gitignored
+  `.env`). Runtime plays the **bundled** mp3s — the API is never called live. Sounds labelled honestly
+  ("Real photos · AI-generated sounds"). `tsc` clean · tests pass · web export green.
 - **2026-07-05** — **Totems & Clans — new Cultural Atlas compendium (grounded).** Added a full "Totems &
   Clans" screen (`TotemsScreen.tsx` + `content/totems.ts`) on the shared sidebar layout: the
   zoo-cosmological system of Southern African totemism — 22 animal totems (Sotho-Tswana / Nguni /

@@ -40,6 +40,8 @@
     "ingest": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ingest.mjs",
     "gen:drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-draft-translations.mjs",
     "gen:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-scene-images.mjs",
+    "gen:sounds": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-animal-sounds.mjs",
+    "import:sounds": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/import-animal-sounds.mjs",
     "webp": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/convert-webp.mjs",
     "cache:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/cache-scene-images.mjs"
   },

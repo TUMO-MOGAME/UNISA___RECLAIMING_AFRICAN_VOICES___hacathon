@@ -18,6 +18,10 @@ export type JourneySlide = {
   image: number;
   /** Optional short, child-friendly line of context. Omit when the card's baked subtitle says enough. */
   caption?: LocalizedText;
+  /** Optional big on-slide title, for photos without a baked-in headline (e.g. the Totems story). */
+  title?: string;
+  /** Optional bundled sound (require) played as this slide shows — e.g. an animal's call. */
+  sound?: number;
 };
 
 // ── Cultural Atlas journey ───────────────────────────────────────────────
@@ -154,6 +158,35 @@ export const atlasJourney: JourneySlide[] = [
       tn: "Bagaki ba hisitori ya rona e batlileng go ba lebala.",
     },
   },
+];
+
+// ── Totems journey — the 22 animal totems, each with its own AI-generated sound ───────────────────
+// The picture (real photo) + the animal's name + a grounded one-line meaning, and its call plays as
+// the slide shows. Captions state only true, sourced meaning (see content/totems.ts). Sounds are
+// AI-generated interpretations (labelled in the player), bundled from scripts/generate-animal-sounds.
+export const totemsJourney: JourneySlide[] = [
+  { id: "lion", title: "Lion", image: require("../../assets/animals/lion.webp"), sound: require("../../assets/animals/sounds/lion.mp3"), caption: { en: "Tau — sovereignty, courage and the right to rule." } },
+  { id: "leopard", title: "Leopard", image: require("../../assets/animals/leopard.webp"), sound: require("../../assets/animals/sounds/leopard.mp3"), caption: { en: "Nkwe — kingship through cunning and grace." } },
+  { id: "crocodile", title: "Crocodile", image: require("../../assets/animals/crocodile.webp"), sound: require("../../assets/animals/sounds/crocodile.mp3"), caption: { en: "Kwena — cool judgment, guardian of the waters." } },
+  { id: "elephant", title: "Elephant", image: require("../../assets/animals/elephant.webp"), sound: require("../../assets/animals/sounds/elephant.mp3"), caption: { en: "Tlou — unstoppable strength and matriarchal wisdom." } },
+  { id: "porcupine", title: "Porcupine", image: require("../../assets/animals/porcupine.webp"), sound: require("../../assets/animals/sounds/porcupine.mp3"), caption: { en: "Noko — a peace that defends itself." } },
+  { id: "vervet-monkey", title: "Vervet Monkey", image: require("../../assets/animals/vervet-monkey.webp"), sound: require("../../assets/animals/sounds/vervet-monkey.mp3"), caption: { en: "Kgabo — quick wit and the spark of survival." } },
+  { id: "baboon", title: "Baboon", image: require("../../assets/animals/baboon.webp"), sound: require("../../assets/animals/sounds/baboon.mp3"), caption: { en: "Tshwene — cunning and watchful strength." } },
+  { id: "duiker", title: "Duiker", image: require("../../assets/animals/duiker.webp"), sound: require("../../assets/animals/sounds/duiker.mp3"), caption: { en: "Phuthi — humility, camouflage and swift escape." } },
+  { id: "kudu", title: "Kudu", image: require("../../assets/animals/kudu.webp"), sound: require("../../assets/animals/sounds/kudu.mp3"), caption: { en: "Tholo — a guide to water in the time of drought." } },
+  { id: "eland", title: "Eland", image: require("../../assets/animals/eland.webp"), sound: require("../../assets/animals/sounds/eland.mp3"), caption: { en: "Phofu — primordial power and abundance." } },
+  { id: "zebra", title: "Zebra", image: require("../../assets/animals/zebra.webp"), sound: require("../../assets/animals/sounds/zebra.mp3"), caption: { en: "Pitsi — beauty, grace and pride." } },
+  { id: "fish", title: "Fish", image: require("../../assets/animals/fish.webp"), sound: require("../../assets/animals/sounds/fish.mp3"), caption: { en: "Tlhapi — survival and breaking the old boundaries." } },
+  { id: "aardvark", title: "Aardvark", image: require("../../assets/animals/aardvark.webp"), sound: require("../../assets/animals/sounds/aardvark.mp3"), caption: { en: "Thakadu — hidden defence and the finding of water." } },
+  { id: "wild-pig", title: "Warthog", image: require("../../assets/animals/wild-pig.webp"), sound: require("../../assets/animals/sounds/wild-pig.mp3"), caption: { en: "Kolobe — hardworking, sociable, earth-bound." } },
+  { id: "buffalo", title: "Buffalo", image: require("../../assets/animals/buffalo.webp"), sound: require("../../assets/animals/sounds/buffalo.mp3"), caption: { en: "Nare — the strength of the herd standing together." } },
+  { id: "sacred-python", title: "Sacred Python", image: require("../../assets/animals/sacred-python.webp"), sound: require("../../assets/animals/sounds/sacred-python.mp3"), caption: { en: "Tharu — rain, fertility and the holy waters." } },
+  { id: "beetle", title: "Beetle", image: require("../../assets/animals/beetle.webp"), sound: require("../../assets/animals/sounds/beetle.mp3"), caption: { en: "Khukhwane — guidance through difficult paths." } },
+  { id: "owl", title: "Owl", image: require("../../assets/animals/owl.webp"), sound: require("../../assets/animals/sounds/owl.mp3"), caption: { en: "Isikhova — a night messenger of the ancestors." } },
+  { id: "rat", title: "Rat", image: require("../../assets/animals/rat.webp"), sound: require("../../assets/animals/sounds/rat.mp3"), caption: { en: "Peba — an ancestral visitor, keeper of the home." } },
+  { id: "rabbit", title: "Hare", image: require("../../assets/animals/rabbit.webp"), sound: require("../../assets/animals/sounds/rabbit.mp3"), caption: { en: "Mmutla — survival and the evasion of conflict." } },
+  { id: "scaly-finch", title: "Scaly Finch", image: require("../../assets/animals/scaly-finch.webp"), sound: require("../../assets/animals/sounds/scaly-finch.mp3"), caption: { en: "Humility, focus and working together." } },
+  { id: "bees", title: "Bees", image: require("../../assets/animals/bees.webp"), sound: require("../../assets/animals/sounds/bees.mp3"), caption: { en: "Nose — industry, unity and fierce defence." } },
 ];
 
 // ── Literature journey — the Four Pillars (captions omitted; each card is self-titled) ────────────
