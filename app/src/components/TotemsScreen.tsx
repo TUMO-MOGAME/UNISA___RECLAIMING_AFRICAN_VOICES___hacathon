@@ -272,7 +272,9 @@ const s = StyleSheet.create({
   metaValue: { color: "rgba(255,255,255,0.82)", fontFamily: fonts.bodySemi, fontSize: 15, lineHeight: 22 },
 
   body: { color: "rgba(255,255,255,0.74)", fontFamily: fonts.body, fontSize: 16, lineHeight: 26, marginBottom: spacing.md },
-  bodyWide: { fontSize: 17, lineHeight: 28, maxWidth: 680 },
+  // No width cap: essay paragraphs then fill to the same right edge as the animal text column (the
+  // totem text column is already narrower than this, so removing the cap doesn't change the animals).
+  bodyWide: { fontSize: 17, lineHeight: 28 },
 
   source: { color: "rgba(255,255,255,0.4)", fontFamily: fonts.serifItalic, fontSize: 13, lineHeight: 20, marginTop: spacing.xs, maxWidth: 680 },
 

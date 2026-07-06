@@ -30,6 +30,7 @@ export function PlayOnceRow({
   by,
   lang,
   onPhase,
+  compact,
 }: {
   /** Bundled audio (require) — static asset, no API quota, no PII. */
   source: number;
@@ -40,6 +41,8 @@ export function PlayOnceRow({
   lang: LangCode;
   /** Observe playback state — e.g. to show a video while the poem plays. */
   onPhase?: (phase: "idle" | "playing" | "paused" | "done") => void;
+  /** Icon-only variant: just the circular play/pause/replay button (no title/attribution row). */
+  compact?: boolean;
 }) {
   const player = useAudioPlayer(source);
   const status = useAudioPlayerStatus(player);
@@ -112,17 +115,27 @@ export function PlayOnceRow({
     } catch {}
   };
 
+  const icon =
+    phase === "playing" ? (
+      <Icon.Pause size={19} color={colors.gold} />
+    ) : phase === "done" ? (
+      <Icon.RotateCcw size={19} color={colors.gold} />
+    ) : (
+      <Icon.Play size={19} color={colors.gold} fill={colors.gold} />
+    );
+
+  if (compact) {
+    // Bare icon only — no circle — with padding kept for a comfortable tap target.
+    return (
+      <PressScale style={s.iconBare} onPress={onPress} accessibilityLabel={`${title}${by ? ` — ${by}` : ""}`}>
+        {icon}
+      </PressScale>
+    );
+  }
+
   return (
     <PressScale style={s.row} onPress={onPress} accessibilityLabel={`${title}${by ? ` — ${by}` : ""}`}>
-      <View style={s.iconWrap}>
-        {phase === "playing" ? (
-          <Icon.Pause size={19} color={colors.gold} />
-        ) : phase === "done" ? (
-          <Icon.RotateCcw size={19} color={colors.gold} />
-        ) : (
-          <Icon.Play size={19} color={colors.gold} fill={colors.gold} />
-        )}
-      </View>
+      <View style={s.iconBare}>{icon}</View>
       <View style={{ flex: 1 }}>
         <Text style={s.title}>{phase === "done" ? t(REPLAY, lang) : title}</Text>
         {by ? <Text style={s.by}>{by}</Text> : null}
@@ -135,6 +148,7 @@ export function PlayOnceRow({
 const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: "rgba(235,164,60,0.08)", borderWidth: 1, borderColor: "rgba(235,164,60,0.4)", borderRadius: radius.md, padding: spacing.md },
   iconWrap: { width: 42, height: 42, borderRadius: 21, backgroundColor: "rgba(235,164,60,0.16)", borderWidth: 1, borderColor: "rgba(235,164,60,0.5)", alignItems: "center", justifyContent: "center" },
+  iconBare: { padding: 10, alignItems: "center", justifyContent: "center" },
   title: { color: "#fff", fontFamily: fonts.bodyBold, fontSize: 14 },
   by: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.serifItalic, fontSize: 12, marginTop: 2 },
 });

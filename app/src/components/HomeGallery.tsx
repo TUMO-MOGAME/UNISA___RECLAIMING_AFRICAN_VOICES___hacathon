@@ -7,6 +7,10 @@ import { t } from "../i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import { SceneImage } from "./SceneImage";
 import { LanguagePicker } from "./LanguagePicker";
+import { CountryPicker } from "./CountryPicker";
+import { DEFAULT_COUNTRY } from "../content/anthems";
+import { HistoryTrail } from "./HistoryTrail";
+import { historyTrailSource, type HistoryMilestone } from "../content/history-trail";
 import { PressScale, Reveal } from "./Motion";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
@@ -160,6 +164,17 @@ const UI = {
     en: "Meet the presidents", tn: "Kopana le dipresidente", af: "Ontmoet die presidente", zu: "Hlangana nabongameli", xh: "Dibana neemongameli",
     nso: "Kopana le dipresidente", st: "Kopana le dipresidente", ss: "Hlangana naboMengameli", ts: "Hlangana ni vapresidente", nr: "Hlangana naboMongameli", ve: "Ṱangana na vhapresidente",
   },
+  heroesKicker: { en: "Heroes of the Nation", tn: "Bagaki ba Setšhaba" },
+  heroesTitle: { en: "Heroes & Heroines", tn: "Bagaki le Bagaki ba Basadi" },
+  heroesSub: {
+    en: "Women and men who gave something of themselves to South Africa's freedom and dignity — their journeys, told honestly and searchable by name.",
+    tn: "Basadi le banna ba ba neileng sengwe sa bone go kgololosego le seriti sa Aforika Borwa — maeto a bona, a bolelwa ka boammaaruri.",
+  },
+  heroesCta: { en: "Meet the heroes", tn: "Kopana le bagaki" },
+  startJourney: { en: "Start the journey", tn: "Simolola leeto", af: "Begin die reis", zu: "Qala uhambo", xh: "Qala uhambo", nso: "Thoma leeto", st: "Qala leeto", ss: "Cala luhambo", ts: "Sungula riendzo", nr: "Thoma ikhambo", ve: "Thoma lwendo" },
+  closeJourney: { en: "Close the journey", tn: "Tswala leeto", af: "Sluit die reis", zu: "Vala uhambo", xh: "Vala uhambo", nso: "Tswalela leeto", st: "Koala leeto", ss: "Vala luhambo", ts: "Pfala riendzo", nr: "Vala ikhambo", ve: "Vala lwendo" },
+  journeyHint: { en: "1652 → today · tap a year", tn: "1652 → gompieno · tobetsa ngwaga" },
+  journeyTitle: { en: "The journey of a nation", tn: "Leeto la setšhaba" },
   daysKicker: {
     en: "Days we remember", tn: "Malatsi a re a gakologelwang", af: "Dae wat ons onthou", zu: "Izinsuku esizikhumbulayo", xh: "Iintsuku esizikhumbulayo",
     nso: "Matšatši ao re a gopolago", st: "Matsatsi ao re a hopolang", ss: "Emalanga lesiwakhumbulako", ts: "Masiku lawa hi ma tsundzukaka", nr: "Amalanga esiwakhumbulako", ve: "Maḓuvha ane ra a humbula",
@@ -232,6 +247,7 @@ export function HomeGallery({
   onAtlas,
   onDays,
   onTotems,
+  onHeroes,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -244,16 +260,38 @@ export function HomeGallery({
   onAtlas: () => void;
   onDays: () => void;
   onTotems: () => void;
+  onHeroes: () => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
   // Drives scroll-in reveals + image parallax across the page.
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Selected country (defaults to South Africa) — drives the flag shown + which anthem plays.
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+
+  // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
+  // journey brings it forward (bright + tappable) and fades the big words back.
+  const [mapOpen, setMapOpen] = useState(false);
+  const [milestone, setMilestone] = useState<HistoryMilestone | null>(null);
+  const trailOpacity = useRef(new Animated.Value(0.16)).current;
+  const wordsOpacity = useRef(new Animated.Value(1)).current;
+  const scrimOpacity = useRef(new Animated.Value(0)).current;
+  const animateTo = (open: boolean) =>
+    Animated.parallel([
+      Animated.timing(trailOpacity, { toValue: open ? 1 : 0.16, duration: 420, useNativeDriver: true }),
+      Animated.timing(wordsOpacity, { toValue: open ? 0.12 : 1, duration: 420, useNativeDriver: true }),
+      Animated.timing(scrimOpacity, { toValue: open ? 0.62 : 0, duration: 420, useNativeDriver: true }),
+    ]);
+  const openMap = () => { setMapOpen(true); animateTo(true).start(); };
+  const closeMap = () => { setMapOpen(false); setMilestone(null); animateTo(false).start(); };
 
   return (
     <View style={styles.root}>
-      {/* Language picker floats over the hero */}
+      {/* Country picker (left) + language picker (right) float over the hero, mirrored */}
+      <View style={styles.countryBar} pointerEvents="box-none">
+        <CountryPicker country={country} onChange={setCountry} lang={lang} />
+      </View>
       <View style={styles.langBar} pointerEvents="box-none">
         <LanguagePicker lang={lang} onChange={onLangChange} />
       </View>
@@ -276,7 +314,26 @@ export function HomeGallery({
             style={StyleSheet.absoluteFill}
             pointerEvents="none"
           />
-          <View style={styles.heroInner}>
+
+          {/* darkening scrim that deepens when the journey opens, so the trail reads clearly */}
+          <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.mapScrim, { opacity: scrimOpacity }]} />
+
+          {/* the history trail — dim behind the words by default, bright + tappable when open. The
+              start flag lives inside it (planted on the 1652 dot) so it never drifts. */}
+          <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+            <HistoryTrail
+              active={mapOpen}
+              dimOpacity={trailOpacity}
+              onSelect={setMilestone}
+              selectedId={milestone?.id}
+              onStart={openMap}
+              startLabel={t(UI.startJourney, lang)}
+            />
+          </View>
+
+          {/* the big words — bright by default, faded back when the journey opens. Nothing here is
+              tappable, so the layer never intercepts clicks meant for the trail / start flag behind it. */}
+          <Animated.View style={[styles.heroInner, { opacity: wordsOpacity }]} pointerEvents="none">
             <Reveal style={styles.heroTitleWrap}>
               <Text style={[styles.heroTitle, wide && styles.heroTitleWide]}>Ubuntu{"\n"}Heritage</Text>
             </Reveal>
@@ -284,7 +341,34 @@ export function HomeGallery({
               <Text style={styles.heroCardTitle}>Reclaiming African Voices</Text>
               <Text style={styles.heroCardSub}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
             </Reveal>
-          </View>
+          </Animated.View>
+
+          {/* journey controls + selected-year caption (only while open) */}
+          {mapOpen ? (
+            <View style={styles.mapUI} pointerEvents="box-none">
+              {/* close sits on the LEFT (where the start flag was) so it never collides with the
+                  language picker in the top-right */}
+              <View style={styles.mapTop} pointerEvents="box-none">
+                <PressScale style={styles.mapClose} onPress={closeMap} accessibilityLabel={t(UI.closeJourney, lang)}>
+                  <Icon.X size={18} color="#fff" />
+                </PressScale>
+                <View style={styles.mapTopText} pointerEvents="none">
+                  <Text style={styles.mapKicker}>{t(UI.journeyTitle, lang)}</Text>
+                  <Text style={styles.mapHint}>{t(UI.journeyHint, lang)}</Text>
+                </View>
+              </View>
+
+              {milestone ? (
+                <View style={styles.mapCaption} pointerEvents="none">
+                  <Text style={styles.capYear}>{milestone.year}</Text>
+                  <Text style={styles.capTitle}>{milestone.title}</Text>
+                  <Text style={styles.capNote}>{milestone.note}</Text>
+                </View>
+              ) : (
+                <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
+              )}
+            </View>
+          ) : null}
         </View>
 
         {/* ── THE LITERATURE — illustrated bookshelf (slate) ─────────────────── */}
@@ -334,6 +418,17 @@ export function HomeGallery({
           intro={t(UI.presSub, lang)}
         >
           <CtaButton label={t(UI.presCta, lang)} onPress={onPresidents} />
+        </Section>
+
+        {/* ── HEROES OF THE NATION (slate) ───────────────────────────────────── */}
+        <Section
+          tone="slate"
+          image={heroSource(modules[1])}
+          kicker={t(UI.heroesKicker, lang)}
+          title={t(UI.heroesTitle, lang)}
+          intro={t(UI.heroesSub, lang)}
+        >
+          <CtaButton label={t(UI.heroesCta, lang)} onPress={onHeroes} />
         </Section>
 
         {/* ── NATIONAL DAYS (slate) ──────────────────────────────────────────── */}
@@ -682,6 +777,7 @@ const SLATE = "#000000"; // ground → pure black
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: SLATE },
   langBar: { position: "absolute", top: 0, right: 0, zIndex: 20, paddingTop: spacing.lg, paddingRight: spacing.lg },
+  countryBar: { position: "absolute", top: 0, left: 0, zIndex: 20, paddingTop: spacing.lg, paddingLeft: spacing.lg },
 
   // Hero
   hero: { width: "100%", justifyContent: "flex-end", backgroundColor: SLATE },
@@ -712,6 +808,20 @@ const styles = StyleSheet.create({
   },
   heroCardTitle: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 20, textAlign: "center" },
   heroCardSub: { color: "rgba(255,255,255,0.9)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, marginTop: 8, textAlign: "center" },
+
+  // History-trail journey
+  mapScrim: { backgroundColor: "#0a0703" },
+  mapUI: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "space-between", paddingHorizontal: spacing.lg, paddingTop: 76, paddingBottom: spacing.xl },
+  mapTop: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  mapTopText: { flex: 1 },
+  mapKicker: { color: "#E8B45A", fontFamily: fonts.displaySemi, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" },
+  mapHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 12, marginTop: 3 },
+  mapClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.12)", borderWidth: 1, borderColor: "rgba(255,255,255,0.28)", alignItems: "center", justifyContent: "center" },
+  mapCaption: { alignSelf: "center", maxWidth: 560, width: "100%", backgroundColor: "rgba(10,7,3,0.72)", borderWidth: 1, borderColor: "rgba(232,180,90,0.4)", borderRadius: radius.md, padding: spacing.md },
+  capYear: { color: "#E8B45A", fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
+  capTitle: { color: "#fff", fontFamily: fonts.heading, fontSize: 17, marginTop: 2 },
+  capNote: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.body, fontSize: 13, lineHeight: 20, marginTop: 6 },
+  mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 
   // Section
   section: { width: "100%", borderTopWidth: 8, borderTopColor: BLUE },
