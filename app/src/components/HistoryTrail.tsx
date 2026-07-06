@@ -14,17 +14,27 @@ import { historyTrail, type HistoryMilestone } from "../content/history-trail";
 // same coordinate space as the dots, so it always sits on 1652 (no cross-component coordinate drift).
 
 const GOLD = "#E8B45A";
+const TENSION = 4.2; // Catmull-Rom looseness — shared by the path and the on-road branch anchors
+
+const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
 function computePoints(n: number, W: number, H: number, rows: number) {
-  const padX = Math.min(72, W * 0.09);
-  const padTop = 60;
-  const padBottom = 56;
+  // generous insets so a dot's label box (and the pickers/title up top) never clip the screen
+  const padX = Math.min(96, W * 0.1);
+  const padTop = 100; // clears the country/language pickers + the journey title
+  const padBottom = 78;
   const perRow = Math.ceil(n / rows);
   const usableW = W - padX * 2;
-  const rowGap = rows > 1 ? (H - padTop - padBottom) / (rows - 1) : 0;
+  const usableH = Math.max(0, H - padTop - padBottom);
+  const rowGap = rows > 1 ? usableH / (rows - 1) : 0;
   const colStep = perRow > 1 ? usableW / (perRow - 1) : usableW;
-  const ampY = Math.max(12, Math.min(rowGap * 0.34, 64));
-  const ampX = Math.max(8, colStep * 0.3);
+  const ampY = Math.max(8, Math.min(rowGap * 0.26, 44)); // capped so rows never crash into each other
+  const ampX = Math.max(6, Math.min(colStep * 0.26, 46));
+  // hard bounds that keep the whole node (dot + ~64px-wide year label) inside the screen
+  const minX = Math.max(38, padX * 0.6);
+  const maxX = W - minX;
+  const minY = padTop;
+  const maxY = H - padBottom;
   const pts: { x: number; y: number }[] = [];
   for (let i = 0; i < n; i++) {
     const row = Math.floor(i / perRow);
@@ -37,16 +47,33 @@ function computePoints(n: number, W: number, H: number, rows: number) {
     let y = padTop + row * rowGap;
     x += Math.sin(i * 2.7 + row * 1.9) * ampX + Math.cos(i * 1.3) * ampX * 0.5;
     y += Math.sin(i * 1.7 + row) * ampY + Math.cos(i * 0.8 + row * 1.3) * ampY * 0.6;
-    x = Math.max(padX * 0.5, Math.min(W - padX * 0.5, x));
-    y = Math.max(padTop * 0.45, Math.min(H - padBottom * 0.45, y));
-    pts.push({ x, y });
+    pts.push({ x: clamp(x, minX, maxX), y: clamp(y, minY, maxY) });
   }
   return pts;
 }
 
+// A point ON the road (the Catmull-Rom → bezier curve) for segment `seg` at parameter t, plus the
+// road's tangent there — so a branch can peel off the actual road rather than radiate from a dot.
+function segAt(pts: { x: number; y: number }[], seg: number, t: number) {
+  const p0 = pts[seg - 1] || pts[seg];
+  const p1 = pts[seg];
+  const p2 = pts[seg + 1] || pts[seg];
+  const p3 = pts[seg + 2] || p2;
+  const cp1x = p1.x + (p2.x - p0.x) / TENSION;
+  const cp1y = p1.y + (p2.y - p0.y) / TENSION;
+  const cp2x = p2.x - (p3.x - p1.x) / TENSION;
+  const cp2y = p2.y - (p3.y - p1.y) / TENSION;
+  const mt = 1 - t;
+  const x = mt * mt * mt * p1.x + 3 * mt * mt * t * cp1x + 3 * mt * t * t * cp2x + t * t * t * p2.x;
+  const y = mt * mt * mt * p1.y + 3 * mt * mt * t * cp1y + 3 * mt * t * t * cp2y + t * t * t * p2.y;
+  const tx = 3 * mt * mt * (cp1x - p1.x) + 6 * mt * t * (cp2x - cp1x) + 3 * t * t * (p2.x - cp2x);
+  const ty = 3 * mt * mt * (cp1y - p1.y) + 6 * mt * t * (cp2y - cp1y) + 3 * t * t * (p2.y - cp2y);
+  return { x, y, tx, ty };
+}
+
 function smoothPath(pts: { x: number; y: number }[]) {
   if (pts.length < 2) return "";
-  const T = 4.2;
+  const T = TENSION;
   const d = [`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`];
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] || pts[i];
@@ -88,6 +115,37 @@ export function HistoryTrail({
   const dPath = useMemo(() => smoothPath(pts), [pts]);
   const first = pts[0];
 
+  // Flatten every milestone's branches. Each branch peels off a point ON THE ROAD (between the
+  // milestone dot and the next, "as we approach" it), perpendicular to the road there.
+  const branchItems = useMemo(() => {
+    const arr: { b: HistoryMilestone; from: { x: number; y: number }; to: { x: number; y: number } }[] = [];
+    historyTrail.forEach((m, i) => {
+      if (!m.branches?.length || !pts[i]) return;
+      const hasNext = i + 1 < pts.length;
+      const seg = hasNext ? i : Math.max(0, i - 1);
+      m.branches.forEach((b, k) => {
+        // stagger each branch to a different point along the road; leave dots breathing room
+        const base = hasNext ? 0.32 : 0.68;
+        const t = Math.min(0.86, Math.max(0.14, base + k * 0.18));
+        const s = segAt(pts, seg, t);
+        const len = Math.hypot(s.tx, s.ty) || 1;
+        const nx = -s.ty / len;
+        const ny = s.tx / len;
+        const dist = 44 + Math.floor(k / 2) * 26;
+        // two candidate sides — pick whichever points further INTO the screen, so branches near an
+        // edge fold inward instead of off-screen. Then clamp as a final safety net.
+        const m2 = 34; // keep the small branch label fully on-screen
+        const edgeScore = (px: number, py: number) => Math.min(px - m2, size.w - m2 - px, py - m2, size.h - m2 - py);
+        const a = { x: s.x + nx * dist, y: s.y + ny * dist };
+        const c = { x: s.x - nx * dist, y: s.y - ny * dist };
+        const pick = edgeScore(a.x, a.y) >= edgeScore(c.x, c.y) ? a : c;
+        const to = { x: clamp(pick.x, m2, size.w - m2), y: clamp(pick.y, m2, size.h - m2) };
+        arr.push({ b, from: { x: s.x, y: s.y }, to });
+      });
+    });
+    return arr;
+  }, [pts, size.w, size.h]);
+
   return (
     <View style={styles.fill} pointerEvents="box-none" onLayout={(e) => setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
       {size.w > 0 && (
@@ -95,8 +153,31 @@ export function HistoryTrail({
           {/* the trail itself — dimmed by the parent's animated value; tappable only when active */}
           <Animated.View style={[StyleSheet.absoluteFill, dimOpacity != null ? { opacity: dimOpacity } : null]} pointerEvents={active ? "box-none" : "none"}>
             <Svg width={size.w} height={size.h} style={StyleSheet.absoluteFill} pointerEvents="none">
-              <Path d={dPath} stroke={GOLD} strokeOpacity={0.18} strokeWidth={9} fill="none" strokeLinecap="round" />
-              <Path d={dPath} stroke={GOLD} strokeOpacity={0.9} strokeWidth={2.5} strokeDasharray="1 12" fill="none" strokeLinecap="round" />
+              {/* thin branch side-roads first (under the main road) */}
+              {branchItems.map((br, idx) => {
+                const dx = br.to.x - br.from.x;
+                const dy = br.to.y - br.from.y;
+                const L = Math.hypot(dx, dy) || 1;
+                const mx = (br.from.x + br.to.x) / 2;
+                const my = (br.from.y + br.to.y) / 2;
+                const cx = mx + (-dy / L) * 9;
+                const cy = my + (dx / L) * 9;
+                return (
+                  <Path
+                    key={`bl${idx}`}
+                    d={`M ${br.from.x.toFixed(1)} ${br.from.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)}, ${br.to.x.toFixed(1)} ${br.to.y.toFixed(1)}`}
+                    stroke={GOLD}
+                    strokeOpacity={0.6}
+                    strokeWidth={1.3}
+                    strokeDasharray="1 6"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+              {/* the thick main road */}
+              <Path d={dPath} stroke={GOLD} strokeOpacity={0.18} strokeWidth={10} fill="none" strokeLinecap="round" />
+              <Path d={dPath} stroke={GOLD} strokeOpacity={0.9} strokeWidth={3} strokeDasharray="1 12" fill="none" strokeLinecap="round" />
             </Svg>
 
             {historyTrail.map((m, i) => {
@@ -114,6 +195,26 @@ export function HistoryTrail({
                   />
                   <Text style={[styles.year, active && styles.yearActive, sel && styles.yearSel]} numberOfLines={1}>
                     {m.year}
+                  </Text>
+                </View>
+              );
+            })}
+
+            {/* branch dots — smaller, tiny dates, at the end of each thin side-road */}
+            {branchItems.map((br, idx) => {
+              const sel = br.b.id === selectedId;
+              return (
+                <View key={`bn${idx}`} style={[styles.bnode, { left: br.to.x - BNODE / 2, top: br.to.y - BDOT / 2 }]} pointerEvents="box-none">
+                  <Pressable
+                    disabled={!active}
+                    onPress={() => onSelect(br.b)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${br.b.year} — ${br.b.title}`}
+                    style={[styles.bdot, active && styles.bdotActive, sel && styles.dotSel]}
+                  />
+                  <Text style={[styles.byear, active && styles.byearActive, sel && styles.yearSel]} numberOfLines={1}>
+                    {br.b.year}
                   </Text>
                 </View>
               );
@@ -141,6 +242,8 @@ export function HistoryTrail({
 
 const DOT = 16;
 const NODE = 64;
+const BDOT = 10; // branch dot (smaller than a main dot)
+const BNODE = 52;
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
@@ -151,6 +254,13 @@ const styles = StyleSheet.create({
   year: { marginTop: 4, color: "#F3E7D0", fontFamily: fonts.displaySemi, fontSize: 11, letterSpacing: 0.3 },
   yearActive: { color: "#FBEFD8" },
   yearSel: { color: GOLD },
+
+  // branch (side-road) dots + tiny dates
+  bnode: { position: "absolute", width: BNODE, alignItems: "center" },
+  bdot: { width: BDOT, height: BDOT, borderRadius: BDOT / 2, borderWidth: 1.5, borderColor: GOLD, backgroundColor: "#17110A", opacity: 0.9 },
+  bdotActive: { backgroundColor: "#241a0d", opacity: 1 },
+  byear: { marginTop: 2, color: "rgba(243,231,208,0.7)", fontFamily: fonts.displaySemi, fontSize: 8.5, letterSpacing: 0.2 },
+  byearActive: { color: "#F3E7D0" },
 
   // planted on the first dot: vertically centred on it, flag then label
   startPin: { position: "absolute", zIndex: 30, flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: "rgba(10,7,3,0.85)", borderWidth: 1, borderColor: GOLD, borderRadius: 999, paddingVertical: 5, paddingLeft: 5, paddingRight: 12, transform: [{ translateX: -13 }, { translateY: -15 }] },
