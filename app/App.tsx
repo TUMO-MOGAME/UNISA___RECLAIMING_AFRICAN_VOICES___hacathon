@@ -29,6 +29,8 @@ import { PresidentsScreen, PresidentScreen } from "./src/components/PresidentsSc
 import { presidentById } from "./src/content/presidents";
 import { NationalDaysScreen } from "./src/components/NationalDaysScreen";
 import { TotemsScreen } from "./src/components/TotemsScreen";
+import { HeroesScreen, HeroScreen } from "./src/components/HeroesScreens";
+import { heroById } from "./src/content/heroes";
 import { Fade } from "./src/components/Motion";
 import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
@@ -60,7 +62,9 @@ type Route =
   | { name: "presidents" }
   | { name: "president"; id: string }
   | { name: "days" }
-  | { name: "totems" };
+  | { name: "totems" }
+  | { name: "heroes" }
+  | { name: "hero"; id: string };
 
 export default function App() {
   // Default language is always English (the guaranteed base for every string); the picker switches it
@@ -111,7 +115,7 @@ export default function App() {
   const ready = fontsLoaded || !!fontError;
 
   const routeKey =
-    route.name === "reader" || route.name === "province" || route.name === "city" || route.name === "president"
+    route.name === "reader" || route.name === "province" || route.name === "city" || route.name === "president" || route.name === "hero"
       ? `${route.name}:${route.id}`
       : route.name;
 
@@ -153,6 +157,12 @@ export default function App() {
         return <NationalDaysScreen onBack={back} lang={lang} />;
       case "totems":
         return <TotemsScreen onBack={back} lang={lang} />;
+      case "heroes":
+        return <HeroesScreen onBack={back} onOpen={(id) => push({ name: "hero", id })} lang={lang} />;
+      case "hero": {
+        const h = heroById(route.id);
+        return h ? <HeroScreen hero={h} onBack={back} lang={lang} /> : null;
+      }
       default:
         return (
           <HomeGallery
@@ -167,6 +177,7 @@ export default function App() {
             onAtlas={() => push({ name: "atlas" })}
             onDays={() => push({ name: "days" })}
             onTotems={() => push({ name: "totems" })}
+            onHeroes={() => push({ name: "heroes" })}
           />
         );
     }
@@ -183,7 +194,9 @@ export default function App() {
     route.name === "presidents" ||
     route.name === "president" || // wide layout: important-dates sidebar + content
     route.name === "days" ||
-    route.name === "totems"; // wide layout: totems sidebar + content
+    route.name === "totems" || // wide layout: totems sidebar + content
+    route.name === "heroes" ||
+    route.name === "hero"; // wide layout: heroes sidebar + content
 
   return (
     <SafeAreaProvider>

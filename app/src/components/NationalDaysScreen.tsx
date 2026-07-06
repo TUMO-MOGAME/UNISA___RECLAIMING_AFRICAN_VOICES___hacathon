@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, useWindowDimensions, Platform } from "react-native";
+import { View, Text, Pressable, StyleSheet, useWindowDimensions, Platform } from "react-native";
 import { Image } from "expo-image";
 import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { nationalDays } from "../content/national-days";
 import { colors, spacing, radius, fonts, type } from "../theme/tokens";
 import { t } from "../i18n";
 import type { LangCode } from "../i18n";
-import { SideIndexScroll } from "./SideIndexScroll";
+import { SideIndexScroll, Anchor } from "./SideIndexScroll";
 import { PlayOnceRow } from "./PlayOnceRow";
 import { ArticlesPanel } from "./ArticleReader";
+import { articlesForDay } from "../content/articles";
 
 // National Days — the commemorative days that carry South Africa's history, in calendar order.
 // Same editorial index layout as the Atlas/Provinces/Presidents. Each day shows its grounded story
@@ -49,7 +50,36 @@ const UI = {
     en: "Poem", tn: "Poko", af: "Gedig", zu: "Inkondlo", xh: "Umbongo",
     nso: "Theto", st: "Thothokiso", ss: "Inkondlo", ts: "Xiphato", nr: "Inkondlo", ve: "Vhurendi",
   },
+  perspectives: {
+    en: "Perspectives", tn: "Dikakanyo", af: "Perspektiewe", zu: "Imibono", xh: "Iimbono",
+    nso: "Dikgopolo", st: "Maikutlo", ss: "Imibono", ts: "Mavonelo", nr: "Imibono", ve: "Mihumbulo",
+  },
 };
+
+// A collapsible dropdown section (Poem / Perspectives). Collapsed by default — the body shows only
+// when opened, either from its own header or from the sidebar sub-link.
+function DropdownSection({
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <View style={s.dd}>
+      <Pressable style={s.ddHead} onPress={onToggle} accessibilityRole="button" accessibilityLabel={title}>
+        <Text style={s.ddTitle}>{title}</Text>
+        <View style={{ flex: 1 }} />
+        {open ? <Icon.ChevronDown size={18} color={colors.gold} /> : <Icon.ChevronRight size={18} color={colors.gold} />}
+      </Pressable>
+      {open ? <View style={s.ddBody}>{children}</View> : null}
+    </View>
+  );
+}
 
 // A muted YouTube embed shown in the media panel WHILE a day's poem plays (the poem carries the
 // audio; the film carries the picture). Web only — RN web renders DOM elements natively; native
@@ -70,6 +100,18 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
   const wide = width >= 900;
   // which day's poem is sounding right now — that day's panel shows its film instead of its photo
   const [playingDay, setPlayingDay] = useState<string | null>(null);
+  // Only ONE dropdown open at a time across all days — opening any section collapses the others.
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const openSection = (key: string) => setOpenKey(key);
+  const toggleSection = (key: string) => setOpenKey((cur) => (cur === key ? null : key));
+
+  // Sidebar sub-links for a day — only for the sections it actually has.
+  const childrenFor = (d: (typeof nationalDays)[number]) => {
+    const kids: { key: string; label: string }[] = [];
+    if (d.audio) kids.push({ key: `${d.id}::poem`, label: t(UI.poem, lang) });
+    if (articlesForDay(d.id).length > 0) kids.push({ key: `${d.id}::perspectives`, label: t(UI.perspectives, lang) });
+    return kids.length ? kids : undefined;
+  };
 
   const masthead = (
     <View style={s.pad}>
@@ -91,63 +133,90 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
           <Text style={s.cat}>{d.date.toUpperCase()} · {d.commemorates.toUpperCase()}</Text>
           <Text style={[s.title, wide && s.titleWide]}>{d.name}</Text>
 
-          {/* media panel — the day's film while its poem plays; otherwise the photograph
-              (letterboxed + credited when it's a real archival photo, never labelled as AI) */}
-          <View style={[s.mediaWrap, { height: wide ? (d.imageCredit ? 380 : 260) : (d.imageCredit ? 280 : 180) }]}>
-            {d.videoEmbed && playingDay === d.id && Platform.OS === "web" ? (
-              <VideoEmbed youtubeId={d.videoEmbed} title={d.name} />
-            ) : d.image ? (
-              <>
-                <Image
-                  source={d.image}
-                  style={s.mediaImg}
-                  contentFit={d.imageCredit ? "contain" : "cover"}
-                  transition={200}
-                  cachePolicy="disk"
-                  accessibilityLabel={`${d.name} — ${d.imageCredit ?? t(UI.interpretation, lang)}`}
-                />
-                <Text style={s.interpretTag}>{d.imageCredit ?? t(UI.interpretation, lang)}</Text>
-              </>
-            ) : (
-              <View style={s.placeholder}>
-                <Text style={s.phDate}>{d.date.toUpperCase()}</Text>
-                <View style={s.phChips}>
-                  <View style={s.phChip}><Icon.ImageIcon size={15} color="rgba(255,255,255,0.55)" /></View>
-                  <View style={s.phChip}><Icon.Film size={15} color="rgba(255,255,255,0.55)" /></View>
-                  <View style={s.phChip}><Icon.Music size={15} color="rgba(255,255,255,0.55)" /></View>
-                </View>
-                <Text style={s.phNote}>{t(UI.mediaSoon, lang)}</Text>
+          {/* On wide screens: LEFT column = media panel; RIGHT column = history, poem and perspectives
+              filling the space beside it (mirrors the Totems & Clans animal layout). Mobile stacks. */}
+          <View style={wide ? s.dayRow : undefined}>
+            <View style={wide ? s.dayLeft : undefined}>
+              {/* media panel — the day's film while its poem plays; otherwise the photograph
+                  (letterboxed + credited when it's a real archival photo, never labelled as AI) */}
+              <View style={[s.mediaWrap, wide ? s.mediaWrapWide : { height: d.imageCredit ? 280 : 180 }]}>
+                {d.videoEmbed && playingDay === d.id && Platform.OS === "web" ? (
+                  <VideoEmbed youtubeId={d.videoEmbed} title={d.name} />
+                ) : d.image ? (
+                  <>
+                    <Image
+                      source={d.image}
+                      style={s.mediaImg}
+                      contentFit={d.imageCredit ? "contain" : "cover"}
+                      transition={200}
+                      cachePolicy="disk"
+                      accessibilityLabel={`${d.name} — ${d.imageCredit ?? t(UI.interpretation, lang)}`}
+                    />
+                    <Text style={s.interpretTag}>{d.imageCredit ?? t(UI.interpretation, lang)}</Text>
+                  </>
+                ) : (
+                  <View style={s.placeholder}>
+                    <Text style={s.phDate}>{d.date.toUpperCase()}</Text>
+                    <View style={s.phChips}>
+                      <View style={s.phChip}><Icon.ImageIcon size={15} color="rgba(255,255,255,0.55)" /></View>
+                      <View style={s.phChip}><Icon.Film size={15} color="rgba(255,255,255,0.55)" /></View>
+                      <View style={s.phChip}><Icon.Music size={15} color="rgba(255,255,255,0.55)" /></View>
+                    </View>
+                    <Text style={s.phNote}>{t(UI.mediaSoon, lang)}</Text>
+                  </View>
+                )}
               </View>
-            )}
+            </View>
+
+            <View style={wide ? s.dayText : undefined}>
+              <Text style={[s.lead, wide && s.leadWide]}>{d.history}</Text>
+            </View>
           </View>
 
-          <Text style={[s.lead, wide && s.leadWide]}>{d.history}</Text>
+          {/* Under the card — the Poem and Perspectives are collapsible dropdowns (hidden until opened,
+              from here or from the sidebar sub-link). Capped to a readable width. */}
+          <View style={s.belowCard}>
+            {d.audio ? (
+              <Anchor anchorKey={`${d.id}::poem`}>
+                <DropdownSection
+                  title={t(UI.poem, lang)}
+                  open={openKey === `${d.id}::poem`}
+                  onToggle={() => toggleSection(`${d.id}::poem`)}
+                >
+                  <PlayOnceRow
+                    source={d.audio}
+                    title={t(UI.poem, lang)}
+                    by={d.audioBy}
+                    lang={lang}
+                    onPhase={(phase) =>
+                      setPlayingDay((cur) =>
+                        phase === "playing" || phase === "paused" ? d.id : cur === d.id ? null : cur
+                      )
+                    }
+                  />
+                </DropdownSection>
+              </Anchor>
+            ) : null}
 
-          {d.audio ? (
-            <View style={{ marginTop: spacing.md }}>
-              <PlayOnceRow
-                source={d.audio}
-                title={t(UI.poem, lang)}
-                by={d.audioBy}
-                lang={lang}
-                onPhase={(phase) =>
-                  setPlayingDay((cur) =>
-                    phase === "playing" || phase === "paused" ? d.id : cur === d.id ? null : cur
-                  )
-                }
-              />
-            </View>
-          ) : null}
+            {articlesForDay(d.id).length > 0 ? (
+              <Anchor anchorKey={`${d.id}::perspectives`}>
+                <DropdownSection
+                  title={t(UI.perspectives, lang)}
+                  open={openKey === `${d.id}::perspectives`}
+                  onToggle={() => toggleSection(`${d.id}::perspectives`)}
+                >
+                  <ArticlesPanel dayId={d.id} lang={lang} hideHeader />
+                </DropdownSection>
+              </Anchor>
+            ) : null}
 
-          {d.notPublicHoliday ? (
-            <View style={s.flagRow}>
-              <Icon.CalendarDays size={14} color={colors.gold} />
-              <Text style={s.flagText}>{t(UI.notHoliday, lang)}</Text>
-            </View>
-          ) : null}
-
-          {/* Perspectives — in-depth reviewed reading for adults (renders only for days with articles) */}
-          <ArticlesPanel dayId={d.id} lang={lang} />
+            {d.notPublicHoliday ? (
+              <View style={s.flagRow}>
+                <Icon.CalendarDays size={14} color={colors.gold} />
+                <Text style={s.flagText}>{t(UI.notHoliday, lang)}</Text>
+              </View>
+            ) : null}
+          </View>
         </View>
       </View>
     );
@@ -160,7 +229,12 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
         masthead={masthead}
         onBack={onBack}
         backLabel={backLabelFor(lang)}
-        items={nationalDays.map((d) => ({ key: d.id, label: `${d.date} — ${d.name}` }))}
+        items={nationalDays.map((d) => ({
+          key: d.id,
+          label: `${d.date} — ${d.name}`,
+          children: childrenFor(d),
+        }))}
+        onChildPress={openSection}
         renderItem={renderDay}
       />
     </Screen>
@@ -181,7 +255,15 @@ const s = StyleSheet.create({
   titleWide: { fontSize: 44, lineHeight: 46 },
 
   mediaWrap: { width: "100%", borderRadius: radius.md, overflow: "hidden", backgroundColor: "#0b0b0b", marginBottom: spacing.lg },
+  mediaWrapWide: { aspectRatio: 3 / 2, marginBottom: 0 },
   mediaImg: { width: "100%", height: "100%" },
+
+  // Wide: media (left) beside history + poem + perspectives (right) — mirrors the Totems layout.
+  dayRow: { flexDirection: "row", alignItems: "flex-start", gap: spacing.xl },
+  dayLeft: { flex: 1, minWidth: 0 },
+  dayText: { flex: 1.2, minWidth: 0 },
+  // Poem + Perspectives sit under the card at a readable width, not the full page width.
+  belowCard: { width: "100%", maxWidth: 680 },
   interpretTag: { position: "absolute", bottom: 8, right: 10, color: "rgba(255,255,255,0.65)", backgroundColor: "rgba(0,0,0,0.45)", fontFamily: fonts.body, fontSize: 10, letterSpacing: 0.4, paddingVertical: 3, paddingHorizontal: 8, borderRadius: radius.pill, overflow: "hidden" },
   placeholder: { flex: 1, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", borderRadius: radius.md, borderStyle: "dashed" },
   phDate: { color: "rgba(255,255,255,0.85)", fontFamily: fonts.display, fontSize: 30, letterSpacing: 2 },
@@ -196,4 +278,9 @@ const s = StyleSheet.create({
   flagRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
   flagText: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 0.6, textTransform: "uppercase" },
 
+  // Collapsible dropdown sections (Poem / Perspectives).
+  dd: { marginTop: spacing.md, borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderRadius: radius.md, overflow: "hidden" },
+  ddHead: { flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: spacing.md, backgroundColor: "#141414" },
+  ddTitle: { color: "#FFFFFF", fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 2, textTransform: "uppercase" },
+  ddBody: { paddingHorizontal: spacing.md, paddingBottom: spacing.md, paddingTop: spacing.xs },
 });

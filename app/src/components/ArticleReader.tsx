@@ -64,20 +64,24 @@ const UI = {
 
 /** The list of article cards for a day (oldest publication first). Renders nothing when a day has
  *  no articles yet. */
-export function ArticlesPanel({ dayId, lang }: { dayId: string; lang: LangCode }) {
+export function ArticlesPanel({ dayId, lang, hideHeader }: { dayId: string; lang: LangCode; hideHeader?: boolean }) {
   const items = articlesForDay(dayId);
   const [open, setOpen] = useState<Article | null>(null);
   if (items.length === 0) return null;
 
   return (
-    <View style={s.panel}>
-      <View style={s.panelHead}>
-        <Icon.Newspaper size={16} color={colors.gold} />
-        <Text style={s.panelTitle}>{t(UI.section, lang)}</Text>
-      </View>
-      <Text style={s.panelSub}>{t(UI.sectionSub, lang)}</Text>
+    <View style={hideHeader ? undefined : s.panel}>
+      {hideHeader ? null : (
+        <>
+          <View style={s.panelHead}>
+            <Icon.Newspaper size={16} color={colors.gold} />
+            <Text style={s.panelTitle}>{t(UI.section, lang)}</Text>
+          </View>
+          <Text style={s.panelSub}>{t(UI.sectionSub, lang)}</Text>
+        </>
+      )}
 
-      <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
+      <View style={{ gap: spacing.sm, marginTop: hideHeader ? 0 : spacing.md }}>
         {items.map((a) => (
           <PressScale key={a.id} style={s.card} onPress={() => setOpen(a)} accessibilityLabel={a.title}>
             <View style={{ flex: 1 }}>

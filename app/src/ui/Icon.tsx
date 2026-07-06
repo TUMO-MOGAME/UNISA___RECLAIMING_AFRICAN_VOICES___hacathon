@@ -40,4 +40,5 @@ export const Icon = {
   BookOpen: L.BookOpen,
   Newspaper: L.Newspaper,
   ExternalLink: L.ExternalLink,
+  Flag: L.Flag,
 };
