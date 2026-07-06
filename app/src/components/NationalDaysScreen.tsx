@@ -8,6 +8,7 @@ import { t } from "../i18n";
 import type { LangCode } from "../i18n";
 import { SideIndexScroll } from "./SideIndexScroll";
 import { PlayOnceRow } from "./PlayOnceRow";
+import { ArticlesPanel } from "./ArticleReader";
 
 // National Days — the commemorative days that carry South Africa's history, in calendar order.
 // Same editorial index layout as the Atlas/Provinces/Presidents. Each day shows its grounded story
@@ -144,6 +145,9 @@ export function NationalDaysScreen({ onBack, lang }: { onBack: () => void; lang:
               <Text style={s.flagText}>{t(UI.notHoliday, lang)}</Text>
             </View>
           ) : null}
+
+          {/* Perspectives — in-depth reviewed reading for adults (renders only for days with articles) */}
+          <ArticlesPanel dayId={d.id} lang={lang} />
         </View>
       </View>
     );

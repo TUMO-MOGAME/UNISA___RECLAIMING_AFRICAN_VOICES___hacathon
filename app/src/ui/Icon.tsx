@@ -37,4 +37,7 @@ export const Icon = {
   Film: L.Film,
   Music: L.Music,
   CalendarDays: L.Calendar,
+  BookOpen: L.BookOpen,
+  Newspaper: L.Newspaper,
+  ExternalLink: L.ExternalLink,
 };
