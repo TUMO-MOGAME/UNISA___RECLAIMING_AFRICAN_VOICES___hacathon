@@ -1,9 +1,10 @@
-# STATUS — Maloba live board
+# STATUS — Ubuntu Heritage live board
 
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
-> of "done."
+> of "done." For the structured **implemented vs. planned** view, see
+> [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-07-07 — by Tumo (via Claude)_
+_Last updated: 2026-07-08 — by Tumo (via Claude)_
 
 ---
 
@@ -35,13 +36,6 @@ _Last updated: 2026-07-07 — by Tumo (via Claude)_
 2. **Emma's review pass** — [specs/emma-review-handoff.md](specs/emma-review-handoff.md) lists exactly
    what needs your eyes, top-down: the 3 on-camera UI strings (**Reetsa** / Simolola go bala / Rekoto
    ya Boswa), the Setswana `tn` drafts across all 7 modules, and 3 cultural-accuracy questions (Atlas).
-3. When keys arrive: `services/gemini.ts` (T017) · Supabase + RLS upload (T027) · Lelapa transcribe (T028).
-   **Botlhale TTS:** contract now wired from their public docs — `POST api.botlhale.xyz/tts`,
-   form-encoded `text_msg`+`language_code`, Bearer token, returns `audio_url`; Setswana = `tn-ZA`.
-   Paste a Bearer token into `app/.env` (`EXPO_PUBLIC_BOTLHALE_API_KEY`) → Listen auto-upgrades to real
-   Setswana audio. **3 residual unknowns for the contact** (marked in `botlhale.ts`): (a) field name
-   `text` vs `text_msg`; (b) dev vs prod host; (c) refresh_token→IdToken flow (using a ready token for
-   the demo).
 3. When keys arrive: `services/gemini.ts` (T017) · Supabase + RLS upload (T027) · Lelapa transcribe (T028).
    **Botlhale TTS:** contract now wired from their public docs — `POST api.botlhale.xyz/tts`,
    form-encoded `text_msg`+`language_code`, Bearer token, returns `audio_url`; Setswana = `tn-ZA`.
