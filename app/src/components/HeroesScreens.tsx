@@ -16,27 +16,87 @@ import { FeatureEntry } from "./FeatureEntry";
 // English); the biographies themselves stay English for now.
 
 const UI = {
-  kicker: { en: "Heroes of the Nation", tn: "Bagaki ba Setšhaba" },
-  title: { en: "Heroes & Heroines", tn: "Bagaki le Bagaki ba Basadi" },
+  kicker: {
+    en: "Heroes of the Nation", tn: "Bagaki ba Setšhaba", af: "Helde van die Nasie", zu: "Amaqhawe Esizwe", xh: "Amaqhawe Esizwe",
+    nso: "Bagale ba Setšhaba", st: "Bahale ba Setjhaba", ss: "Emacawe Esive", ts: "Tinhenha ta Rixaka", nr: "Amaqhawe Wesitjhaba", ve: "Vhahali vha Lushaka",
+  },
+  title: {
+    en: "Heroes & Heroines", tn: "Bagaki le Bagaki ba Basadi", af: "Helde & Heldinne", zu: "Amaqhawe Namaqhawekazi", xh: "Amaqhawe Namaqhawekazi",
+    nso: "Bagale le Bagale ba Basadi", st: "Bahale le Bahale ba Basadi", ss: "Emacawe Nemacawekati", ts: "Tinhenha na Tinhenhakati", nr: "Amaqhawe Namaqhawekazi", ve: "Vhahali na Vhahali vha Vhafumakadzi",
+  },
   intro: {
     en: "The people — women and men — who gave something of themselves to South Africa's freedom and dignity. Search a name, or scroll the roll.",
     tn: "Batho — basadi le banna — ba ba neileng sengwe sa bone go kgololosego le seriti sa Aforika Borwa. Batla leina, kgotsa o menye lenaneo.",
+    af: "Die mense — vroue en mans — wat iets van hulself aan Suid-Afrika se vryheid en waardigheid gegee het. Soek 'n naam, of rol deur die lys.",
+    zu: "Abantu — abesifazane namadoda — abanikela ngokuthile kwabo enkululekweni nasesithunzini saseNingizimu Afrika. Sesha igama, noma uskrole uhla.",
+    xh: "Abantu — abafazi namadoda — abanikela ngento ethile ngabo kwinkululeko nakwisidima soMzantsi Afrika. Khangela igama, okanye uskrole uluhlu.",
+    nso: "Batho — basadi le banna — bao ba neilego se sengwe sa bona go tokologo le seriti sa Afrika Borwa. Nyaka leina, goba o menye lelokelelo.",
+    st: "Batho — basadi le banna — ba faneng ka ho hong ha bona tokolohong le seriting sa Afrika Borwa. Batla lebitso, kapa u thelle lethathamo.",
+    ss: "Bantfu — bafati nemadvodza — labaniketa ngalokutsite kwabo enkhululekweni nasesitfunti saseNingizimu Afrika. Sesha libito, nome uskrole luhlu.",
+    ts: "Vanhu — vavasati ni vavanuna — lava nyikeke swin'wana swa vona eku ntshunxekeni ni xindzhuti xa Afrika-Dzonga. Lava vito, kumbe u sereleta nxaxamelo.",
+    nr: "Abantu — abafazi namadoda — abanikele ngokuthile kwabo ekukhululekeni nesithunzini seSewula Afrika. Sesa ibizo, namkha uskrole uhlu.",
+    ve: "Vhathu — vhafumakadzi na vhanna — vhe vha ṋekedza tshiṅwe tsha vhone kha mbofholowo na tshirunzi tsha Afrika Tshipembe. Ṱoḓani dzina, kana ni sombe mutevhe.",
   },
-  search: { en: "Search a person", tn: "Batla motho" },
-  contents: { en: "People", tn: "Batho" },
-  read: { en: "Read their story", tn: "Bala kanegelo ya bone", af: "Lees hul storie", zu: "Funda indaba yabo", xh: "Funda ibali labo" },
-  born: { en: "Born", tn: "O tsetswe" },
-  died: { en: "Died", tn: "O tlhokafetse" },
-  movement: { en: "Movement", tn: "Mokgatlho" },
-  theJourney: { en: "The journey", tn: "Leeto" },
-  aLife: { en: "A life", tn: "Botshelo" },
-  whatToKnow: { en: "What to know", tn: "Se o tshwanetseng go se itse" },
-  howWeSource: { en: "How we source this", tn: "Ka moo re bonang se ka gone" },
-  importantDates: { en: "Their journey", tn: "Leeto la bone" },
-  gallery: { en: "In pictures", tn: "Ka ditshwantsho" },
+  search: {
+    en: "Search a person", tn: "Batla motho", af: "Soek 'n persoon", zu: "Sesha umuntu", xh: "Khangela umntu",
+    nso: "Nyaka motho", st: "Batla motho", ss: "Sesha umuntfu", ts: "Lava munhu", nr: "Sesa umuntu", ve: "Ṱoḓani muthu",
+  },
+  contents: {
+    en: "People", tn: "Batho", af: "Mense", zu: "Abantu", xh: "Abantu",
+    nso: "Batho", st: "Batho", ss: "Bantfu", ts: "Vanhu", nr: "Abantu", ve: "Vhathu",
+  },
+  read: {
+    en: "Read their story", tn: "Bala kanegelo ya bone", af: "Lees hul storie", zu: "Funda indaba yabo", xh: "Funda ibali labo",
+    nso: "Bala kanegelo ya bona", st: "Bala pale ya bona", ss: "Fundza indzaba yabo", ts: "Hlaya ntsheketo wa vona", nr: "Funda indaba yabo", ve: "Vhalani tshiitwa tshavho",
+  },
+  born: {
+    en: "Born", tn: "O tsetswe", af: "Gebore", zu: "Wazalwa", xh: "Wazalwa",
+    nso: "O belegwe", st: "O tswetswe", ss: "Watalwa", ts: "U velekiwile", nr: "Wabelethwa", ve: "O bebwa",
+  },
+  died: {
+    en: "Died", tn: "O tlhokafetse", af: "Oorlede", zu: "Washona", xh: "Wasweleka",
+    nso: "O hlokofetše", st: "O hlokahetse", ss: "Washona", ts: "U lovile", nr: "Wahlongakala", ve: "O lovha",
+  },
+  movement: {
+    en: "Movement", tn: "Mokgatlho", af: "Beweging", zu: "Inhlangano", xh: "Umbutho",
+    nso: "Mokgatlo", st: "Mokgatlo", ss: "Inhlangano", ts: "Nhlangano", nr: "Ihlangano", ve: "Tshigwada",
+  },
+  theJourney: {
+    en: "The journey", tn: "Leeto", af: "Die reis", zu: "Uhambo", xh: "Uhambo",
+    nso: "Leeto", st: "Leeto", ss: "Luhambo", ts: "Riendzo", nr: "Ikhambo", ve: "Lwendo",
+  },
+  aLife: {
+    en: "A life", tn: "Botshelo", af: "'n Lewe", zu: "Impilo", xh: "Ubomi",
+    nso: "Bophelo", st: "Bophelo", ss: "Imphilo", ts: "Vutomi", nr: "Ukuphila", ve: "Vhutshilo",
+  },
+  whatToKnow: {
+    en: "What to know", tn: "Se o tshwanetseng go se itse", af: "Wat om te weet", zu: "Okufanele ukwazi", xh: "Okufuneka ukwazi",
+    nso: "Seo o swanetšego go se tseba", st: "Seo o lokelang ho se tseba", ss: "Lokufanele ukwati", ts: "Leswi u faneleke ku swi tiva", nr: "Okufanele ukwazi", ve: "Zwine wa fanela u zwi ḓivha",
+  },
+  howWeSource: {
+    en: "How we source this", tn: "Ka moo re bonang se ka gone", af: "Hoe ons dit verkry", zu: "Indlela esikuthola ngayo lokhu", xh: "Indlela esikufumana ngayo oku",
+    nso: "Ka moo re hwetšago se ka gona", st: "Kamoo re fumanang sena kateng", ss: "Indlela lesikutfola ngayo loku", ts: "Ndlela leyi hi kumaka leswi ha yona", nr: "Indlela esikuthola ngayo lokhu", ve: "Nḓila ine ra zwi wana ngayo",
+  },
+  importantDates: {
+    en: "Their journey", tn: "Leeto la bone", af: "Hul reis", zu: "Uhambo lwabo", xh: "Uhambo lwabo",
+    nso: "Leeto la bona", st: "Leeto la bona", ss: "Luhambo lwabo", ts: "Riendzo ra vona", nr: "Ikhambo labo", ve: "Lwendo lwavho",
+  },
+  gallery: {
+    en: "In pictures", tn: "Ka ditshwantsho", af: "In prente", zu: "Ngezithombe", xh: "Ngemifanekiso",
+    nso: "Ka diswantšho", st: "Ka dinepe", ss: "Ngetitfombe", ts: "Hi swifaniso", nr: "Ngeenthombe", ve: "Nga zwifanyiso",
+  },
   galleryNote: {
     en: "Historical photographs from public archives — full credits to be confirmed.",
     tn: "Ditshwantsho tsa hisitori tse di tswang mo dipolokelong tsa setšhaba — ditebogo tse di feletseng di sa netefadiwa.",
+    af: "Historiese foto's uit openbare argiewe — volledige erkennings moet nog bevestig word.",
+    zu: "Izithombe zomlando ezivela ezinqolobaneni zomphakathi — imininingwane egcwele izoqinisekiswa.",
+    xh: "Iifoto zembali ezivela koovimba boluntu — iinkcukacha ezipheleleyo ziza kuqinisekiswa.",
+    nso: "Diswantšho tša histori tše di tšwago dipolokelong tša setšhaba — ditebogo ka botlalo di sa tla netefatšwa.",
+    st: "Dinepe tsa histori tse tsoang lipolokelong tsa setjhaba — litebello tse felletseng li sa tla netefatsoa.",
+    ss: "Titfombe temlandvo letisuka etingobeni temmango — imininingwane legcwele itawuciniseka.",
+    ts: "Tifoto ta matimu leti humaka eka vuhlayiselo bya vaaki — vukhongoteri hinkwabyo byi ta tiyisisiwa.",
+    nr: "Iinthombe zomlando ezivela eengobeni zomphakathi — imininingwana ezeleko izokuqinisekiswa.",
+    ve: "Zwifanyiso zwa ḓivhazwakale zwi bvaho kha vhulondoloti ha tshitshavha — ndivhadzo dzo fhelelaho dzi kha ḓi khwaṱhisedzwa.",
   },
 };
 

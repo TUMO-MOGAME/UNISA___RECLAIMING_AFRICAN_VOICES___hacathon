@@ -31,20 +31,31 @@ const UI = {
   intro: {
     en: "The days that carry our history — what happened, why it matters, and the people who paid for it. Photos, film and sound for each day are being added.",
     tn: "Malatsi a a rweleng hisitori ya rona — se se diragetseng, goreng se le botlhokwa, le batho ba ba se duetseng. Ditshwantsho, difilimi le modumo di a tla.",
+    af: "Die dae wat ons geskiedenis dra — wat gebeur het, waarom dit saak maak, en die mense wat daarvoor betaal het. Foto's, film en klank vir elke dag word bygevoeg.",
+    zu: "Izinsuku eziphethe umlando wethu — okwenzeka, ukuthi kungani kubalulekile, nabantu abakhokhela khona. Izithombe, ifilimu nomsindo walusuku ngalunye kuyangezwa.",
+    xh: "Iintsuku ezithwele imbali yethu — okwenzekayo, ukuba kutheni kubalulekile, nabantu abahlawula ngayo. Iifoto, ifilimu nesandi salusuku ngalunye ziyongezwa.",
+    nso: "Matšatši ao a rwelego histori ya rena — seo se diregilego, lebaka leo se lego bohlokwa, le batho bao ba se lefetšego. Diswantšho, filimi le modumo wa letšatši le lengwe le le lengwe di a okeletšwa.",
+    st: "Matsatsi a jereng histori ya rona — se etsahetseng, hobaneng se le bohlokwa, le batho ba se lefileng. Dinepe, filimi le molumo bakeng sa letsatsi le leng le le leng di ntse di ekeletswa.",
+    ss: "Emalanga latfwele umlandvo wetfu — lokwentekile, kutsi kungani kubalulekile, nebantfu labakhokhele ngako. Titfombe, ifilimu nemsindvo waloluke lonye nalonye kuyangetwa.",
+    ts: "Masiku lawa ma rhwaleke matimu ya hina — leswi humeleleke, leswaku ha yini swi ri swa nkoka, ni vanhu lava swi hakeleke. Tifoto, filimi ni mpfumawulo wa siku rin'wana ni rin'wana swi ri karhi swi engeteriwa.",
+    nr: "Amalanga athwele umlando wethu — okwenzekileko, ukuthi kubayini kuqakathekile, nabantu abakubhadelileko. Iinthombe, ifilimu nomsindo welanga linye nalinye kuyangezelelwa.",
+    ve: "Maḓuvha ane a hwala ḓivhazwakale yashu — zwe zwa itea, uri ndi ngani zwi zwa ndeme, na vhathu vhe vha zwi badela. Zwifanyiso, filimu na mubvumo wa ḓuvha ḽiṅwe na ḽiṅwe zwi khou engedzwa.",
   },
   contents: {
     en: "Days", tn: "Malatsi", af: "Dae", zu: "Izinsuku", xh: "Iintsuku",
     nso: "Matšatši", st: "Matsatsi", ss: "Emalanga", ts: "Masiku", nr: "Amalanga", ve: "Maḓuvha",
   },
   mediaSoon: {
-    en: "Photos, film & sound coming", tn: "Ditshwantsho, filimi le modumo di e tla",
+    en: "Photos, film & sound coming", tn: "Ditshwantsho, filimi le modumo di e tla", af: "Foto's, film en klank kom binnekort", zu: "Izithombe, ifilimu nomsindo kuyeza", xh: "Iifoto, ifilimu nesandi ziyeza",
+    nso: "Diswantšho, filimi le modumo di a tla", st: "Dinepe, filimi le molumo di a tla", ss: "Titfombe, ifilimu nemsindvo kuyeta", ts: "Tifoto, filimi ni mpfumawulo swi ta", nr: "Iinthombe, ifilimu nomsindo kuyeza", ve: "Zwifanyiso, filimu na mubvumo zwi a ḓa",
   },
   interpretation: {
     en: "Illustrated interpretation", tn: "Setshwantsho sa botaki", af: "Geïllustreerde interpretasie", zu: "Ukudweba okuhunyushiwe", xh: "Umzobo oguqulweyo",
     nso: "Seswantšho sa tlhathollo", st: "Setshwantsho sa tlhaloso", ss: "Umdvwebo lohunyushiwe", ts: "Xifaniso xo hlamuseriwa", nr: "Umdwebo ohlathululiweko", ve: "Tshifanyiso tsha ṱhalutshedzo",
   },
   notHoliday: {
-    en: "Commemorative — not a public holiday", tn: "Segopotso — ga se letsatsi la boikhutso",
+    en: "Commemorative — not a public holiday", tn: "Segopotso — ga se letsatsi la boikhutso", af: "Gedenkdag — nie 'n openbare vakansiedag nie", zu: "Esikhumbuzo — akulona usuku lokuphumula lomphakathi", xh: "Esikhumbuzo — asilosuku lweholide loluntu",
+    nso: "Segopotšo — ga se letšatši la maikhutšo a setšhaba", st: "Sehopotso — hase letsatsi la phomolo la setjhaba", ss: "Sikhumbuto — akusilo lilanga lekuphumula lemmango", ts: "Xitsundzuxo — a hi siku ra vhumba ra mfumo", nr: "Sikhumbuzo — akusilo ilanga lekuphumula lomphakathi", ve: "Tshihumbudzo — a si ḓuvha ḽa vhudifhinduleli ḽa tshitshavha",
   },
   poem: {
     en: "Poem", tn: "Poko", af: "Gedig", zu: "Inkondlo", xh: "Umbongo",

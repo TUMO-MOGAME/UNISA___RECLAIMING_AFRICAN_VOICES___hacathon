@@ -50,8 +50,14 @@ const UI = {
     en: "Anchoring pending", tn: "E emetse go tshwarwa", af: "Verankering hangende", zu: "Kulindwe ukumiswa", xh: "Kulindwe ukumiswa",
     nso: "Go tiišetša go emetše", st: "Ho tiisa ho emetse", ss: "Kulindzelwe kumiswa", ts: "Ku simeka ku ri karhi ku yimela", nr: "Kulindwe ukumiswa", ve: "U khwaṱhisedza hu kha ḓi lindela",
   },
-  cidLabel: { en: "IPFS content ID", tn: "IPFS" },
-  hashLabel: { en: "SHA-256 fingerprint", tn: "Letshwao SHA-256" },
+  cidLabel: {
+    en: "IPFS content ID", tn: "IPFS content ID", af: "IPFS-inhoud-ID", zu: "I-ID yokuqukethwe ye-IPFS", xh: "I-ID yomxholo ye-IPFS",
+    nso: "IPFS content ID", st: "IPFS content ID", ss: "I-ID yalokucuketfwe ye-IPFS", ts: "IPFS content ID", nr: "I-ID yalokuqukethwe ye-IPFS", ve: "IPFS content ID",
+  },
+  hashLabel: {
+    en: "SHA-256 fingerprint", tn: "Letshwao SHA-256", af: "SHA-256-vingerafdruk", zu: "Isigxivizo se-SHA-256", xh: "Uphawu lwe-SHA-256",
+    nso: "Leswao la SHA-256", st: "Letshwao la SHA-256", ss: "Luphawu lwe-SHA-256", ts: "Xikombiso xa SHA-256", nr: "Uphawu lwe-SHA-256", ve: "Tshiga tsha SHA-256",
+  },
   certLabel: {
     en: "Heritage certificate (token)", tn: "Setifikeiti sa boswa", af: "Erfenissertifikaat (token)", zu: "Isitifiketi samagugu (ithokheni)", xh: "Isatifikethi selifa (ithokheni)",
     nso: "Setifikeiti sa bohwa (thokheni)", st: "Setifikeiti sa lefa (thokheni)", ss: "Isitifiketi semagugu (ithokheni)", ts: "Xitifikheti xa ndzhaka (thokheni)", nr: "Isitifiketi samagugu (ithokheni)", ve: "Tshithifiketsi tsha ifa (thokheni)",

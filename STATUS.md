@@ -125,6 +125,18 @@ _Last updated: 2026-07-07 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-08** — **UI chrome finished in all 11 languages (in-session, no API).** Closed the last gaps
+  in the fully-multilingual interface without the Gemini/Claude generation script — translated directly
+  this session and wrote the strings into the inline `t({...})` chrome objects. Audit found most of the
+  app was already all-11 (Reader, ConsentSheet, LanguagePicker, chatbot, Provinces, Presidents, Atlas,
+  Totems, Archive were done); only **~39 chrome objects across 6 files** still had EN(+TSW)-only:
+  **HeroesScreens** (16), **ArticleReader** (10), **HomeGallery** (7: heroes block, journey hint/title,
+  daysSub), **NationalDays** (intro, mediaSoon, notHoliday), **HeritageLedger** (cid/hash labels),
+  **CountryPicker** (moreSoon). All six now balance (en count == ve count per file). These are INTERFACE
+  labels only — literary/heritage **content** stays honest EN-fallback / labelled drafts (integrity rule
+  intact; scope confirmed with Tumo). tsc clean · **79/79 tests**. **Needs Tumo:** the `tn` Setswana was
+  already authored; the 9 new languages are machine-quality chrome (af/zu/xh/nso/st/ss/ts/nr/ve) — a
+  native-speaker eye welcome but not blocking, since chrome is explicitly best-effort.
 - **2026-07-08** — **Interactive walking journey + "dot stories" on the home timeline.** Turned the
   history trail into a guided walk. (1) **Walker** — Tumo's Groovy walk-cycle, keyed white→transparent
   (VP9 alpha `assets/journey/walk.webm`), strolls the **main road** big-dot → big-dot along the real

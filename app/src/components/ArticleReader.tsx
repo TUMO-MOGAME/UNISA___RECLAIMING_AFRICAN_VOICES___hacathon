@@ -48,17 +48,53 @@ const UI = {
   sectionSub: {
     en: "In-depth reading — reviewed, with the record set in order",
     tn: "Go bala ka botlalo — go sekasekilwe, rekoto e beilwe ka thulaganyo",
+    af: "Diepgaande leeswerk — nagegaan, met die rekord reggestel",
+    zu: "Ukufunda okujulile — okubuyekeziwe, nomlando ohlelwe kahle",
+    xh: "Ukufunda okunzulu — okuphononongiweyo, nembali ehlelwe ngokufanelekileyo",
+    nso: "Go bala ka botlalo — go lekotšwe, le rekoto e beakantšwe ka thulaganyo",
+    st: "Ho bala ka botebo — ho hlahlobilwe, le tlaleho e behilwe ka tatellano",
+    ss: "Kufundza lokujulile — lokubuyeketiwe, nemlandvo lohleliwe kahle",
+    ts: "Ku hlaya loku enteke — loku kamberiweke, ni rhekhodo yi vekiwe hi ndlela",
+    nr: "Ukufunda okutjhingileko — okubuyekeziweko, nomtlolo obekwe kuhle",
+    ve: "U vhala ho dzikaho — ho lingululwaho, na rekhodo yo vhewaho nga ndpowelo",
   },
   by: { en: "By", tn: "Ka", af: "Deur", zu: "Ngu", xh: "Ngu", nso: "Ka", st: "Ka", ss: "Ngu", ts: "Hi", nr: "Ngu", ve: "Nga" },
-  inThisArticle: { en: "Who this article recovers", tn: "Batho ba setlhogo se ba busetsang" },
-  howItUnfolded: { en: "How it unfolded", tn: "Ka moo go diragetseng ka teng" },
-  keyPoints: { en: "The argument, in short", tn: "Kgang, ka bokhutshwane" },
-  readOriginal: { en: "Read the original", tn: "Bala setlhogo sa ntlha" },
-  opensNewTab: { en: "Opens on the publisher's site in a new tab", tn: "Se bulega mo saeteng ya mophasalatsi mo tebeng e ntšha" },
-  liveNote: { en: "Live from the publisher — all rights theirs. If it stays blank, switch to Summary or use the ↗ button.", tn: "Ka nako ya nnete go tswa go mophasalatsi — ditshwanelo tsotlhe ke tsa bone. Fa se sa tsene, fetolela go Tshobokanyo kgotsa o dirise konopo ya ↗." },
-  tabLive: { en: "Live article", tn: "Setlhogo sa nnete" },
-  tabSummary: { en: "Summary", tn: "Tshobokanyo" },
-  aboutSource: { en: "About this source", tn: "Ka ga motswedi ono" },
+  inThisArticle: {
+    en: "Who this article recovers", tn: "Batho ba setlhogo se ba busetsang", af: "Wie hierdie artikel herwin", zu: "Ubani lo mbhalo owubuyisayo", xh: "Ngubani eli nqaku elimbuyisayo",
+    nso: "Bao sehlogo se se ba bušetšago", st: "Bao sehlooho sena se ba khutlisang", ss: "Bantfu lesihloko lesibabuyisako", ts: "Vanhu lava xihloko lexi xi va vuyisaka", nr: "Abantu lesi sihloko esibabuyisako", ve: "Vhathu vhane ino thero i vha vhuyisaho",
+  },
+  howItUnfolded: {
+    en: "How it unfolded", tn: "Ka moo go diragetseng ka teng", af: "Hoe dit ontvou het", zu: "Indlela okwenzeka ngayo", xh: "Indlela okwenzeka ngayo",
+    nso: "Ka moo go diregilego ka gona", st: "Kamoo ho etsahetseng kateng", ss: "Indlela lokwenteka ngayo", ts: "Ndlela leyi swi humeleleke ha yona", nr: "Indlela okwenzeka ngayo", ve: "Nḓila ye zwa itea ngayo",
+  },
+  keyPoints: {
+    en: "The argument, in short", tn: "Kgang, ka bokhutshwane", af: "Die argument, in kort", zu: "Impikiswano, kafushane", xh: "Ingxoxo, ngokufutshane",
+    nso: "Ngangišano, ka bokopana", st: "Khang, ka bokgutshwane", ss: "Imphikiswano, ngalokufishane", ts: "Kanelo, hi ku komisa", nr: "Ukuphikisana, kafitjhani", ve: "Khani, nga u pfufhifhadza",
+  },
+  readOriginal: {
+    en: "Read the original", tn: "Bala setlhogo sa ntlha", af: "Lees die oorspronklike", zu: "Funda okwangempela", xh: "Funda eyoqobo",
+    nso: "Bala sa mathomo", st: "Bala sa mantlha", ss: "Fundza lesekucala", ts: "Hlaya xa xisungu", nr: "Funda okwakuqala", ve: "Vhalani tsha u thoma",
+  },
+  opensNewTab: {
+    en: "Opens on the publisher's site in a new tab", tn: "Se bulega mo saeteng ya mophasalatsi mo tebeng e ntšha", af: "Maak op die uitgewer se webwerf in 'n nuwe oortjie oop", zu: "Kuvuleka kusayithi yomshicileli ethebhulethi entsha", xh: "Kuvuleka kwisayithi yompapashi kwithebhu entsha",
+    nso: "E bulega go saete ya mogatiši ka thepe ye mpsha", st: "E bulehang sebakeng sa mohatisi tepeng e ntjha", ss: "Kuvuleka kusayithi yemshicileli kuthebhu lensha", ts: "Swi pfuleka eka sayiti ya mukandziyisi eka theve leyintshwa", nr: "Kuvuleka kusayidi yomgadangisi kuthebhu etjha", ve: "Zwi vulea kha saiti ya mubveledzi kha thebe ntswa",
+  },
+  liveNote: {
+    en: "Live from the publisher — all rights theirs. If it stays blank, switch to Summary or use the ↗ button.", tn: "Ka nako ya nnete go tswa go mophasalatsi — ditshwanelo tsotlhe ke tsa bone. Fa se sa tsene, fetolela go Tshobokanyo kgotsa o dirise konopo ya ↗.", af: "Regstreeks van die uitgewer — alle regte hulle s'n. As dit leeg bly, skakel na Opsomming of gebruik die ↗-knoppie.", zu: "Bukhoma kumshicileli — wonke amalungelo ngawakhe. Uma kuhlala kungenalutho, shintshela ku-Isifinyezo noma usebenzise inkinobho ethi ↗.", xh: "Bukho kumpapashi — onke amalungelo ngawakhe. Ukuba kuhlala kungenanto, tshintshela kwiSishwankathelo okanye usebenzise iqhosha elithi ↗.",
+    nso: "Ka nako ya kgonthe go tšwa go mogatiši — ditokelo ka moka ke tša bona. Ge e dula e se na selo, fetolela go Kakaretšo goba o šomiše konopo ya ↗.", st: "Ka nako ya nnete ho tswa ho mohatisi — litokelo tsohle ke tsa bona. Haeba e lula e se na letho, fetolela ho Kakaretso kapa u sebedise konopo ya ↗.", ss: "Ngesikhatsi sangempela kusuka kumshicileli — onkhe emalungelo ngawakhe. Nangabe kuhlala kungenalutfo, tjintjela ku-Sifingcanetiso nome usebentise inkhinobho letsi ↗.", ts: "Hi nkarhi wa xiviri ku suka eka mukandziyisi — timfanelo hinkwato i ta vona. Loko swi tshama swi nga ri na nchumu, hundzula eka Nkatsakanyo kumbe u tirhisa xikhomo xa ↗.", nr: "Bukhona kumgadangisi — woke amalungelo ngawakhe. Nangabe kuhlala kunganalitho, tjhugululela ku-Isirhunyezo namkha usebenzise ibhethini elithi ↗.", ve: "Nga tshifhinga tsha ngoho u bva kha mubveledzi — pfanelo dzoṱhe ndi dzavho. Arali zwa dzula zwi si na tshithu, shandukiselani kha Manweledzo kana ni shumise bathoni ya ↗.",
+  },
+  tabLive: {
+    en: "Live article", tn: "Setlhogo sa nnete", af: "Regstreekse artikel", zu: "Isihloko sabukhoma", xh: "Inqaku elibukhoma",
+    nso: "Sehlogo sa nako ya kgonthe", st: "Sehlooho sa nako ya nnete", ss: "Sihloko sangempela", ts: "Xihloko xa nkarhi wa xiviri", nr: "Isihloko sabukhona", ve: "Thero ya tshifhinga tsha ngoho",
+  },
+  tabSummary: {
+    en: "Summary", tn: "Tshobokanyo", af: "Opsomming", zu: "Isifinyezo", xh: "Isishwankathelo",
+    nso: "Kakaretšo", st: "Kakaretso", ss: "Sifingcanetiso", ts: "Nkatsakanyo", nr: "Isirhunyezo", ve: "Manweledzo",
+  },
+  aboutSource: {
+    en: "About this source", tn: "Ka ga motswedi ono", af: "Oor hierdie bron", zu: "Mayelana nalo mthombo", xh: "Malunga nalo mthombo",
+    nso: "Ka ga mothopo wo", st: "Mabapi le mohlodi ona", ss: "Mayelana nalomtfombo", ts: "Mayelana ni xihlovo lexi", nr: "Malunga nalomthombo", ve: "Nga ha tshiko itshi",
+  },
   close: { en: "Close", tn: "Tswala", af: "Maak toe", zu: "Vala", xh: "Vala", nso: "Tswalela", st: "Koala", ss: "Vala", ts: "Pfala", nr: "Vala", ve: "Vala" },
 };
 
