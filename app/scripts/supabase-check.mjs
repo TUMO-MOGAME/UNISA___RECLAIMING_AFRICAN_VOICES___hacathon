@@ -33,6 +33,17 @@ async function main() {
   console.log("→ signing in anonymously…");
   const { data: auth, error: authErr } = await sb.auth.signInAnonymously();
   if (authErr) {
+    const msg = authErr.message.toLowerCase();
+    // If CAPTCHA protection is enabled, a headless CLI can't solve the challenge — that's EXPECTED,
+    // not a config failure. The real verification then happens in-app (the hCaptcha widget).
+    if (msg.includes("captcha")) {
+      console.log(
+        "\nℹ️  CAPTCHA protection is enabled — this CLI can't solve the challenge, so it can't sign in\n" +
+          "   headlessly. That's expected: verify anonymous sign-in IN THE APP, where the hCaptcha\n" +
+          "   widget provides the token. Config + anon-auth are otherwise reachable.\n"
+      );
+      return 0;
+    }
     console.error(
       `\n❌ anonymous sign-in failed: ${authErr.message}\n` +
         "   Fix: Supabase dashboard → Authentication → Sign In / Providers → enable **Anonymous sign-ins**.\n"
