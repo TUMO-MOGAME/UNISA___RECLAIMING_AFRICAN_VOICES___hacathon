@@ -9,7 +9,7 @@ import { SceneImage } from "./SceneImage";
 import { LanguagePicker } from "./LanguagePicker";
 import { CountryPicker } from "./CountryPicker";
 import { DEFAULT_COUNTRY } from "../content/anthems";
-import { HistoryTrail } from "./HistoryTrail";
+import { HistoryTrail, type HistoryTrailHandle } from "./HistoryTrail";
 import { historyTrailSource, historyTrail, type HistoryMilestone } from "../content/history-trail";
 import { JourneyStory } from "./JourneyStory";
 import { mediaFor, hasStory } from "../content/journey-media";
@@ -354,6 +354,9 @@ export function HomeGallery({
   // journey brings it forward (bright + tappable) and fades the big words back.
   const [mapOpen, setMapOpen] = useState(false);
   const [milestone, setMilestone] = useState<HistoryMilestone | null>(null);
+  // The walk is driven from the caption card via this handle; walkState picks the label + disables mid-step.
+  const trailRef = useRef<HistoryTrailHandle>(null);
+  const [walkState, setWalkState] = useState<{ atLast: boolean; walking: boolean }>({ atLast: false, walking: false });
   // The "dot story" (full-screen picture → film) currently playing, or null.
   const [storyId, setStoryId] = useState<string | null>(null);
   const trailOpacity = useRef(new Animated.Value(0.16)).current;
@@ -378,11 +381,12 @@ export function HomeGallery({
   const storyMilestone = storyId ? historyTrail.find((m) => m.id === storyId) ?? null : null;
   const storyMedia = storyId ? mediaFor(storyId) : undefined;
 
-  // Tell the app when a story is on-screen so it can hide the floating chatbot; reset on unmount.
+  // Hide the floating chatbot for the whole journey (walk + full-screen story) so it never crowds the
+  // caption's controls on a phone; reset on unmount.
   useEffect(() => {
-    onStoryActiveChange?.(!!(storyMilestone && storyMedia));
+    onStoryActiveChange?.(mapOpen || !!(storyMilestone && storyMedia));
     return () => onStoryActiveChange?.(false);
-  }, [storyId]);
+  }, [storyId, mapOpen]);
 
   return (
     <View style={styles.root}>
@@ -425,14 +429,14 @@ export function HomeGallery({
               start flag lives inside it (planted on the 1652 dot) so it never drifts. */}
           <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
             <HistoryTrail
+              ref={trailRef}
               active={mapOpen}
               dimOpacity={trailOpacity}
               onSelect={setMilestone}
               selectedId={milestone?.id}
               onStart={openMap}
               startLabel={t(UI.startJourney, lang)}
-              keepWalkingLabel={t(UI.keepWalking, lang)}
-              journeyDoneLabel={t(UI.journeyDone, lang)}
+              onWalkChange={setWalkState}
             />
           </View>
 
@@ -468,12 +472,38 @@ export function HomeGallery({
                   <Text style={styles.capYear}>{milestone.year}</Text>
                   <Text style={styles.capTitle}>{milestone.title}</Text>
                   <Text style={styles.capNote}>{milestone.note}</Text>
-                  {hasStory(milestone.id) ? (
-                    <PressScale style={styles.storyBtn} onPress={() => setStoryId(milestone.id)} accessibilityLabel={t(UI.playStory, lang)}>
-                      <Icon.Play size={13} color={colors.night} fill={colors.night} />
-                      <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
-                    </PressScale>
-                  ) : null}
+                  {/* Both actions live here (fixed, never under a dot): the primary gold "Keep walking"
+                      advances the walk; the outlined "Play the story" opens this year's picture/film. */}
+                  <View style={styles.capBtnRow}>
+                    {!walkState.atLast ? (
+                      <Pressable
+                        style={[styles.walkCta, walkState.walking && styles.walkCtaDisabled]}
+                        onPress={() => trailRef.current?.walkNext()}
+                        disabled={walkState.walking}
+                        accessibilityRole="button"
+                        accessibilityLabel={t(UI.keepWalking, lang)}
+                      >
+                        <Text style={styles.walkCtaText}>{t(UI.keepWalking, lang)}</Text>
+                        <Icon.ChevronRight size={15} color={colors.night} />
+                      </Pressable>
+                    ) : (
+                      <Pressable
+                        style={styles.walkCta}
+                        onPress={() => trailRef.current?.restart()}
+                        accessibilityRole="button"
+                        accessibilityLabel={t(UI.journeyDone, lang)}
+                      >
+                        <Icon.RotateCcw size={14} color={colors.night} />
+                        <Text style={styles.walkCtaText}>{t(UI.journeyDone, lang)}</Text>
+                      </Pressable>
+                    )}
+                    {hasStory(milestone.id) ? (
+                      <PressScale style={styles.storyBtn} onPress={() => setStoryId(milestone.id)} accessibilityLabel={t(UI.playStory, lang)}>
+                        <Icon.Play size={13} color={colors.gold} fill={colors.gold} />
+                        <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
+                      </PressScale>
+                    ) : null}
+                  </View>
                 </View>
               ) : (
                 <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
@@ -981,8 +1011,15 @@ const styles = StyleSheet.create({
   capYear: { color: "#E8B45A", fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
   capTitle: { color: "#fff", fontFamily: fonts.heading, fontSize: 17, marginTop: 2 },
   capNote: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.body, fontSize: 13, lineHeight: 20, marginTop: 6 },
-  storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14, marginTop: spacing.sm },
-  storyBtnText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
+  // Caption actions sit in one row; wrap on very narrow screens so both stay tappable.
+  capBtnRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.md },
+  // Primary: solid gold — advances the guided walk.
+  walkCta: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 9, paddingHorizontal: 16 },
+  walkCtaText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
+  walkCtaDisabled: { opacity: 0.45 },
+  // Secondary: outlined gold — opens this year's story (distinct from Keep walking so they're not confused).
+  storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(232,180,90,0.14)", borderWidth: 1, borderColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14 },
+  storyBtnText: { color: "#E8B45A", fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
   mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 
   // Section

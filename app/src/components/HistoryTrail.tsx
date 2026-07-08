@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import { View, Text, Pressable, Animated, StyleSheet, useWindowDimensions, Platform } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Asset } from "expo-asset";
@@ -126,29 +126,29 @@ function smoothPath(pts: { x: number; y: number }[]) {
   return d.join(" ");
 }
 
-export function HistoryTrail({
-  active,
-  onSelect,
-  selectedId,
-  dimOpacity,
-  onStart,
-  startLabel,
-  keepWalkingLabel,
-  journeyDoneLabel,
-}: {
-  active: boolean;
-  onSelect: (m: HistoryMilestone) => void;
-  selectedId?: string | null;
-  /** Opacity for the trail (path + dots). The start flag ignores this and stays full-opacity. */
-  dimOpacity?: Animated.Value;
-  /** Fired by the "Start" flag on the first dot. */
-  onStart?: () => void;
-  /** Localized label shown beside the start flag. */
-  startLabel?: string;
-  /** Localized labels for the guided walk controls. */
-  keepWalkingLabel?: string;
-  journeyDoneLabel?: string;
-}) {
+// Imperative handle so the walk can be driven from the caption card (which owns the "Keep walking" /
+// "Restart" button now — the floating button used to sit under the caption and steal its taps).
+export type HistoryTrailHandle = { walkNext: () => void; restart: () => void };
+
+export const HistoryTrail = forwardRef<
+  HistoryTrailHandle,
+  {
+    active: boolean;
+    onSelect: (m: HistoryMilestone) => void;
+    selectedId?: string | null;
+    /** Opacity for the trail (path + dots). The start flag ignores this and stays full-opacity. */
+    dimOpacity?: Animated.Value;
+    /** Fired by the "Start" flag on the first dot. */
+    onStart?: () => void;
+    /** Localized label shown beside the start flag. */
+    startLabel?: string;
+    /** Reports walk progress so the caption can show "Keep walking" vs "Restart" and disable mid-walk. */
+    onWalkChange?: (s: { atLast: boolean; walking: boolean }) => void;
+  }
+>(function HistoryTrail(
+  { active, onSelect, selectedId, dimOpacity, onStart, startLabel, onWalkChange },
+  ref
+) {
   const { width } = useWindowDimensions();
   const rows = width >= 900 ? 3 : width >= 560 ? 4 : 5;
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -228,6 +228,14 @@ export function HistoryTrail({
   };
 
   const atLast = idx >= historyTrail.length - 1;
+
+  // Expose the walk actions to the parent (the caption card drives them). Rebuilt when the values the
+  // closures read change, so a tap always advances from the walker's current position.
+  useImperativeHandle(ref, () => ({ walkNext, restart: restartWalk }), [phase, pts, atLast, size.w, size.h]);
+  // Keep the caption's control in sync (which label to show; disable while a step is animating).
+  useEffect(() => {
+    onWalkChange?.({ atLast, walking: phase === "walking" });
+  }, [atLast, phase, active, ready, onWalkChange]);
 
   // Flatten every milestone's branches. Each branch peels off a point ON THE ROAD (between the
   // milestone dot and the next, "as we approach" it), perpendicular to the road there.
@@ -335,43 +343,18 @@ export function HistoryTrail({
             })}
           </Animated.View>
 
-          {/* Guided walker + "keep walking" control — full opacity, only while journeying */}
+          {/* Guided walker figure — full opacity, only while journeying. The "Keep walking" control
+              lives in the caption card (HomeGallery) so it can never sit under a dot and steal taps. */}
           {active && ready && (
-            <>
-              <Animated.View
-                pointerEvents="none"
-                style={[
-                  styles.walker,
-                  { transform: [{ translateX: wx }, { translateY: wy }, { translateX: -WALK_SIZE / 2 }, { translateY: -WALK_SIZE + 10 }] },
-                ]}
-              >
-                <WalkVideo facing={facing} />
-              </Animated.View>
-
-              {phase === "idle" && !atLast && (
-                <Pressable
-                  style={[styles.walkBtn, { left: clamp(pts[idx].x + 18, 8, size.w - 168), top: clamp(pts[idx].y - 14, 8, size.h - 44) }]}
-                  onPress={walkNext}
-                  accessibilityRole="button"
-                  accessibilityLabel={keepWalkingLabel}
-                >
-                  <Text style={styles.walkBtnText}>{keepWalkingLabel ?? "Keep walking"}</Text>
-                  <Icon.ChevronRight size={15} color={colors.night} />
-                </Pressable>
-              )}
-
-              {phase === "idle" && atLast && (
-                <Pressable
-                  style={[styles.walkBtn, { left: clamp(pts[idx].x + 18, 8, size.w - 190), top: clamp(pts[idx].y - 14, 8, size.h - 44) }]}
-                  onPress={restartWalk}
-                  accessibilityRole="button"
-                  accessibilityLabel={journeyDoneLabel}
-                >
-                  <Icon.RotateCcw size={14} color={colors.night} />
-                  <Text style={styles.walkBtnText}>{journeyDoneLabel ?? "Restart"}</Text>
-                </Pressable>
-              )}
-            </>
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.walker,
+                { transform: [{ translateX: wx }, { translateY: wy }, { translateX: -WALK_SIZE / 2 }, { translateY: -WALK_SIZE + 10 }] },
+              ]}
+            >
+              <WalkVideo facing={facing} />
+            </Animated.View>
           )}
 
           {/* the "Start" flag planted on the FIRST dot — full opacity, only while the map is closed */}
@@ -391,7 +374,7 @@ export function HistoryTrail({
       )}
     </View>
   );
-}
+});
 
 const DOT = 16;
 const NODE = 64;
@@ -420,23 +403,6 @@ const styles = StyleSheet.create({
   startFlag: { width: 22, height: 22, borderRadius: 11, backgroundColor: GOLD, alignItems: "center", justifyContent: "center" },
   startPinText: { color: "#FBEFD8", fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 0.3 },
 
-  // Guided walk
+  // Guided walk — the walker figure (the "Keep walking" control now lives in the caption card).
   walker: { position: "absolute", left: 0, top: 0, zIndex: 25 },
-  walkBtn: {
-    position: "absolute",
-    zIndex: 26,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    backgroundColor: GOLD,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  walkBtnText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
 });

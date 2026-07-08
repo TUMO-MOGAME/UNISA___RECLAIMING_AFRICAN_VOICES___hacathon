@@ -125,6 +125,43 @@ _Last updated: 2026-07-07 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-08** — **Journey walk-control fix + phone-mode pass.** Fixed the reported bug: on the guided
+  walk, the floating "Keep walking" button sat *under* the caption card and its taps landed on "Play the
+  story" instead (worst on phone, where the bottom row of dots crowds the caption). Moved the walk control
+  **into the caption card** — `HistoryTrail` is now a `forwardRef` exposing `{ walkNext, restart }` and
+  reports walk state via `onWalkChange`; `HomeGallery` renders the button in the caption. Styled the two
+  actions distinctly so they're never confused: **Keep walking** = solid gold (primary), **Play the story**
+  = outlined gold (secondary); they share one wrapping row so both stay tappable on narrow screens. Also
+  **hide the floating chatbot for the whole journey** (not just during a story) so it never crowds the
+  caption on a phone. The walker figure stays on the road. Verified: tsc clean · 79/79 tests · `expo export
+  --platform web` green (bundles all 3 journey films + 25 dot images). **Phone note:** on mobile *web* the
+  walker + films play; on a *native* build they still degrade (inline `<video>` is web-only by design) —
+  flag for later if a native demo is needed. **Needs Tumo's eyeball:** open the journey on a phone browser,
+  walk a few dots, confirm Keep walking / Play the story both press cleanly.
+- **2026-07-08** — **1816 Zulu-kingdom dot — two films in order (ordered playlist support).** Tumo supplied
+  two films for the 1816 "big dot": *Margaret Singana — We Are Growing* (the Shaka Zulu series theme) then
+  *Shaka Zulu — Epic African Music (Song of Kings)*. Extended the dot-story model to a **playlist**:
+  `JourneyMedia.videos?: number[]` (ordered; takes precedence over the single `video`), and `JourneyStory`
+  now advances film→film (`onEnded`) and closes after the last; **Back** rewinds to the picture. Both films
+  **web-optimized** with ffmpeg — H.264 360p (kept native res), CRF 29, AAC 96k, **`+faststart`** (moov atom
+  up front so playback starts while streaming): 13.4MB→12.3MB and 18MB→12.9MB → `assets/journey/1816-we-are-
+  growing.mp4` + `1816-song-of-kings.mp4`. So 1816 now plays: picture → We Are Growing → Song of Kings →
+  close. tsc clean · 79/79 tests. **Needs an eyeball:** the picture→film1→film2 flow in a browser
+  (`npm run web`, open the journey, tap 1816). Other big dots stay picture-only until Tumo adds their films.
+- **2026-07-08** — **Big-dot journey pictures — all 24 remaining milestones (Gemini, Tumo-approved gen).**
+  Extended the "dot story" treatment beyond 1652 to every **big dot** (the 24 top-level milestones in
+  `history-trail.ts`). Added grounded, integrity-safe prompts to `scripts/generate-journey-images.mjs`
+  and ran `npm run gen:journey-images` → `assets/journey/y<year>.webp` (24 new, 1652 skipped). Wired each
+  into `content/journey-media.ts` as `image` + `imageIsAI:true` with **no film** — `JourneyStory` already
+  degrades to picture + description + "Skip" when there's no video, and the "Watch the film" button
+  auto-appears once Tumo adds a film per dot (branches/side-road dots deliberately have no media yet).
+  **Integrity (humanities rule):** prompts depict the EVENT/SCENE, never a fabricated portrait of a real
+  named person (Shaka/Mandela/Biko etc. shown via crowds/landscapes, not faces); Sharpeville + Madiba's
+  passing kept sober and non-graphic; all labelled "Artistic interpretation" in the UI. Spot-checked the
+  sensitive ones — Sharpeville (dropped passbooks + a lone shoe, no bodies), 1976 Soweto, 1955 Kliptown,
+  1994 voting queue, 2013 mourning wall all read clearly South African + dignified; **1990 first came out
+  European, regenerated with a Grand Parade / Table Mountain anchor** → now correct. tsc clean · 79/79
+  tests. **Needs Tumo:** eyeball the 24 as a set (his call to keep/redo any); films land per-dot later.
 - **2026-07-08** — **UI chrome finished in all 11 languages (in-session, no API).** Closed the last gaps
   in the fully-multilingual interface without the Gemini/Claude generation script — translated directly
   this session and wrote the strings into the inline `t({...})` chrome objects. Audit found most of the

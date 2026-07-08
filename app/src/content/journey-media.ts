@@ -10,10 +10,17 @@ export type JourneyMedia = {
   image?: number;
   /** Whether the image is an AI artistic interpretation (shown labelled) vs a real photo. */
   imageIsAI?: boolean;
-  /** Film to play after the picture (require of a bundled .mp4). Web plays it inline. */
+  /** Single film to play after the picture (require of a bundled .mp4). Web plays it inline. */
   video?: number;
+  /** Ordered playlist of films to play back-to-back after the picture (require of bundled .mp4s).
+   *  Takes precedence over `video` when present; the player advances through them in order. */
+  videos?: number[];
 };
 
+// Every "big dot" (top-level milestone in history-trail.ts) opens on a dignified AI interpretation of
+// its event (labelled as such). Films are added per-dot later as Tumo supplies them — until then a dot
+// shows its picture + description and "Skip" only (the "Watch the film" button appears once a video is
+// added). 1652 already has both a picture and a film.
 export const journeyMedia: Record<string, JourneyMedia> = {
   // 1652 — the arrival of the Dutch at the Cape (start of colonial settlement).
   y1652: {
@@ -21,10 +28,42 @@ export const journeyMedia: Record<string, JourneyMedia> = {
     imageIsAI: true,
     video: require("../../assets/journey/1652.mp4"),
   },
+  y1779: { image: require("../../assets/journey/y1779.webp"), imageIsAI: true },
+  y1806: { image: require("../../assets/journey/y1806.webp"), imageIsAI: true },
+  // 1816 — the rise of the Zulu kingdom. Picture, then two films in order (Tumo's selection).
+  y1816: {
+    image: require("../../assets/journey/y1816.webp"),
+    imageIsAI: true,
+    videos: [
+      require("../../assets/journey/1816-we-are-growing.mp4"),
+      require("../../assets/journey/1816-song-of-kings.mp4"),
+    ],
+  },
+  y1834: { image: require("../../assets/journey/y1834.webp"), imageIsAI: true },
+  y1838: { image: require("../../assets/journey/y1838.webp"), imageIsAI: true },
+  y1867: { image: require("../../assets/journey/y1867.webp"), imageIsAI: true },
+  y1879: { image: require("../../assets/journey/y1879.webp"), imageIsAI: true },
+  y1886: { image: require("../../assets/journey/y1886.webp"), imageIsAI: true },
+  y1899: { image: require("../../assets/journey/y1899.webp"), imageIsAI: true },
+  y1910: { image: require("../../assets/journey/y1910.webp"), imageIsAI: true },
+  y1912: { image: require("../../assets/journey/y1912.webp"), imageIsAI: true },
+  y1913: { image: require("../../assets/journey/y1913.webp"), imageIsAI: true },
+  y1948: { image: require("../../assets/journey/y1948.webp"), imageIsAI: true },
+  y1955: { image: require("../../assets/journey/y1955.webp"), imageIsAI: true },
+  y1956: { image: require("../../assets/journey/y1956.webp"), imageIsAI: true },
+  y1960: { image: require("../../assets/journey/y1960.webp"), imageIsAI: true },
+  y1964: { image: require("../../assets/journey/y1964.webp"), imageIsAI: true },
+  y1976: { image: require("../../assets/journey/y1976.webp"), imageIsAI: true },
+  y1990: { image: require("../../assets/journey/y1990.webp"), imageIsAI: true },
+  y1994: { image: require("../../assets/journey/y1994.webp"), imageIsAI: true },
+  y2010: { image: require("../../assets/journey/y2010.webp"), imageIsAI: true },
+  y2013: { image: require("../../assets/journey/y2013.webp"), imageIsAI: true },
+  y2024: { image: require("../../assets/journey/y2024.webp"), imageIsAI: true },
+  y2026: { image: require("../../assets/journey/y2026.webp"), imageIsAI: true },
 };
 
 export const mediaFor = (id: string): JourneyMedia | undefined => journeyMedia[id];
 export const hasStory = (id: string): boolean => {
   const m = journeyMedia[id];
-  return !!(m && (m.image != null || m.video != null));
+  return !!(m && (m.image != null || m.video != null || (m.videos?.length ?? 0) > 0));
 };

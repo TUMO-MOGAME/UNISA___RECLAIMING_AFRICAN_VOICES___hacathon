@@ -34,10 +34,24 @@ export function JourneyStory({
 }) {
   const { width } = useWindowDimensions();
   const wide = width >= 768;
-  const vUri = videoUri(media.video);
-  const canPlayVideo = Platform.OS === "web" && !!vUri; // inline <video> is web-only for now
+  // A dot can carry an ordered playlist of films (media.videos) or a single one (media.video).
+  const clips = media.videos && media.videos.length > 0 ? media.videos : media.video != null ? [media.video] : [];
+  const [clipIndex, setClipIndex] = useState(0);
+  const vUri = videoUri(clips[clipIndex]);
+  const canPlayVideo = Platform.OS === "web" && clips.length > 0; // inline <video> is web-only for now
   const hasImage = media.image != null;
   const [stage, setStage] = useState<"image" | "video">(hasImage ? "image" : "video");
+
+  // When a film ends, roll on to the next one; after the last, close the story.
+  const onFilmEnded = () => {
+    if (clipIndex < clips.length - 1) setClipIndex(clipIndex + 1);
+    else onClose();
+  };
+  // "Back" returns to the picture and rewinds the playlist to the first film.
+  const backToImage = () => {
+    setClipIndex(0);
+    setStage("image");
+  };
 
   return (
     <View style={styles.overlay}>
@@ -59,7 +73,7 @@ export function JourneyStory({
             <Text style={styles.note}>{milestone.note}</Text>
             <View style={styles.row}>
               {canPlayVideo ? (
-                <Pressable style={styles.primary} onPress={() => setStage("video")} accessibilityRole="button" accessibilityLabel={labels.watch}>
+                <Pressable style={styles.primary} onPress={() => { setClipIndex(0); setStage("video"); }} accessibilityRole="button" accessibilityLabel={labels.watch}>
                   <Icon.Play size={17} color={colors.night} fill={colors.night} />
                   <Text style={styles.primaryText}>{labels.watch}</Text>
                 </Pressable>
@@ -76,11 +90,12 @@ export function JourneyStory({
       {stage === "video" && canPlayVideo ? (
         <>
           {React.createElement("video" as any, {
+            key: clipIndex, // remount on clip change so the next film autoplays
             src: vUri,
             autoPlay: true,
             controls: true,
             playsInline: true,
-            onEnded: onClose,
+            onEnded: onFilmEnded,
             style: {
               position: "absolute",
               top: 0,
@@ -93,7 +108,7 @@ export function JourneyStory({
           })}
           <View style={styles.filmBar} pointerEvents="box-none">
             {hasImage ? (
-              <Pressable style={styles.ghostDark} onPress={() => setStage("image")} accessibilityRole="button" accessibilityLabel={labels.back}>
+              <Pressable style={styles.ghostDark} onPress={backToImage} accessibilityRole="button" accessibilityLabel={labels.back}>
                 <Icon.ChevronLeft size={16} color="#fff" />
                 <Text style={styles.ghostDarkText}>{labels.back}</Text>
               </Pressable>
