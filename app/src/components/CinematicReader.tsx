@@ -260,7 +260,7 @@ export function CinematicReader({
   );
 }
 
-// ── The book — a turn.js-style flipbook (see design/5396f77366f55-turnjs4.zip) ───────────────
+// ── The book — a turn.js-style flipbook (modelled on the turn.js page-fold behaviour) ───────────────
 // Faithful to turn.js's model: a two-page SPREAD around a centre spine (image plate verso, text
 // recto), and on a turn the RIGHT leaf rotates a full 180° over the spine — its BACK face carries
 // the incoming left page (backfaceVisibility, exactly like turn.js's folded page) — landing to

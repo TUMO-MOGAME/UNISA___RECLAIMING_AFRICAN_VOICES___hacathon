@@ -42,13 +42,6 @@ _Last updated: 2026-07-07 — by Tumo (via Claude)_
    Setswana audio. **3 residual unknowns for the contact** (marked in `botlhale.ts`): (a) field name
    `text` vs `text_msg`; (b) dev vs prod host; (c) refresh_token→IdToken flow (using a ready token for
    the demo).
-3. When keys arrive: `services/gemini.ts` (T017) · Supabase + RLS upload (T027) · Lelapa transcribe (T028).
-   **Botlhale TTS:** contract now wired from their public docs — `POST api.botlhale.xyz/tts`,
-   form-encoded `text_msg`+`language_code`, Bearer token, returns `audio_url`; Setswana = `tn-ZA`.
-   Paste a Bearer token into `app/.env` (`EXPO_PUBLIC_BOTLHALE_API_KEY`) → Listen auto-upgrades to real
-   Setswana audio. **3 residual unknowns for the contact** (marked in `botlhale.ts`): (a) field name
-   `text` vs `text_msg`; (b) dev vs prod host; (c) refresh_token→IdToken flow (using a ready token for
-   the demo).
 4. Persistence: WatermelonDB so recordings survive reload (T024). Optional: NativeWind (T006).
 5. Phase 3: ElevenLabs static intro · record the 2–3 min demo video · finalise the written narrative.
 
