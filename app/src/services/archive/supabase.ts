@@ -18,6 +18,18 @@ export function hasSupabase(): boolean {
   return !!(url && anonKey);
 }
 
+/** Whether an auth session already exists (so a write can skip the captcha challenge). */
+export async function hasSession(): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { data } = await sb.auth.getSession();
+    return !!data.session?.user;
+  } catch {
+    return false;
+  }
+}
+
 let client: SupabaseClient | null = null;
 
 /** Lazy singleton. Returns null when unconfigured (callers then stay device-local). */

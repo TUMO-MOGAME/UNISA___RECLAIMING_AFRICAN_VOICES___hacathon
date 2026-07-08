@@ -11,6 +11,7 @@ import {
   prepend,
   removeById,
   renameById,
+  updateById,
   sortNewestFirst,
 } from "./recordings";
 
@@ -36,6 +37,10 @@ export const recordingsStore: RecordingsStore = {
 
   async rename(id, title) {
     metas = renameById(metas, id, title);
+  },
+
+  async update(id, patch) {
+    metas = updateById(metas, id, patch);
   },
 
   async getPlaybackUri(id) {

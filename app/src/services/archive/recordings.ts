@@ -17,6 +17,10 @@ export type RecordingMeta = {
   visibility: Visibility;
   title: string;
   createdAt: string;
+  /** Set once shared to the cloud community feed: the Supabase row id (uuid). */
+  cloudId?: string;
+  /** The audio object's path in the `recordings` storage bucket (<uid>/<id>.<ext>). */
+  storagePath?: string;
 };
 
 /** Contract both platform stores implement. */
@@ -31,6 +35,8 @@ export type RecordingsStore = {
   remove(id: string): Promise<void>;
   /** Update the stored title. */
   rename(id: string, title: string): Promise<void>;
+  /** Patch stored metadata (e.g. mark a recording as shared: cloudId + storagePath). */
+  update(id: string, patch: Partial<RecordingMeta>): Promise<void>;
   /** A freshly-playable URI for this recording (new object URL on web), or null if missing. */
   getPlaybackUri(id: string): Promise<string | null>;
 };
@@ -53,4 +59,8 @@ export function removeById(list: RecordingMeta[], id: string): RecordingMeta[] {
 
 export function renameById(list: RecordingMeta[], id: string, title: string): RecordingMeta[] {
   return list.map((r) => (r.id === id ? { ...r, title } : r));
+}
+
+export function updateById(list: RecordingMeta[], id: string, patch: Partial<RecordingMeta>): RecordingMeta[] {
+  return list.map((r) => (r.id === id ? { ...r, ...patch } : r));
 }

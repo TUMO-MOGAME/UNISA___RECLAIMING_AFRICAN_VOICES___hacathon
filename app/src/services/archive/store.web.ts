@@ -88,6 +88,15 @@ export const recordingsStore: RecordingsStore = {
     if (row) await tx("readwrite", (s) => s.put({ ...row, title } as Row));
   },
 
+  async update(id, patch) {
+    if (!available) {
+      mem = mem.map((m) => (m.id === id ? { ...m, ...patch } : m));
+      return;
+    }
+    const row = await tx<Row | undefined>("readonly", (s) => s.get(id) as IDBRequest<Row | undefined>);
+    if (row) await tx("readwrite", (s) => s.put({ ...row, ...patch } as Row));
+  },
+
   async getPlaybackUri(id) {
     if (!available) return memUris.get(id) ?? null;
     const row = await tx<Row | undefined>("readonly", (s) => s.get(id) as IDBRequest<Row | undefined>);
