@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, Text, Pressable, Animated, Image, Modal, StyleSheet, useWindowDimensions, Linking } from "react-native";
 import { Module, Lang } from "../content/types";
 import { modules, atlasModules } from "../content";
@@ -224,6 +224,14 @@ const UI = {
     en: "Heritage Ledger · on-chain", tn: "Rekoto ya Boswa · mo blockchain", af: "Erfenisregister · op-ketting", zu: "Irejista Yamagugu · ku-blockchain", xh: "Irejista Yelifa · kwi-blockchain",
     nso: "Rejista ya Bohwa · go blockchain", st: "Rejista ya Lefa · ho blockchain", ss: "Irejista Yelifa · ku-blockchain", ts: "Rejista ya Ndzhaka · eka blockchain", nr: "Irejista Yelifa · ku-blockchain", ve: "Rejista ya Ifa · kha blockchain",
   },
+  scrollDown: {
+    en: "Scroll down for more", tn: "Kgweetla tlase go bona go feta", af: "Rol af vir meer", zu: "Skrola phansi ukuze uthole okwengeziwe", xh: "Skrola ezantsi ukuze ufumane okungakumbi",
+    nso: "Kgweetša tlase go bona tše dingwe", st: "Thella tlase ho bona tse ding", ss: "Skrola phansi kutfola lokunye", ts: "Sereleta ehansi ku vona swin'wana", nr: "Skrola phasi bona okhunye", ve: "Sombani fhasi u vhona zwinwe",
+  },
+  backToTop: {
+    en: "Back to top", tn: "Boela kwa godimo", af: "Terug na bo", zu: "Buyela phezulu", xh: "Buyela phezulu",
+    nso: "Boela godimo", st: "Khutlela hodimo", ss: "Buyela etulu", ts: "Vuyela ehenhla", nr: "Buyela phezulu", ve: "Vhuyelela nṱha",
+  },
 };
 
 // Feeds the page scroll position + viewport height to each Section for scroll-in reveals + parallax.
@@ -270,6 +278,33 @@ export function HomeGallery({
   // Selected country (defaults to South Africa) — drives the flag shown + which anthem plays.
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
 
+  // Scroll affordances: a bouncing "scroll down for more" cue near the top, and a "back to top"
+  // button once the reader nears the bottom of this long landing page.
+  // Typed `any` — Animated.ScrollView's ref typing is awkward; the instance exposes scrollTo at runtime.
+  const scrollRef = useRef<any>(null);
+  const [contentH, setContentH] = useState(0);
+  const [cue, setCue] = useState<"down" | "up" | null>("down");
+  const bounce = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounce, { toValue: 1, duration: 720, useNativeDriver: true }),
+        Animated.timing(bounce, { toValue: 0, duration: 720, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [bounce]);
+  const onScrollY = (y: number) => {
+    let next: "down" | "up" | null;
+    if (y < 80) next = "down";
+    else if (contentH > height * 1.4 && contentH - height - y < 180) next = "up";
+    else next = null;
+    setCue((prev) => (prev === next ? prev : next));
+  };
+  const scrollToTop = () => scrollRef.current?.scrollTo({ y: 0, animated: true });
+  const scrollDownOne = () => scrollRef.current?.scrollTo({ y: Math.max(height * 0.94, 520), animated: true });
+
   // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
   // journey brings it forward (bright + tappable) and fades the big words back.
   const [mapOpen, setMapOpen] = useState(false);
@@ -298,10 +333,15 @@ export function HomeGallery({
 
       <ScrollCtx.Provider value={{ scrollY, vh: height }}>
       <Animated.ScrollView
+        ref={scrollRef}
         contentContainerStyle={{ paddingBottom: 0 }}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: true })}
+        onContentSizeChange={(_w, h) => setContentH(h)}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: true,
+          listener: (e: any) => onScrollY(e.nativeEvent.contentOffset.y),
+        })}
       >
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
         <View style={[styles.hero, { height: heroH }]}>
@@ -562,6 +602,23 @@ export function HomeGallery({
         </View>
       </Animated.ScrollView>
       </ScrollCtx.Provider>
+
+      {/* Scroll affordances on the right edge (vertically centred, clear of the bottom-right chatbot):
+          a bouncing "scroll for more" chevron near the top, a "back to top" arrow near the bottom. */}
+      <View style={styles.scrollCue} pointerEvents="box-none">
+        {cue === "down" && (
+          <PressScale style={styles.cueBtn} onPress={scrollDownOne} accessibilityLabel={t(UI.scrollDown, lang)}>
+            <Animated.View style={{ transform: [{ translateY: bounce.interpolate({ inputRange: [0, 1], outputRange: [-3, 5] }) }] }}>
+              <Icon.ChevronDown size={24} color={colors.dsSlate} />
+            </Animated.View>
+          </PressScale>
+        )}
+        {cue === "up" && (
+          <PressScale style={styles.cueBtn} onPress={scrollToTop} accessibilityLabel={t(UI.backToTop, lang)}>
+            <Icon.ArrowUp size={22} color={colors.dsSlate} />
+          </PressScale>
+        )}
+      </View>
     </View>
   );
 }
@@ -777,6 +834,23 @@ const SLATE = "#000000"; // ground → pure black
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: SLATE },
   langBar: { position: "absolute", top: 0, right: 0, zIndex: 20, paddingTop: spacing.lg, paddingRight: spacing.lg },
+  // Right-edge scroll cue, vertically centred.
+  scrollCue: { position: "absolute", right: spacing.lg, top: 0, bottom: 0, justifyContent: "center", zIndex: 30 },
+  cueBtn: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: "rgba(255,255,255,0.92)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.06)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
+  },
   countryBar: { position: "absolute", top: 0, left: 0, zIndex: 20, paddingTop: spacing.lg, paddingLeft: spacing.lg },
 
   // Hero

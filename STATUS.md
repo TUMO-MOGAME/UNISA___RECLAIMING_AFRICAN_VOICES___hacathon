@@ -3,7 +3,7 @@
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
 > of "done."
 
-_Last updated: 2026-07-05 — by Tumo (via Claude)_
+_Last updated: 2026-07-07 — by Tumo (via Claude)_
 
 ---
 
@@ -20,6 +20,8 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 | **Reader "Listen" (TTS)**: pluggable Botlhale AI → on-device fallback | ✅ done (device path live; Botlhale on key) |
 | **All 11 SA languages**: data-driven registry + picker + TTS + honest EN fallback | ✅ framework done (EN/TSW text authored) |
 | **Machine-draft translations** (Botlhale): service + draft-aware Reader + gen script | ✅ built, awaiting token+org_id to run |
+| **Machine-draft translations (Claude)**: `npm run gen:claude-drafts` → 9 languages into `drafts.data.ts` | ✅ built + typecheck/bundle green, **awaiting `ANTHROPIC_API_KEY` to run** |
+| **"Ask Ubuntu" chatbot**: Claude tool-use (Anthropic SDK), RAG over site content only + `navigate_to` orchestrator | ✅ built + **runs in `expo start` dev + prod** (widget wired app-wide; **chrome localized in all 11 languages** + LLM replies in the picked language; nav + site answers work key-free; full chat on `EXPO_PUBLIC_ANTHROPIC_API_KEY`). Moved off LangChain — its `langsmith` dep TDZ-crashed the Expo web dev server. |
 | **Visual polish**: cinematic fonts · gradients · image fade+KenBurns · motion · branded launch | ✅ done (compiles; eyeball via `npm run web`) |
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
@@ -123,6 +125,44 @@ _Last updated: 2026-07-05 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-08** — **Chatbot memory + home scroll cues + nav-matcher fix.** (1) **Conversation memory** —
+  `services/chatbot/memory.ts`: device-local ONLY (web = localStorage, survives refresh; native = session),
+  never uploaded (POPIA); the panel restores the prior chat on open and passes the last ~10 turns to Claude
+  so it remembers context. Added a **"new chat" (↺) erase** button in the panel header — real erasure of the
+  stored transcript. Verified live: sent a message → full page reload → conversation restored from
+  localStorage. (2) **Scroll affordances on HomeGallery** — a bouncing **scroll-down chevron** on the right
+  edge near the top, swapping to a **back-to-top arrow** near the bottom (both clear of the bottom-right
+  chatbot); localized labels (`scrollDown`/`backToTop`). Verified live at top + bottom. (3) **Nav-matcher
+  fix** — `matchNavigation` no longer hijacks short questions that name a page ("Who was Sol Plaatje?" is
+  now answered, not navigated); unless an explicit "take me to" trigger is present. tsc clean · **79/79 tests**.
+- **2026-07-07** — **Language (Claude drafts) + "Ask Ubuntu" chatbot (LangChain).** Two features toward
+  the strict-scorecard gaps (Accessibility 12→ and a demonstrable AI wrapper). (1) **Claude translation
+  pipeline** — new `scripts/generate-claude-translations.mjs` (`npm run gen:claude-drafts`) drafts every
+  literary scene (title/adult/child) of the 4 pillars into the **9 not-yet-reviewed** SA languages using
+  **Claude** (Anthropic SDK, model `claude-opus-4-8`, structured JSON output, resumable), guided by the
+  human-reviewed Setswana as a register reference. Writes the existing `src/content/drafts.data.ts` that
+  the Reader already renders + labels "machine translation — unreviewed" (integrity rule intact — no
+  fabricated authority). **Gated on `ANTHROPIC_API_KEY` (build-time only)** to actually run. (2) **"Ask
+  Ubuntu" chatbot** — `src/services/chatbot/` (knowledge base built ONLY from the app's own grounded
+  content; pure retriever + nav-intent matcher w/ 8 unit tests; **LangChain `ChatAnthropic`** agent with
+  a bound `navigate_to` orchestrator tool). Answers strictly from site content (RAG + no-invention system
+  prompt); the orchestrator ("take me to the provinces") + retrieval answers work with **zero key**, and
+  upgrade to full conversation on `EXPO_PUBLIC_ANTHROPIC_API_KEY`. Floating widget wired app-wide in
+  `App.tsx` via a page→route resolver. **Chatbot chrome localized in all 11 languages** (`services/
+  chatbot/uiStrings.ts` via `t()`; verified live switching the picker to isiZulu — header, greeting,
+  chips, offline note, placeholder all switch); the LLM answer path is also told to **reply in the
+  picked language** (grounded in EN site context). Installed `@anthropic-ai/sdk` + `@langchain/anthropic` +
+  `@langchain/core`. **tsc clean · 77/77 tests · `expo export --platform web` green** (LangChain bundles;
+  index 4.4MB). **Awaiting Tumo:** paste an Anthropic key into `app/.env` (both `ANTHROPIC_API_KEY` and
+  `EXPO_PUBLIC_ANTHROPIC_API_KEY`, same value ok — see `.env.example`) → then run generation + live-drive
+  the chatbot. Optional: `EXPO_PUBLIC_CHATBOT_MODEL` / `TRANSLATE_MODEL=claude-haiku-4-5` for a faster,
+  cheaper path. **Update (same day):** localized the chatbot chrome in all 11 languages
+  (`services/chatbot/uiStrings.ts`; verified live in isiZulu) + LLM replies in the picked language.
+  Then **moved the chatbot off LangChain to the Anthropic SDK** — LangChain's `langsmith` dep
+  TDZ-crashes the Expo *web dev server* under Fast Refresh (`Cannot access 'Client' before init`);
+  production export was fine, but `expo start --web` white-screened. Same agent design (Claude tool-use
+  + `navigate_to` + RAG), now runs in **dev AND prod**; uninstalled `@langchain/*`. Verified the dev
+  server renders + the widget mounts with **zero runtime exceptions** (headless check). tsc clean · 77/77.
 - **2026-07-06** — **Totems story — cinematic slideshow with per-animal sound.** Added a "Play the story"
   Journey on the Totems screen: all 22 animals, each showing the photo + name + a grounded one-line
   meaning while **its sound plays**. Extended the shared `Journey` (per-slide `sound`/`title`; the music
