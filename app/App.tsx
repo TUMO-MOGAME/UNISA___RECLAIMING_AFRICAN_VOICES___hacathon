@@ -32,6 +32,7 @@ import { TotemsScreen } from "./src/components/TotemsScreen";
 import { HeroesScreen, HeroScreen } from "./src/components/HeroesScreens";
 import { heroById } from "./src/content/heroes";
 import { Fade } from "./src/components/Motion";
+import { ChatbotWidget } from "./src/components/ChatbotWidget";
 import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
 import { Lang } from "./src/content/types";
@@ -83,6 +84,30 @@ export default function App() {
       return [...s, r];
     });
   const back = () => setStack((s) => (s.length > 1 ? s.slice(0, -1) : s));
+
+  // The chatbot orchestrator: map a page id (from ChatbotWidget) to a real route. Literary + atlas
+  // topics are module ids and open in the Reader; the rest are named sections.
+  const navigateTo = (pageId: string) => {
+    switch (pageId) {
+      case "home":
+        setStack([{ name: "home" }]);
+        break;
+      case "atlas":
+      case "provinces":
+      case "presidents":
+      case "days":
+      case "totems":
+      case "heroes":
+      case "archive":
+      case "heritage":
+      case "about":
+        push({ name: pageId } as Route);
+        break;
+      default:
+        if (moduleById(pageId)) push({ name: "reader", id: pageId });
+        else setStack([{ name: "home" }]);
+    }
+  };
 
   // Android hardware/gesture back pops the in-app route stack instead of exiting the app.
   // Only handled while there is somewhere to go back to, so back on Home still exits normally.
@@ -217,6 +242,9 @@ export default function App() {
             </Fade>
           )}
         </View>
+        {/* The conversational guide floats above every screen (answers only from site content; can
+            navigate). Rendered outside the route Fade so it persists across navigation. */}
+        {ready && <ChatbotWidget lang={lang} onNavigate={navigateTo} />}
       </View>
     </SafeAreaProvider>
   );
