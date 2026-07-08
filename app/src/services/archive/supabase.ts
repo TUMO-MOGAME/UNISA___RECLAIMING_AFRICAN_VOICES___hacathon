@@ -18,6 +18,18 @@ export function hasSupabase(): boolean {
   return !!(url && anonKey);
 }
 
+/** Whether an auth session already exists (so a write can skip the captcha challenge). */
+export async function hasSession(): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  try {
+    const { data } = await sb.auth.getSession();
+    return !!data.session?.user;
+  } catch {
+    return false;
+  }
+}
+
 let client: SupabaseClient | null = null;
 
 /** Lazy singleton. Returns null when unconfigured (callers then stay device-local). */
@@ -35,13 +47,17 @@ export function getSupabase(): SupabaseClient | null {
  * Ensure an anonymous session exists and return its user id (the RLS owner), or null if cloud is
  * unconfigured / anonymous sign-ins are disabled in the dashboard. Never throws.
  */
-export async function ensureAnonSession(): Promise<string | null> {
+export async function ensureAnonSession(captchaToken?: string): Promise<string | null> {
   const sb = getSupabase();
   if (!sb) return null;
   try {
     const { data } = await sb.auth.getSession();
     if (data.session?.user) return data.session.user.id;
-    const { data: signed, error } = await sb.auth.signInAnonymously();
+    // If CAPTCHA protection is enabled on the project, signInAnonymously requires a captchaToken
+    // obtained from the hCaptcha widget (see CaptchaGate) — otherwise it is omitted.
+    const { data: signed, error } = await sb.auth.signInAnonymously(
+      captchaToken ? { options: { captchaToken } } : undefined
+    );
     if (error) {
       console.warn("[supabase] anonymous sign-in failed:", error.message);
       return null;
@@ -57,13 +73,13 @@ export async function ensureAnonSession(): Promise<string | null> {
  * End-to-end connectivity probe used by `npm run supabase:check` and any in-app diagnostic: confirm
  * the client is configured, an anonymous session can be obtained, and an RLS-guarded read succeeds.
  */
-export async function checkConnection(): Promise<
+export async function checkConnection(captchaToken?: string): Promise<
   | { ok: true; uid: string; publicCount: number }
   | { ok: false; stage: "config" | "auth" | "query"; message: string }
 > {
   if (!hasSupabase()) return { ok: false, stage: "config", message: "EXPO_PUBLIC_SUPABASE_URL / _ANON_KEY not set" };
   const sb = getSupabase() as SupabaseClient;
-  const uid = await ensureAnonSession();
+  const uid = await ensureAnonSession(captchaToken);
   if (!uid) return { ok: false, stage: "auth", message: "no anonymous session (enable Anonymous sign-ins in the dashboard)" };
   const { count, error } = await sb
     .from("recordings")

@@ -26,6 +26,23 @@ access is enforced entirely by **Row-Level Security (RLS)**.
    EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...
    ```
 
+## Optional: CAPTCHA protection (hCaptcha)
+
+CAPTCHA is **not required** for anonymous sign-ins — it's abuse-prevention for a public launch. If you
+enable it, **every** sign-in must carry a valid hCaptcha token, so the app renders an hCaptcha widget
+in the share flow and passes the token to `signInAnonymously({ options: { captchaToken } })`.
+
+To enable:
+1. Create a free account at [hcaptcha.com](https://www.hcaptcha.com) → add a site → copy the
+   **Sitekey** (public) and **Secret key** (private).
+2. Supabase dashboard → **Authentication → Attack Protection → Enable CAPTCHA protection** → provider
+   **hCaptcha** → paste the **Secret key** → **Save**. (The secret lives ONLY here.)
+3. Put the **Sitekey** in `app/.env` as `EXPO_PUBLIC_HCAPTCHA_SITEKEY=...` (public, safe to bundle).
+   For local dev, hCaptcha's always-pass test sitekey is `10000000-ffff-ffff-ffff-000000000001`.
+
+Note: the CLI `npm run supabase:check` can't solve a CAPTCHA, so once it's enabled the check reports
+"CAPTCHA enabled — verify in-app" instead of signing in headlessly.
+
 ## The access rules (what RLS guarantees)
 
 | Action | Who can do it |

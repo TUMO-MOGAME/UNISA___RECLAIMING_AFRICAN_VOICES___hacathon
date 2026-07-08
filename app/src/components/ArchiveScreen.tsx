@@ -14,7 +14,10 @@ import { PressScale } from "./Motion";
 import { Screen, ScreenHeader, Card, Body, Meta, Muted, Icon } from "../ui";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 import { recordingsStore } from "../services/archive/store";
-import { RecordingMeta, prepend, removeById, renameById } from "../services/archive/recordings";
+import { RecordingMeta, prepend, removeById, renameById, updateById } from "../services/archive/recordings";
+import { hasSupabase, hasSession, checkConnection } from "../services/archive/supabase";
+import { fetchPublicFeed, signedUrlFor, uploadPublic, deleteCloud, type FeedItem } from "../services/archive/cloud";
+import { CaptchaGate, CAPTCHA_ENABLED } from "./CaptchaGate";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
 // behind a POPIA consent gate, keep them private or public, and can delete them at any time (erasure).
@@ -111,6 +114,45 @@ const UI = {
     nr: "Ukubhala akutholakali kwesi sitjhini/isiphequluli. Linga i-app efonini nge-Expo Go.",
     ve: "U rekhoda a zwi wanali kha tshishumiswa itshi/buronza. Lingedzani app kha luṱingo nga Expo Go.",
   },
+  cloudTitle: {
+    en: "Cloud archive", tn: "Polokelo ya maru", af: "Wolkargief", zu: "Ingobo yasefwini", xh: "Uvimba wefu",
+    nso: "Polokelo ya maru", st: "Polokelo ya maru", ss: "Ingobo yelifu", ts: "Vuhlayiselo bya mapapa", nr: "Ingobo yelifu", ve: "Vhulondoloti ha makole",
+  },
+  cloudTest: {
+    en: "Test cloud connection", tn: "Leka kgolagano ya maru", af: "Toets wolkverbinding", zu: "Hlola uxhumano lwasefwini", xh: "Vavanya uqhagamshelwano lwefu",
+    nso: "Leka kgokagano ya maru", st: "Leka khokahano ya maru", ss: "Hlola luchumano lwelifu", ts: "Ringeta vuhlanganisi bya mapapa", nr: "Hlola ukuxhumana kwelifu", ve: "Lingani vhukwamani ha makole",
+  },
+  cloudChecking: {
+    en: "Checking…", tn: "E a lekola…", af: "Toets tans…", zu: "Iyahlola…", xh: "Iyavavanya…",
+    nso: "E a lekola…", st: "Ea hlahloba…", ss: "Iyahlola…", ts: "Ya kambela…", nr: "Iyahlola…", ve: "I khou lingedza…",
+  },
+  share: {
+    en: "Share to community", tn: "Abelana le setšhaba", af: "Deel met gemeenskap", zu: "Yabelana nomphakathi", xh: "Yabelana noluntu",
+    nso: "Abelana le setšhaba", st: "Arolelana le setjhaba", ss: "Yabelana nemmango", ts: "Avela vaaki", nr: "Yabelana nomphakathi", ve: "Kovhelani na tshitshavha",
+  },
+  sharing: {
+    en: "Sharing…", tn: "Go abelana…", af: "Deel tans…", zu: "Kuyabelwana…", xh: "Kuyabelwana…",
+    nso: "Go abelana…", st: "Ho arolelanwa…", ss: "Kuyabelwana…", ts: "Ku averiwa…", nr: "Kuyabelwana…", ve: "Hu khou kovhelwa…",
+  },
+  shared: {
+    en: "Shared ✓", tn: "Go abetswe ✓", af: "Gedeel ✓", zu: "Kwabelwe ✓", xh: "Kwabelwane ✓",
+    nso: "Go abetšwe ✓", st: "E arolelanwe ✓", ss: "Kwabiwe ✓", ts: "Swi averiwile ✓", nr: "Kwabelwe ✓", ve: "Zwo kovhelwa ✓",
+  },
+  community: {
+    en: "From the community", tn: "Go tswa setšhabeng", af: "Van die gemeenskap", zu: "Kuvela emphakathini", xh: "Kuvela eluntwini",
+    nso: "Go tšwa setšhabeng", st: "Ho tswa setjhabeng", ss: "Kuvela emmangweni", ts: "Ku suka evaakini", nr: "Kuvela emphakathini", ve: "Zwi bva tshitshavhani",
+  },
+  communityEmpty: {
+    en: "No shared stories yet — be the first to share one.", tn: "Ga go na dikanegelo tse di abetsweng — nna wa ntlha go abelana.",
+    af: "Nog geen gedeelde stories nie — wees die eerste om een te deel.", zu: "Azikho izindaba ezabiwe okwamanje — yiba ngowokuqala ukwabelana.",
+    xh: "Akukho mabali abelwane ngawo okwangoku — yiba ngowokuqala ukwabelana.", nso: "Ga go na dikanegelo tše di abetšwego — eba wa mathomo go abelana.",
+    st: "Ha ho dipale tse arolelanweng — eba wa pele ho arolelana.", ss: "Atikho tindzaba letabiwe — yiba ngewekucala kwabelana.",
+    ts: "A ku na mintsheketo leyi averiweke — va wo sungula ku avela.", nr: "Azikho iindaba ezabiwe — yiba ngowokuthoma ukwabelana.", ve: "A hu na zwiitwa zwo kovhelwaho — vhani wa u thoma u kovhela.",
+  },
+  refresh: {
+    en: "Refresh", tn: "Ntšhafatsa", af: "Verfris", zu: "Vuselela", xh: "Hlaziya",
+    nso: "Mpshafatša", st: "Ntjhafatsa", ss: "Vuselela", ts: "Pfuxeta", nr: "Vuselela", ve: "Vusuludza",
+  },
 };
 
 export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
@@ -122,16 +164,96 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
   const [pendingVisibility, setPendingVisibility] = useState<Visibility | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Cloud (Supabase): the community feed + sharing. Reading the feed needs no captcha (public rows are
+  // anon-readable via RLS); writing (share/erase) needs an anonymous session — captcha on first sign-in.
+  const [feed, setFeed] = useState<FeedItem[]>([]);
+  const [captchaFor, setCaptchaFor] = useState<null | { kind: "test" } | { kind: "share"; rec: RecordingMeta }>(null);
+  const [cloudBusy, setCloudBusy] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<string | null>(null);
 
-  // Rehydrate any recordings saved on this device (durable on web via IndexedDB).
+  const refreshFeed = () => {
+    if (hasSupabase()) fetchPublicFeed().then(setFeed).catch(() => {});
+  };
+
+  async function verifyCloud(token?: string) {
+    setCloudBusy(true);
+    setCloudStatus(null);
+    try {
+      const res = await checkConnection(token);
+      setCloudStatus(res.ok ? `Connected ✓ · ${res.publicCount} shared recording(s)` : `Failed (${res.stage}): ${res.message}`);
+    } catch (e: any) {
+      setCloudStatus(`Failed: ${e?.message ?? e}`);
+    } finally {
+      setCloudBusy(false);
+    }
+  }
+
+  async function doShare(rec: RecordingMeta, token?: string) {
+    setCloudBusy(true);
+    setCloudStatus(null);
+    try {
+      const uri = await recordingsStore.getPlaybackUri(rec.id);
+      if (!uri) {
+        setCloudStatus("Could not read the local audio.");
+        return;
+      }
+      const res = await uploadPublic({ recId: rec.id, uri, title: rec.title, language: lang, captchaToken: token });
+      if (res.ok) {
+        await recordingsStore.update(rec.id, { cloudId: res.cloudId, storagePath: res.storagePath });
+        setRecordings((rs) => updateById(rs, rec.id, { cloudId: res.cloudId, storagePath: res.storagePath }));
+        setCloudStatus("Shared to the community ✓");
+        refreshFeed();
+      } else {
+        setCloudStatus(`Share failed: ${res.message}`);
+      }
+    } finally {
+      setCloudBusy(false);
+    }
+  }
+
+  // Route a write through the captcha only when a sitekey is configured AND there's no session yet.
+  // With no sitekey (captcha disabled on the project), sign in anonymously without a token.
+  async function startShare(rec: RecordingMeta) {
+    if (!CAPTCHA_ENABLED || (await hasSession())) doShare(rec);
+    else setCaptchaFor({ kind: "share", rec });
+  }
+  async function startTest() {
+    if (!CAPTCHA_ENABLED || (await hasSession())) verifyCloud();
+    else setCaptchaFor({ kind: "test" });
+  }
+  function onCaptchaToken(token: string) {
+    const job = captchaFor;
+    setCaptchaFor(null);
+    if (!job) return;
+    if (job.kind === "test") verifyCloud(token);
+    else doShare(job.rec, token);
+  }
+
+  async function playRemote(item: FeedItem) {
+    const url = await signedUrlFor(item.storagePath);
+    if (!url) {
+      setCloudStatus("Could not load that recording.");
+      return;
+    }
+    try {
+      player.replace(url);
+      player.play();
+    } catch {
+      setCloudStatus("Playback failed.");
+    }
+  }
+
+  // Rehydrate any recordings saved on this device (durable on web via IndexedDB) + load the feed.
   useEffect(() => {
     let alive = true;
     recordingsStore.load().then((saved) => {
       if (alive) setRecordings(saved);
     });
+    refreshFeed();
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function beginRecording(visibility: Visibility) {
@@ -188,10 +310,15 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     }
   }
 
-  // Erasure (POPIA): permanently deletes the recording + its audio bytes. Cloud erasure follows on sync.
+  // Erasure (POPIA): permanently deletes the recording + its audio bytes locally, and — if it was
+  // shared — from the cloud too (row + storage object), then refreshes the community feed.
   function remove(id: string) {
+    const rec = recordings.find((r) => r.id === id);
     setRecordings((rs) => removeById(rs, id));
     recordingsStore.remove(id).catch(() => {});
+    if (rec?.cloudId && rec.storagePath) {
+      deleteCloud({ cloudId: rec.cloudId, storagePath: rec.storagePath }).then(refreshFeed).catch(() => {});
+    }
   }
 
   function rename(id: string, title: string) {
@@ -247,10 +374,76 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
                 <Icon.Trash2 size={13} color="rgba(255,255,255,0.7)" />
                 <Text style={styles.delText}>{t(UI.del, lang)}</Text>
               </Pressable>
+              {/* Share only appears for PUBLIC recordings once cloud is configured. */}
+              {r.visibility === "public" && hasSupabase() ? (
+                r.cloudId ? (
+                  <View style={styles.sharedBadge}>
+                    <Icon.Check size={12} color={colors.gold} strokeWidth={2.6} />
+                    <Text style={styles.sharedText}>{t(UI.shared, lang)}</Text>
+                  </View>
+                ) : (
+                  <Pressable style={styles.shareBtn} onPress={() => startShare(r)} disabled={cloudBusy}>
+                    <Icon.ArrowUpRight size={12} color={colors.night} />
+                    <Text style={styles.shareText}>{cloudBusy ? t(UI.sharing, lang) : t(UI.share, lang)}</Text>
+                  </Pressable>
+                )
+              ) : null}
             </View>
           </Card>
         ))
       )}
+
+      {/* Community cloud archive — shared recordings from everyone. Reading needs no captcha; the
+          hCaptcha challenge appears only for a write (test/share) when there's no session yet. */}
+      {hasSupabase() ? (
+        <Card style={styles.cloudCard}>
+          <View style={styles.badgeRow}>
+            <Icon.Users size={12} color={colors.gold} />
+            <Meta>{t(UI.cloudTitle, lang)}</Meta>
+          </View>
+
+          {captchaFor ? (
+            <CaptchaGate
+              onToken={onCaptchaToken}
+              onError={(m) => {
+                setCaptchaFor(null);
+                setCloudStatus(m ?? "captcha error");
+              }}
+            />
+          ) : (
+            <View style={styles.cloudActions}>
+              <Pressable style={styles.cloudBtn} onPress={startTest} disabled={cloudBusy}>
+                <Text style={styles.cloudBtnText}>{cloudBusy ? t(UI.cloudChecking, lang) : t(UI.cloudTest, lang)}</Text>
+              </Pressable>
+              <Pressable style={styles.cloudBtn} onPress={refreshFeed}>
+                <Text style={styles.cloudBtnText}>{t(UI.refresh, lang)}</Text>
+              </Pressable>
+            </View>
+          )}
+          {cloudStatus ? <Muted style={styles.cloudStatus}>{cloudStatus}</Muted> : null}
+
+          <Text style={styles.feedHeading}>{t(UI.community, lang)}</Text>
+          {feed.length === 0 ? (
+            <Muted style={styles.cloudStatus}>{t(UI.communityEmpty, lang)}</Muted>
+          ) : (
+            feed.map((f) => (
+              <View key={f.id} style={styles.feedRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.feedTitle} numberOfLines={1}>{f.title}</Text>
+                  <Muted style={styles.date}>
+                    {(f.createdAt ?? "").slice(0, 10)}
+                    {f.language ? ` · ${f.language}` : ""}
+                  </Muted>
+                </View>
+                <Pressable style={styles.playBtn} onPress={() => playRemote(f)}>
+                  <Icon.Play size={13} color="#000" fill="#000" />
+                  <Text style={styles.playText}>{t(UI.play, lang)}</Text>
+                </Pressable>
+              </View>
+            ))
+          )}
+        </Card>
+      ) : null}
 
       <ConsentSheet
         visible={consentVisible}
@@ -302,4 +495,18 @@ const styles = StyleSheet.create({
   playText: { color: "#000", fontFamily: fonts.bodySemi, fontSize: type.small },
   delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: "rgba(255,255,255,0.3)", flexDirection: "row", alignItems: "center", gap: 6 },
   delText: { color: "rgba(255,255,255,0.7)", fontFamily: fonts.bodySemi, fontSize: type.small },
+  cloudCard: { marginTop: spacing.xl, padding: spacing.md },
+  cloudActions: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm, flexWrap: "wrap" },
+  cloudBtn: { alignSelf: "flex-start", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" },
+  cloudBtnText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.small },
+  cloudStatus: { marginTop: spacing.sm, fontSize: type.small },
+  // Share button on a public recording card (gold pill, dark text — like the play button's cousin).
+  shareBtn: { backgroundColor: colors.gold, borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 6 },
+  shareText: { color: colors.night, fontFamily: fonts.bodySemi, fontSize: type.small },
+  sharedBadge: { flexDirection: "row", alignItems: "center", gap: 5, paddingVertical: 8, paddingHorizontal: 12 },
+  sharedText: { color: colors.gold, fontFamily: fonts.bodySemi, fontSize: type.small },
+  // Community feed rows.
+  feedHeading: { color: colors.gold, fontFamily: fonts.bodyBold, fontSize: type.small - 1, letterSpacing: 1, textTransform: "uppercase", marginTop: spacing.lg, marginBottom: spacing.xs },
+  feedRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, paddingVertical: spacing.sm, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.1)" },
+  feedTitle: { color: "#fff", fontFamily: fonts.bodySemi, fontSize: type.body },
 });
