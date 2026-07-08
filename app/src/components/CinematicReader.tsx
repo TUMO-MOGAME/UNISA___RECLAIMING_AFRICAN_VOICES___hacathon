@@ -34,6 +34,13 @@ const playlist = sharedPlaylist(soundtrackClips.length);
 const READING_VOLUME = 0.12; // a whisper under the text
 const DUCKED_VOLUME = 0.03; // under narration, almost silent
 
+// Scene title in the shown language — human-reviewed copy first, then a machine draft (drafts.data.ts),
+// else an honest English fallback. Keeps the title in-language alongside the body (which resolves the
+// same way), so a translated passage doesn't sit under an English heading.
+function sceneTitleText(module: Module, scene: Module["scenes"][number], lang: Lang) {
+  return resolveText(scene.title, lang, draftText(module.id, scene.id, "title", lang)).text;
+}
+
 const UI = {
   child: {
     en: "Child", tn: "Bana", af: "Kind", zu: "Ingane", xh: "Umntwana",
@@ -193,7 +200,7 @@ export function CinematicReader({
               <Text style={styles.kicker}>
                 {module.title} · {module.author}
               </Text>
-              <Text style={styles.sceneTitle}>{t(scene.title, lang)}</Text>
+              <Text style={styles.sceneTitle}>{sceneTitleText(module, scene, lang)}</Text>
             </View>
           </View>
           <View style={styles.toggles}>
@@ -294,7 +301,7 @@ function ImagePage({ module, i, lang }: { module: Module; i: number; lang: Lang 
       <View style={styles.plate}>
         <SceneImage source={src} />
       </View>
-      <Text style={styles.plateCaption}>{t(scene.title, lang)}</Text>
+      <Text style={styles.plateCaption}>{sceneTitleText(module, scene, lang)}</Text>
       <Text style={styles.plateNote}>{t(UI.interpretation, lang)}</Text>
       <Text style={styles.plateNote}>
         {t(UI.source, lang)}: {scene.sourceNote}
@@ -331,7 +338,7 @@ function TextPage({
           <SceneImage source={sceneImageSource(module.id, scene.id, scene.imagePrompt, { seed: scene.seed })} />
         </View>
       )}
-      <Text style={styles.pageTitle}>{t(scene.title, lang)}</Text>
+      <Text style={styles.pageTitle}>{sceneTitleText(module, scene, lang)}</Text>
       <ScrollView style={styles.pageScroll} contentContainerStyle={{ paddingBottom: spacing.lg }} showsVerticalScrollIndicator={false}>
         <Text style={styles.ink}>
           <Text style={styles.inkDrop}>{text.slice(0, 1)}</Text>
