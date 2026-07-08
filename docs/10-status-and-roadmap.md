@@ -70,7 +70,7 @@ notarises the public-domain canon on a public blockchain. Humanities first; tech
 |---|---|---|
 | **Indigenous neural voice** (Listen upgrades from on-device to Botlhale) | `services/tts/botlhale.ts` — real API contract wired | `EXPO_PUBLIC_BOTLHALE_API_KEY` |
 | **Transcription** of archive recordings (Lelapa/Vulavula, code-switching) | service layer + Mantswe pure core | Lelapa key |
-| **Cloud sharing** of recordings (private/public, RLS) | Supabase storage + policy design | Supabase URL + anon key |
+| **Cloud sharing** of recordings (private/public, RLS) | **DB schema provisioned** (`supabase/migrations/0001_community_archive.sql` — POPIA RLS + storage + erasure trigger); client not yet wired | Supabase URL + publishable key (configured) + run the migration |
 | **Full "Ask Ubuntu" conversation** (LLM, not just retrieval/nav) | Anthropic SDK agent w/ `navigate_to` tool | `EXPO_PUBLIC_ANTHROPIC_API_KEY` |
 | **Regenerating** machine translations at scale | `gen:claude-drafts` script | Anthropic key (drafts already seeded in-session) |
 
@@ -88,6 +88,9 @@ The demo runs entirely without these; each simply upgrades a fallback to its ful
   before adding new sections (depth over breadth).
 - ⏳ **Human review of the 9-language literary drafts** (Tumo, native speakers) → promote reviewed
   languages to `reviewedContent: true`.
+- ⏳ **Wire the app to Supabase** — the Community Archive DB is provisioned
+  ([supabase/README.md](../supabase/README.md)); next: `@supabase/supabase-js` client with anonymous
+  sign-in, upload-on-public-consent, a community feed, and delete = object-then-row.
 - ⏳ **Mantswe a Batho** (oral-history AI consensus that surfaces agreement/divergence, never adjudicates)
   — pure de-identify + aggregate core is built and tested; UI + Lelapa/Gemini/Supabase wiring pending.
 - ⏳ **Ingestion Library** — `npm run ingest` turns a rights-cleared public-domain book into a draft
