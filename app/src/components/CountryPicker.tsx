@@ -28,6 +28,15 @@ const UI = {
   moreSoon: {
     en: "Anthems are being added country by country.",
     tn: "Dipina di tsenngwa naga ka naga.",
+    af: "Volksliedere word land vir land bygevoeg.",
+    zu: "Amaculo esizwe engezwa izwe ngezwe.",
+    xh: "Iingoma zesizwe zongezwa ilizwe ngelizwe.",
+    nso: "Dikoša tša setšhaba di okeletšwa naga ka naga.",
+    st: "Dipina tsa naha di ekeletswa naha ka naha.",
+    ss: "Tingoma tesive tengetwa live ngelive.",
+    ts: "Tinsimu ta rixaka ti engeteriwa tiko hi tiko.",
+    nr: "Iingoma zesitjhaba zingezelelwa inarha nge narha.",
+    ve: "Nyimbo dza lushaka dzi khou engedzwa shango nga shango.",
   },
   search: {
     en: "Search countries", tn: "Batla dinaga", af: "Soek lande", zu: "Sesha amazwe", xh: "Khangela amazwe",
