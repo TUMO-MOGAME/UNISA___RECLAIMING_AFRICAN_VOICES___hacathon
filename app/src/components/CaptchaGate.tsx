@@ -5,6 +5,9 @@ import { colors, fonts, spacing } from "../theme/tokens";
 // Native stub — cloud sign-in (and thus the hCaptcha challenge) is web-only for now. The real widget
 // lives in CaptchaGate.web.tsx; Metro picks that on web. Keeping the same props so callers are identical.
 
+/** Native has no captcha widget (cloud sign-in is web-only), so never require one here. */
+export const CAPTCHA_ENABLED = false;
+
 export type CaptchaGateProps = {
   onToken: (token: string) => void;
   onError?: (message?: string) => void;

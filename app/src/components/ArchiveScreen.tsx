@@ -17,7 +17,7 @@ import { recordingsStore } from "../services/archive/store";
 import { RecordingMeta, prepend, removeById, renameById, updateById } from "../services/archive/recordings";
 import { hasSupabase, hasSession, checkConnection } from "../services/archive/supabase";
 import { fetchPublicFeed, signedUrlFor, uploadPublic, deleteCloud, type FeedItem } from "../services/archive/cloud";
-import { CaptchaGate } from "./CaptchaGate";
+import { CaptchaGate, CAPTCHA_ENABLED } from "./CaptchaGate";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
 // behind a POPIA consent gate, keep them private or public, and can delete them at any time (erasure).
@@ -211,13 +211,14 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     }
   }
 
-  // Route a write through the captcha only when there's no session yet.
+  // Route a write through the captcha only when a sitekey is configured AND there's no session yet.
+  // With no sitekey (captcha disabled on the project), sign in anonymously without a token.
   async function startShare(rec: RecordingMeta) {
-    if (await hasSession()) doShare(rec);
+    if (!CAPTCHA_ENABLED || (await hasSession())) doShare(rec);
     else setCaptchaFor({ kind: "share", rec });
   }
   async function startTest() {
-    if (await hasSession()) verifyCloud();
+    if (!CAPTCHA_ENABLED || (await hasSession())) verifyCloud();
     else setCaptchaFor({ kind: "test" });
   }
   function onCaptchaToken(token: string) {

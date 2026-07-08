@@ -10,6 +10,9 @@ import { colors, fonts, spacing } from "../theme/tokens";
 
 const SITEKEY = process.env.EXPO_PUBLIC_HCAPTCHA_SITEKEY;
 
+/** Whether a captcha challenge should be required (a sitekey is configured). */
+export const CAPTCHA_ENABLED = !!SITEKEY;
+
 export type CaptchaGateProps = {
   onToken: (token: string) => void;
   onError?: (message?: string) => void;
