@@ -1,9 +1,10 @@
-# STATUS — Maloba live board
+# STATUS — Ubuntu Heritage live board
 
 > Source of truth for "what's going on right now." Read first, update last. Treat updating it as part
-> of "done."
+> of "done." For the structured **implemented vs. planned** view, see
+> [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-07-07 — by Tumo (via Claude)_
+_Last updated: 2026-07-08 — by Tumo (via Claude)_
 
 ---
 
