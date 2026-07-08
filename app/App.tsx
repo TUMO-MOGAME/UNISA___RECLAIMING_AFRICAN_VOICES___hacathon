@@ -75,6 +75,9 @@ export default function App() {
   // to where the user actually came from (e.g. Reader→Atlas, City→Province, Archive→President).
   const [stack, setStack] = useState<Route[]>([{ name: "home" }]);
   const route = stack[stack.length - 1];
+  // A full-screen "dot story" (picture/film) is playing — hide the floating chatbot so it doesn't
+  // sit over the film.
+  const [storyActive, setStoryActive] = useState(false);
   // Ignore a double-tap pushing the same route twice (it would make the first Back look dead).
   const push = (r: Route) =>
     setStack((s) => {
@@ -203,6 +206,7 @@ export default function App() {
             onDays={() => push({ name: "days" })}
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
+            onStoryActiveChange={setStoryActive}
           />
         );
     }
@@ -244,7 +248,7 @@ export default function App() {
         </View>
         {/* The conversational guide floats above every screen (answers only from site content; can
             navigate). Rendered outside the route Fade so it persists across navigation. */}
-        {ready && <ChatbotWidget lang={lang} onNavigate={navigateTo} />}
+        {ready && !storyActive && <ChatbotWidget lang={lang} onNavigate={navigateTo} />}
       </View>
     </SafeAreaProvider>
   );

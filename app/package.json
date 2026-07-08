@@ -43,6 +43,7 @@
     "gen:drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-draft-translations.mjs",
     "gen:claude-drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-claude-translations.mjs",
     "gen:images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-scene-images.mjs",
+    "gen:journey-images": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-journey-images.mjs",
     "gen:sounds": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generate-animal-sounds.mjs",
     "import:sounds": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/import-animal-sounds.mjs",
     "webp": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/convert-webp.mjs",

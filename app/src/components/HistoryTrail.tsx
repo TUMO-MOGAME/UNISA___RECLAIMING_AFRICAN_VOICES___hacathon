@@ -1,9 +1,46 @@
-import React, { useMemo, useState } from "react";
-import { View, Text, Pressable, Animated, StyleSheet, useWindowDimensions } from "react-native";
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import { View, Text, Pressable, Animated, StyleSheet, useWindowDimensions, Platform } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { Asset } from "expo-asset";
 import { fonts, colors } from "../theme/tokens";
 import { Icon } from "../ui";
 import { historyTrail, type HistoryMilestone } from "../content/history-trail";
+
+// The walking-journey character (transparent VP9 webm). On web it plays as a looping <video>; on
+// native it degrades to a small marker until expo-video is wired. The figure faces RIGHT by default,
+// so we mirror it (scaleX) when walking to the LEFT. Resolve the bundled asset URL via expo-asset
+// (web-safe — react-native-web has no Image.resolveAssetSource), guarded so it can never crash render.
+let WALK_URI: string | undefined;
+try {
+  WALK_URI = Asset.fromModule(require("../../assets/journey/walk.webm")).uri;
+} catch {
+  WALK_URI = undefined;
+}
+const WALK_SIZE = 58;
+
+function WalkVideo({ facing }: { facing: "left" | "right" }) {
+  const flip = facing === "left"; // source faces right; mirror only when heading left
+  if (Platform.OS === "web" && WALK_URI) {
+    // Raw DOM <video> (react-native-web renders it via react-dom). Cast around RN's JSX typings.
+    return React.createElement("video" as any, {
+      src: WALK_URI,
+      autoPlay: true,
+      loop: true,
+      muted: true,
+      playsInline: true,
+      style: {
+        width: WALK_SIZE,
+        height: WALK_SIZE,
+        objectFit: "contain",
+        transform: flip ? "scaleX(-1)" : "none",
+        display: "block",
+        pointerEvents: "none",
+        filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.5))",
+      },
+    });
+  }
+  return <View style={{ width: WALK_SIZE, height: WALK_SIZE, borderRadius: WALK_SIZE / 2, backgroundColor: GOLD }} />;
+}
 
 // The History Trail — a wandering "ant-trail" journey map of dated milestones. The connecting line is
 // a smooth dashed SVG path; dots + year labels are RN views on top (real fonts + tap targets). The
@@ -96,6 +133,8 @@ export function HistoryTrail({
   dimOpacity,
   onStart,
   startLabel,
+  keepWalkingLabel,
+  journeyDoneLabel,
 }: {
   active: boolean;
   onSelect: (m: HistoryMilestone) => void;
@@ -106,6 +145,9 @@ export function HistoryTrail({
   onStart?: () => void;
   /** Localized label shown beside the start flag. */
   startLabel?: string;
+  /** Localized labels for the guided walk controls. */
+  keepWalkingLabel?: string;
+  journeyDoneLabel?: string;
 }) {
   const { width } = useWindowDimensions();
   const rows = width >= 900 ? 3 : width >= 560 ? 4 : 5;
@@ -114,6 +156,78 @@ export function HistoryTrail({
   const pts = useMemo(() => computePoints(historyTrail.length, size.w, size.h, rows), [size.w, size.h, rows]);
   const dPath = useMemo(() => smoothPath(pts), [pts]);
   const first = pts[0];
+
+  // ── Guided walk: a character strolls the main road, stopping at each big dot. ──────────────────
+  const [idx, setIdx] = useState(0); // current big-dot index the walker is at
+  const idxRef = useRef(0);
+  const [phase, setPhase] = useState<"idle" | "walking">("idle");
+  const [facing, setFacing] = useState<"left" | "right">("right");
+  const wx = useRef(new Animated.Value(0)).current; // walker screen x
+  const wy = useRef(new Animated.Value(0)).current; // walker screen y
+  const p = useRef(new Animated.Value(0)).current; // 0..1 progress along the current segment
+  const onSelectRef = useRef(onSelect);
+  onSelectRef.current = onSelect;
+  const ready = size.w > 0 && pts.length > 1;
+
+  // Start / reset the walk when the journey opens (active) and the layout is known.
+  useEffect(() => {
+    if (!active || !ready) {
+      setPhase("idle");
+      setIdx(0);
+      idxRef.current = 0;
+      return;
+    }
+    idxRef.current = 0;
+    setIdx(0);
+    setPhase("idle");
+    setFacing("right");
+    wx.setValue(pts[0].x);
+    wy.setValue(pts[0].y);
+    onSelectRef.current?.(historyTrail[0]); // show the first milestone's description
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, ready, size.w, size.h, rows]);
+
+  // Walk from the current big dot to the next one, following the real road curve.
+  const walkNext = () => {
+    if (phase === "walking") return;
+    const i = idxRef.current;
+    if (i >= historyTrail.length - 1) return;
+    const seg = i;
+    const a = pts[seg];
+    const b = pts[seg + 1];
+    setFacing(b.x >= a.x ? "right" : "left");
+    setPhase("walking");
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    const dur = Math.max(650, Math.min(2400, (dist / 130) * 1000));
+    p.setValue(0);
+    const listenerId = p.addListener(({ value }) => {
+      const s = segAt(pts, seg, value);
+      wx.setValue(s.x);
+      wy.setValue(s.y);
+    });
+    Animated.timing(p, { toValue: 1, duration: dur, useNativeDriver: false }).start(({ finished }) => {
+      p.removeListener(listenerId);
+      if (!finished) return;
+      idxRef.current = i + 1;
+      setIdx(i + 1);
+      wx.setValue(b.x);
+      wy.setValue(b.y);
+      setPhase("idle");
+      onSelectRef.current?.(historyTrail[i + 1]); // reveal the arrival milestone's description
+    });
+  };
+
+  const restartWalk = () => {
+    idxRef.current = 0;
+    setIdx(0);
+    setPhase("idle");
+    setFacing("right");
+    wx.setValue(pts[0].x);
+    wy.setValue(pts[0].y);
+    onSelectRef.current?.(historyTrail[0]);
+  };
+
+  const atLast = idx >= historyTrail.length - 1;
 
   // Flatten every milestone's branches. Each branch peels off a point ON THE ROAD (between the
   // milestone dot and the next, "as we approach" it), perpendicular to the road there.
@@ -221,6 +335,45 @@ export function HistoryTrail({
             })}
           </Animated.View>
 
+          {/* Guided walker + "keep walking" control — full opacity, only while journeying */}
+          {active && ready && (
+            <>
+              <Animated.View
+                pointerEvents="none"
+                style={[
+                  styles.walker,
+                  { transform: [{ translateX: wx }, { translateY: wy }, { translateX: -WALK_SIZE / 2 }, { translateY: -WALK_SIZE + 10 }] },
+                ]}
+              >
+                <WalkVideo facing={facing} />
+              </Animated.View>
+
+              {phase === "idle" && !atLast && (
+                <Pressable
+                  style={[styles.walkBtn, { left: clamp(pts[idx].x + 18, 8, size.w - 168), top: clamp(pts[idx].y - 14, 8, size.h - 44) }]}
+                  onPress={walkNext}
+                  accessibilityRole="button"
+                  accessibilityLabel={keepWalkingLabel}
+                >
+                  <Text style={styles.walkBtnText}>{keepWalkingLabel ?? "Keep walking"}</Text>
+                  <Icon.ChevronRight size={15} color={colors.night} />
+                </Pressable>
+              )}
+
+              {phase === "idle" && atLast && (
+                <Pressable
+                  style={[styles.walkBtn, { left: clamp(pts[idx].x + 18, 8, size.w - 190), top: clamp(pts[idx].y - 14, 8, size.h - 44) }]}
+                  onPress={restartWalk}
+                  accessibilityRole="button"
+                  accessibilityLabel={journeyDoneLabel}
+                >
+                  <Icon.RotateCcw size={14} color={colors.night} />
+                  <Text style={styles.walkBtnText}>{journeyDoneLabel ?? "Restart"}</Text>
+                </Pressable>
+              )}
+            </>
+          )}
+
           {/* the "Start" flag planted on the FIRST dot — full opacity, only while the map is closed */}
           {!active && first ? (
             <Pressable
@@ -266,4 +419,24 @@ const styles = StyleSheet.create({
   startPin: { position: "absolute", zIndex: 30, flexDirection: "row", alignItems: "center", gap: 7, backgroundColor: "rgba(10,7,3,0.85)", borderWidth: 1, borderColor: GOLD, borderRadius: 999, paddingVertical: 5, paddingLeft: 5, paddingRight: 12, transform: [{ translateX: -13 }, { translateY: -15 }] },
   startFlag: { width: 22, height: 22, borderRadius: 11, backgroundColor: GOLD, alignItems: "center", justifyContent: "center" },
   startPinText: { color: "#FBEFD8", fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 0.3 },
+
+  // Guided walk
+  walker: { position: "absolute", left: 0, top: 0, zIndex: 25 },
+  walkBtn: {
+    position: "absolute",
+    zIndex: 26,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: GOLD,
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  walkBtnText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
 });
