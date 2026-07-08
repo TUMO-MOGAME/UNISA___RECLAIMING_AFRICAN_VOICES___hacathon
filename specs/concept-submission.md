@@ -81,12 +81,14 @@ prototype.
 Open Ubuntu Heritage and choose a pillar of South African letters, or an entry in the **Cultural Atlas**.
 Each scene is rendered as a cinematic image (generated free by Pollinations.ai, or pre-generated with
 Google Gemini and cached for offline use) with the text overlaid; toggle **Child/Adult** reading levels
-(tone adapts, never facts) and the reading language. A **Listen** control reads the scene aloud. Reading
-works **offline**. In the **Community Archive**, record an elder's story — after a clear **POPIA
-consent** step — keep it private or share it, and delete it at any time. A **Heritage Ledger** screen
-shows the on-chain provenance record for each canonical work (content hash + IPFS reference + a "Verify
-on Solana" link). A floating **"Ask Ubuntu"** guide answers questions strictly from the site's own
-grounded content and can navigate you to any section.
+(tone adapts, never facts) and the reading language. A **Listen** control reads the scene aloud. The
+reading core works on **low data / poor connectivity** (text + cached images + on-device narration). In
+the **Community Archive**, record an elder's story — after a clear **POPIA consent** step — keep it
+private, or **share it to a community feed anyone can hear**, and delete it at any time (erased from the
+cloud too). A **Heritage Ledger** screen shows the on-chain provenance record for each canonical work
+(content hash + IPFS reference + a "Verify on Solana" link). A floating **"Ask Ubuntu"** guide answers
+strictly from the site's own grounded content — conversationally via **Google Gemini**, or from grounded
+snippets with no key — and can navigate you to any section.
 
 ## 5. What is live now vs. what activates with a key (honesty note)
 
@@ -96,12 +98,13 @@ is added — the demo is honest about which is which:
 
 | Capability | State in the demo |
 |---|---|
-| Reading, Child/Adult, cinematic images, offline, 11-language UI, the Journey, Heritage Ledger, "Ask Ubuntu" navigation/retrieval | ✅ **Live, key-free** |
-| Community Archive: consent → record → local save → play → delete | ✅ **Live on web** (durable local storage; erasure is real) |
+| Reading, Child/Adult, cinematic images, low-data, 11-language UI, the Journey, Heritage Ledger, "Ask Ubuntu" navigation/retrieval | ✅ **Live, key-free** |
+| Community Archive: consent → record → local save → play → delete | ✅ **Live** (durable local storage; erasure is real) |
+| **Community cloud sharing** — Share to a public feed → others stream it → delete syncs to the cloud | ✅ **Live online** (Supabase + Row-Level Security + anonymous auth + hCaptcha; verified end-to-end on the deployed site) |
+| **"Ask Ubuntu" conversational answers** | ✅ **Live via Google Gemini**, grounded in site content; falls back to grounded snippets with no key. (An Anthropic/Claude key can be swapped in instead.) |
 | Literary text in the 9 not-yet-reviewed languages | ✅ **Shown as machine-draft, clearly labelled "unreviewed"** (EN + Setswana are human-reviewed) |
 | **Listen** in indigenous-language neural voice (Botlhale) | 🔑 built + wired — **falls back to on-device speech** until a Botlhale key is added |
-| Transcription (Lelapa) + cloud sharing (Supabase) | 🔑 built + wired — **local-only** until keys are added |
-| Full "Ask Ubuntu" LLM conversation (Anthropic) | 🔑 navigation + site answers work key-free; **full chat** activates with a key |
+| Automatic transcription of recordings (Lelapa / Vulavula) | 🔑 built + wired — **awaiting a key** |
 
 ## 6. Rubric alignment (why it scores)
 
