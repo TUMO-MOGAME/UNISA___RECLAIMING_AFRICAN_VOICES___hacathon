@@ -15,6 +15,8 @@ import { Screen, ScreenHeader, Card, Body, Meta, Muted, Icon } from "../ui";
 import { colors, spacing, radius, type, fonts } from "../theme/tokens";
 import { recordingsStore } from "../services/archive/store";
 import { RecordingMeta, prepend, removeById, renameById } from "../services/archive/recordings";
+import { hasSupabase, checkConnection } from "../services/archive/supabase";
+import { CaptchaGate } from "./CaptchaGate";
 
 // The Community Archive — the heart of Community Impact (25%). Users record their own oral histories
 // behind a POPIA consent gate, keep them private or public, and can delete them at any time (erasure).
@@ -111,6 +113,18 @@ const UI = {
     nr: "Ukubhala akutholakali kwesi sitjhini/isiphequluli. Linga i-app efonini nge-Expo Go.",
     ve: "U rekhoda a zwi wanali kha tshishumiswa itshi/buronza. Lingedzani app kha luṱingo nga Expo Go.",
   },
+  cloudTitle: {
+    en: "Cloud archive", tn: "Polokelo ya maru", af: "Wolkargief", zu: "Ingobo yasefwini", xh: "Uvimba wefu",
+    nso: "Polokelo ya maru", st: "Polokelo ya maru", ss: "Ingobo yelifu", ts: "Vuhlayiselo bya mapapa", nr: "Ingobo yelifu", ve: "Vhulondoloti ha makole",
+  },
+  cloudTest: {
+    en: "Test cloud connection", tn: "Leka kgolagano ya maru", af: "Toets wolkverbinding", zu: "Hlola uxhumano lwasefwini", xh: "Vavanya uqhagamshelwano lwefu",
+    nso: "Leka kgokagano ya maru", st: "Leka khokahano ya maru", ss: "Hlola luchumano lwelifu", ts: "Ringeta vuhlanganisi bya mapapa", nr: "Hlola ukuxhumana kwelifu", ve: "Lingani vhukwamani ha makole",
+  },
+  cloudChecking: {
+    en: "Checking…", tn: "E a lekola…", af: "Toets tans…", zu: "Iyahlola…", xh: "Iyavavanya…",
+    nso: "E a lekola…", st: "Ea hlahloba…", ss: "Iyahlola…", ts: "Ya kambela…", nr: "Iyahlola…", ve: "I khou lingedza…",
+  },
 };
 
 export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
@@ -122,6 +136,26 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
   const [pendingVisibility, setPendingVisibility] = useState<Visibility | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Cloud connection self-test (Supabase + hCaptcha). Verifies in-app what the CLI can't (captcha).
+  const [cloudOpen, setCloudOpen] = useState(false);
+  const [cloudBusy, setCloudBusy] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<string | null>(null);
+
+  async function verifyCloud(captchaToken: string) {
+    setCloudBusy(true);
+    setCloudOpen(false);
+    setCloudStatus(null);
+    try {
+      const res = await checkConnection(captchaToken);
+      setCloudStatus(
+        res.ok ? `Connected ✓ · ${res.publicCount} shared recording(s)` : `Failed (${res.stage}): ${res.message}`
+      );
+    } catch (e: any) {
+      setCloudStatus(`Failed: ${e?.message ?? e}`);
+    } finally {
+      setCloudBusy(false);
+    }
+  }
 
   // Rehydrate any recordings saved on this device (durable on web via IndexedDB).
   useEffect(() => {
@@ -252,6 +286,38 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
         ))
       )}
 
+      {/* Cloud connection self-test — only when Supabase is configured. Verifies anon sign-in + RLS
+          via the hCaptcha widget (the CLI health-check can't solve a captcha). */}
+      {hasSupabase() ? (
+        <Card style={styles.cloudCard}>
+          <View style={styles.badgeRow}>
+            <Icon.Users size={12} color={colors.gold} />
+            <Meta>{t(UI.cloudTitle, lang)}</Meta>
+          </View>
+          {cloudOpen ? (
+            <CaptchaGate
+              onToken={verifyCloud}
+              onError={(m) => {
+                setCloudOpen(false);
+                setCloudStatus(m ?? "captcha error");
+              }}
+            />
+          ) : (
+            <Pressable
+              style={styles.cloudBtn}
+              onPress={() => {
+                setCloudStatus(null);
+                setCloudOpen(true);
+              }}
+              disabled={cloudBusy}
+            >
+              <Text style={styles.cloudBtnText}>{cloudBusy ? t(UI.cloudChecking, lang) : t(UI.cloudTest, lang)}</Text>
+            </Pressable>
+          )}
+          {cloudStatus ? <Muted style={styles.cloudStatus}>{cloudStatus}</Muted> : null}
+        </Card>
+      ) : null}
+
       <ConsentSheet
         visible={consentVisible}
         lang={lang}
@@ -302,4 +368,8 @@ const styles = StyleSheet.create({
   playText: { color: "#000", fontFamily: fonts.bodySemi, fontSize: type.small },
   delBtn: { borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 18, borderWidth: 1, borderColor: "rgba(255,255,255,0.3)", flexDirection: "row", alignItems: "center", gap: 6 },
   delText: { color: "rgba(255,255,255,0.7)", fontFamily: fonts.bodySemi, fontSize: type.small },
+  cloudCard: { marginTop: spacing.xl, padding: spacing.md },
+  cloudBtn: { alignSelf: "flex-start", marginTop: spacing.sm, borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 16, borderWidth: 1, borderColor: "rgba(255,255,255,0.3)" },
+  cloudBtnText: { color: colors.sand, fontFamily: fonts.bodySemi, fontSize: type.small },
+  cloudStatus: { marginTop: spacing.sm, fontSize: type.small },
 });
