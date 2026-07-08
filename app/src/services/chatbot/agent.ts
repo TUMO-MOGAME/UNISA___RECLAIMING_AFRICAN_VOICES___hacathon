@@ -19,6 +19,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { buildKnowledge } from "./knowledge";
 import { retrieve, matchNavigation } from "./retrieve";
 import { PAGES, pageById } from "./pages";
+import { geminiChat, type GeminiTurn } from "./gemini";
 import { languageByCode, type LangCode } from "../../i18n";
 
 export type ChatTurn = { role: "user" | "assistant"; text: string };
@@ -30,10 +31,14 @@ export type ChatResult =
 const KEY =
   process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY || process.env.EXPO_PUBLIC_CLAUDE_API_KEY || "";
 const MODEL = process.env.EXPO_PUBLIC_CHATBOT_MODEL || "claude-opus-4-8";
+// Fallback conversational engine: Gemini, when there's no Anthropic key but a (client-exposed) Gemini
+// key is present. Navigation stays deterministic; Gemini only writes the grounded prose answer.
+const GEMINI_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY || "";
+const GEMINI_MODEL = process.env.EXPO_PUBLIC_GEMINI_CHAT_MODEL || "gemini-2.5-flash";
 
-/** Whether the conversational (LLM) path is available. Navigation works regardless. */
+/** Whether a conversational (LLM) path is available — Claude OR Gemini. Navigation works regardless. */
 export function chatbotHasKey(): boolean {
-  return !!KEY;
+  return !!(KEY || GEMINI_KEY);
 }
 
 // The orchestrator tool. Claude *asks* to navigate; we read the tool call and let the UI perform it.
@@ -51,7 +56,7 @@ const NAV_TOOL: Anthropic.Tool = {
   },
 };
 
-const SYSTEM = (context: string, langName: string, endonym: string) =>
+const SYSTEM = (context: string, langName: string, endonym: string, withNavTool: boolean) =>
   `You are "Ubuntu", the friendly in-app guide for the app *Ubuntu Heritage · South Africa* — a ` +
   `cinematic, multilingual archive of South Africa's foundational literature and heritage.\n\n` +
   `RULES:\n` +
@@ -59,7 +64,9 @@ const SYSTEM = (context: string, langName: string, endonym: string) =>
   `• If the answer is not in the CONTEXT, say you don't have that on the site yet and point to a related ` +
   `section. NEVER invent history, dates, names, quotes, or sources — this project's rule is truth only.\n` +
   `• Keep replies short and warm: 2–4 sentences, plain language. Name the section the fact comes from.\n` +
-  `• If the user wants to be taken somewhere, call the navigate_to tool instead of describing it.\n` +
+  (withNavTool
+    ? `• If the user wants to be taken somewhere, call the navigate_to tool instead of describing it.\n`
+    : `• If the user wants to open a section, tell them to say e.g. "take me to the provinces".\n`) +
   `• Write your reply in ${langName} (${endonym}). Keep proper nouns, titles, and cited source names ` +
   `in their original form. If you cannot write fluently in ${langName}, answer in English instead.\n\n` +
   `CONTEXT:\n${context}`;
@@ -104,22 +111,37 @@ export async function askChatbot(
     };
   };
 
-  // 3) No key → still answer, straight from the retrieved site content.
-  if (!KEY) return retrievalAnswer();
+  const context = hits.length
+    ? hits.map((h, i) => `[${i + 1}] ${h.chunk.title} — ${h.chunk.body}`).join("\n\n")
+    : "(no matching site content found)";
+  const meta = languageByCode(lang);
+
+  // 3) No Anthropic key → use Gemini if configured (grounded prose answer), else the retrieval answer.
+  if (!KEY) {
+    if (GEMINI_KEY) {
+      const turns: GeminiTurn[] = [
+        ...history.slice(-10).map((t) => ({ role: (t.role === "assistant" ? "model" : "user") as GeminiTurn["role"], text: t.text })),
+        { role: "user", text: q },
+      ];
+      const text = await geminiChat({
+        apiKey: GEMINI_KEY,
+        system: SYSTEM(context, meta.english, meta.endonym, false),
+        turns,
+        model: GEMINI_MODEL,
+      });
+      if (text) return { type: "text", text, sources };
+    }
+    return retrievalAnswer();
+  }
 
   // 4) Conversational answer with Claude, grounded in the retrieved context, navigate_to available.
   try {
-    const context = hits.length
-      ? hits.map((h, i) => `[${i + 1}] ${h.chunk.title} — ${h.chunk.body}`).join("\n\n")
-      : "(no matching site content found)";
-    const meta = languageByCode(lang);
-
     const client = new Anthropic({ apiKey: KEY, dangerouslyAllowBrowser: true });
     const res = await client.messages.create({
       model: MODEL,
       max_tokens: 900,
       // NOTE: no `temperature` — Opus 4.8 rejects it; omitting it keeps the request valid.
-      system: SYSTEM(context, meta.english, meta.endonym),
+      system: SYSTEM(context, meta.english, meta.endonym, true),
       tools: [NAV_TOOL],
       messages: [
         // Recent conversation memory so the guide remembers what was said earlier in the chat.
