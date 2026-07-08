@@ -125,6 +125,22 @@ _Last updated: 2026-07-07 — by Tumo (via Claude)_
 
 ## 🗒️ Log
 
+- **2026-07-08** — **Interactive walking journey + "dot stories" on the home timeline.** Turned the
+  history trail into a guided walk. (1) **Walker** — Tumo's Groovy walk-cycle, keyed white→transparent
+  (VP9 alpha `assets/journey/walk.webm`), strolls the **main road** big-dot → big-dot along the real
+  Catmull-Rom curve (reusing `HistoryTrail`'s `segAt`), facing the way it travels, stopping at each dot
+  with its description + a **"Keep walking"** control (localized). (2) **Dot stories** — starting the
+  journey opens a **full-screen story for 1652**: a picture first, then a film, with **Skip** (→ back to
+  the walk) and **Back** (film → picture); a **"Play the story"** button re-opens it. `JourneyStory.tsx`
+  + `content/journey-media.ts` (per-milestone media map). (3) **1652 picture** — the ONE Gemini image
+  Tumo approved (`npm run gen:journey-images`, `assets/journey/y1652.webp`): Table Bay, VOC ships + fort
+  **and** Khoekhoe herders in the foreground — honest, dignified, labelled "Artistic interpretation".
+  **No other Gemini use.** (4) **1652 film** — Tumo's *They Came With Chains* compressed 39MB→7.3MB @720p
+  (`assets/journey/1652.mp4`); streams on demand. Chatbot hides while a story plays. `metro.config.js`
+  now bundles `.webm`/`.mp4`. **Only 1652 has media**; other dots show text until Tumo adds theirs.
+  tsc clean · 79/79 tests · verified live (walker walks + faces correctly; story picture→film→skip).
+  **Next:** branch turn-choices (keep walking vs turn to a side-road); more dots' media as Tumo sends them.
+
 - **2026-07-08** — **Chatbot memory + home scroll cues + nav-matcher fix.** (1) **Conversation memory** —
   `services/chatbot/memory.ts`: device-local ONLY (web = localStorage, survives refresh; native = session),
   never uploaded (POPIA); the panel restores the prior chat on open and passes the last ~10 turns to Claude

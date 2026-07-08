@@ -10,7 +10,9 @@ import { LanguagePicker } from "./LanguagePicker";
 import { CountryPicker } from "./CountryPicker";
 import { DEFAULT_COUNTRY } from "../content/anthems";
 import { HistoryTrail } from "./HistoryTrail";
-import { historyTrailSource, type HistoryMilestone } from "../content/history-trail";
+import { historyTrailSource, historyTrail, type HistoryMilestone } from "../content/history-trail";
+import { JourneyStory } from "./JourneyStory";
+import { mediaFor, hasStory } from "../content/journey-media";
 import { PressScale, Reveal } from "./Motion";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
@@ -172,6 +174,13 @@ const UI = {
   },
   heroesCta: { en: "Meet the heroes", tn: "Kopana le bagaki" },
   startJourney: { en: "Start the journey", tn: "Simolola leeto", af: "Begin die reis", zu: "Qala uhambo", xh: "Qala uhambo", nso: "Thoma leeto", st: "Qala leeto", ss: "Cala luhambo", ts: "Sungula riendzo", nr: "Thoma ikhambo", ve: "Thoma lwendo" },
+  keepWalking: { en: "Keep walking", tn: "Tswelela pele", af: "Stap verder", zu: "Qhubeka uhambe", xh: "Qhubeka uhambe", nso: "Tšwela pele", st: "Tsoela pele", ss: "Chubeka uhambe", ts: "Famba emahlweni", nr: "Ragela phambili", ve: "Bvelani phanḓa" },
+  journeyDone: { en: "Restart the journey", tn: "Simolola leeto gape", af: "Herbegin die reis", zu: "Qalisa kabusha uhambo", xh: "Qalisa kwakhona uhambo", nso: "Thoma leeto gape", st: "Qala leeto hape", ss: "Cala kabusha luhambo", ts: "Sungula nakambe riendzo", nr: "Thoma godu ikhambo", ve: "Thoma hafhu lwendo" },
+  storySkip: { en: "Skip", tn: "Tlola", af: "Slaan oor", zu: "Yeqa", xh: "Tsiba", nso: "Fetiša", st: "Tlōla", ss: "Yeca", ts: "Tlula", nr: "Yeqa", ve: "Fhirisa" },
+  storyBack: { en: "Back", tn: "Morago", af: "Terug", zu: "Emuva", xh: "Emva", nso: "Morago", st: "Morao", ss: "Emuva", ts: "Endzhaku", nr: "Emuva", ve: "Murahu" },
+  storyWatch: { en: "Watch the film", tn: "Lebelela filimi", af: "Kyk die film", zu: "Buka ifilimu", xh: "Bukela ifilimu", nso: "Lebelela filimi", st: "Sheba filimi", ss: "Buka ifilimu", ts: "Languta filimi", nr: "Buka ifilimu", ve: "Lavhelesa filimi" },
+  storyInterpretation: { en: "Artistic interpretation", tn: "Setshwantsho sa botaki (e seng senepe)", af: "Artistieke vertolking", zu: "Ukuhunyushwa kobuciko", xh: "Utoliko lobugcisa", nso: "Tlhathollo ya bokgabo", st: "Tlhaloso ya bonono", ss: "Kuhunyushwa kwebuciko", ts: "Nhlamuselo ya vutshila", nr: "Ukuhlathululwa kobuciko", ve: "Ṱhalutshedzo ya vhutsila" },
+  playStory: { en: "Play the story", tn: "Bapala kanegelo", af: "Speel die storie", zu: "Dlala indaba", xh: "Dlala ibali", nso: "Bapala kanegelo", st: "Bapala pale", ss: "Dlala indzaba", ts: "Tlanga ntsheketo", nr: "Dlala indaba", ve: "Tambani tshiitwa" },
   closeJourney: { en: "Close the journey", tn: "Tswala leeto", af: "Sluit die reis", zu: "Vala uhambo", xh: "Vala uhambo", nso: "Tswalela leeto", st: "Koala leeto", ss: "Vala luhambo", ts: "Pfala riendzo", nr: "Vala ikhambo", ve: "Vala lwendo" },
   journeyHint: { en: "1652 → today · tap a year", tn: "1652 → gompieno · tobetsa ngwaga" },
   journeyTitle: { en: "The journey of a nation", tn: "Leeto la setšhaba" },
@@ -256,6 +265,7 @@ export function HomeGallery({
   onDays,
   onTotems,
   onHeroes,
+  onStoryActiveChange,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -269,6 +279,8 @@ export function HomeGallery({
   onDays: () => void;
   onTotems: () => void;
   onHeroes: () => void;
+  /** Notifies the app when a full-screen dot-story opens/closes (to hide the floating chatbot). */
+  onStoryActiveChange?: (active: boolean) => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
@@ -309,6 +321,8 @@ export function HomeGallery({
   // journey brings it forward (bright + tappable) and fades the big words back.
   const [mapOpen, setMapOpen] = useState(false);
   const [milestone, setMilestone] = useState<HistoryMilestone | null>(null);
+  // The "dot story" (full-screen picture → film) currently playing, or null.
+  const [storyId, setStoryId] = useState<string | null>(null);
   const trailOpacity = useRef(new Animated.Value(0.16)).current;
   const wordsOpacity = useRef(new Animated.Value(1)).current;
   const scrimOpacity = useRef(new Animated.Value(0)).current;
@@ -318,8 +332,24 @@ export function HomeGallery({
       Animated.timing(wordsOpacity, { toValue: open ? 0.12 : 1, duration: 420, useNativeDriver: true }),
       Animated.timing(scrimOpacity, { toValue: open ? 0.62 : 0, duration: 420, useNativeDriver: true }),
     ]);
-  const openMap = () => { setMapOpen(true); animateTo(true).start(); };
-  const closeMap = () => { setMapOpen(false); setMilestone(null); animateTo(false).start(); };
+  const openMap = () => {
+    setMapOpen(true);
+    animateTo(true).start();
+    // Right after starting the journey, open the opening milestone's story (1652: the arrival) —
+    // full-screen picture then film. Skipping returns to the walk.
+    const firstId = historyTrail[0]?.id;
+    if (firstId && hasStory(firstId)) setStoryId(firstId);
+  };
+  const closeMap = () => { setMapOpen(false); setMilestone(null); setStoryId(null); animateTo(false).start(); };
+
+  const storyMilestone = storyId ? historyTrail.find((m) => m.id === storyId) ?? null : null;
+  const storyMedia = storyId ? mediaFor(storyId) : undefined;
+
+  // Tell the app when a story is on-screen so it can hide the floating chatbot; reset on unmount.
+  useEffect(() => {
+    onStoryActiveChange?.(!!(storyMilestone && storyMedia));
+    return () => onStoryActiveChange?.(false);
+  }, [storyId]);
 
   return (
     <View style={styles.root}>
@@ -368,6 +398,8 @@ export function HomeGallery({
               selectedId={milestone?.id}
               onStart={openMap}
               startLabel={t(UI.startJourney, lang)}
+              keepWalkingLabel={t(UI.keepWalking, lang)}
+              journeyDoneLabel={t(UI.journeyDone, lang)}
             />
           </View>
 
@@ -399,10 +431,16 @@ export function HomeGallery({
               </View>
 
               {milestone ? (
-                <View style={styles.mapCaption} pointerEvents="none">
+                <View style={styles.mapCaption} pointerEvents="box-none">
                   <Text style={styles.capYear}>{milestone.year}</Text>
                   <Text style={styles.capTitle}>{milestone.title}</Text>
                   <Text style={styles.capNote}>{milestone.note}</Text>
+                  {hasStory(milestone.id) ? (
+                    <PressScale style={styles.storyBtn} onPress={() => setStoryId(milestone.id)} accessibilityLabel={t(UI.playStory, lang)}>
+                      <Icon.Play size={13} color={colors.night} fill={colors.night} />
+                      <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
+                    </PressScale>
+                  ) : null}
                 </View>
               ) : (
                 <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
@@ -619,6 +657,21 @@ export function HomeGallery({
           </PressScale>
         )}
       </View>
+
+      {/* Full-screen "dot story" — opens on the picture, then plays the film. Skip/Back return here. */}
+      {storyMilestone && storyMedia ? (
+        <JourneyStory
+          milestone={storyMilestone}
+          media={storyMedia}
+          onClose={() => setStoryId(null)}
+          labels={{
+            skip: t(UI.storySkip, lang),
+            back: t(UI.storyBack, lang),
+            watch: t(UI.storyWatch, lang),
+            interpretation: t(UI.storyInterpretation, lang),
+          }}
+        />
+      ) : null}
     </View>
   );
 }
@@ -895,6 +948,8 @@ const styles = StyleSheet.create({
   capYear: { color: "#E8B45A", fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
   capTitle: { color: "#fff", fontFamily: fonts.heading, fontSize: 17, marginTop: 2 },
   capNote: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.body, fontSize: 13, lineHeight: 20, marginTop: 6 },
+  storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", backgroundColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14, marginTop: spacing.sm },
+  storyBtnText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
   mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 
   // Section
