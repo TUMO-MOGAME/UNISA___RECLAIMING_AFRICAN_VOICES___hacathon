@@ -28,7 +28,7 @@ and a real watch → quiz → collect loop that gives the humanities content som
 | # | Decision | Consequence |
 |---|----------|-------------|
 | **D1** | **Nav = `Journey · Watch · Atlas · Archive · Kids · Schools`** + country ▾ + language ▾ + Passport chip | Resolves the three conflicting navs across the source designs. Nothing already built loses its home. |
-| **D2** | **Hero trail stays; it *links into* the Journey page** | [HistoryTrail](../app/src/components/HistoryTrail.tsx) remains the cinematic landing preview. "Start the journey" now navigates to `/journey`, which is the deep, staged, gamified version. Two trails, two jobs — not a duplicate. |
+| **D2** *(revised 2026-08-26)* | **The hero trail is the FREE TRAILER and stays exactly as it was — it opens in place, it does not hand off** | Tapping "Start the journey" walks the SA road, 1652 to today, with no lock and no sign-in. The deeper staged `/journey` page is reached from the nav instead, and is where future chapters get locked. Originally D2 had the hero navigating to `/journey`; that was reversed once the free-vs-locked split was decided. |
 | **D3** | **Country selection moves to the new `/countries` page — but national anthems come with it** | The floating [CountryPicker](../app/src/components/CountryPicker.tsx) leaves the hero. All 54 countries, flags and [anthem playback](../app/src/content/anthems.ts) are re-homed into the Countries page, which has far more room for them than a dropdown did. |
 | **D4** | **Keep the current palette: pure black `#000000` + sa-blue accent `#1A85A7`** | We take the source designs' **structure and layout**, not their gold-on-brown skin. The kept hero and footer stay coherent with every new page, and none of the 15 existing screens need retouching. See [tokens.ts](../app/src/theme/tokens.ts). |
 | **D5** | **Progress is local-only. No accounts, no PII.** | Stars, streaks, heritage cards, stamps and the Passport persist on-device (same pattern as the Archive: IndexedDB on web, AsyncStorage on native). Schools ships as a working dashboard over **seeded demo class data**. POPIA-clean by construction — no minor's data leaves the device. |
@@ -40,7 +40,7 @@ and a real watch → quiz → collect loop that gives the humanities content som
 
 | Thing | Where it lives now | Where it goes |
 |-------|--------------------|---------------|
-| **Hero + SA road trail** | [HomeGallery.tsx:413-513](../app/src/components/HomeGallery.tsx#L413-L513) + [HistoryTrail.tsx](../app/src/components/HistoryTrail.tsx) | → `components/home/HomeHero.tsx` — same markup, same styles. Only the `onStart` target changes (opens `/journey` instead of the in-place overlay). |
+| **Hero + SA road trail** | [HomeGallery.tsx:413-513](../app/src/components/HomeGallery.tsx#L413-L513) + [HistoryTrail.tsx](../app/src/components/HistoryTrail.tsx) | → `components/home/HomeHero.tsx` — same markup, same styles, same behaviour. The walk still opens **in place** (D2 revised); nothing about the hero changed but the file it lives in. |
 | **Footer** | [HomeGallery.tsx:598-705](../app/src/components/HomeGallery.tsx#L598-L705) | → `components/shell/SiteFooter.tsx` — same markup, same styles. Now rendered by the shell on **every** route. |
 | **All 15 existing screens** | `src/components/*Screen*.tsx` | Unchanged internals. They gain the shell's header and footer, and lose their bespoke back-bars where the shell supersedes them. |
 | **All content modules** | `src/content/*.ts` | Unchanged. |
@@ -137,7 +137,7 @@ Wiped by a single "reset my progress" action in the Passport.
 | V2-03 | `components/shell/SiteHeader.tsx` — D1 nav, country ▾, language ▾, Passport chip, active-route underline | Full nav ≥900px. |
 | V2-04 | `components/shell/MobileTabBar.tsx` — `Journey · Watch · Atlas · Me` | <900px. |
 | V2-05 | **Extract the footer** from `HomeGallery` → `components/shell/SiteFooter.tsx`, verbatim | D6. Visual diff must be nil. |
-| V2-06 | **Extract the hero** from `HomeGallery` → `components/home/HomeHero.tsx`, verbatim | D6. `onStart` → `/journey` (D2). |
+| V2-06 | **Extract the hero** from `HomeGallery` → `components/home/HomeHero.tsx`, verbatim | D6. The walk stays in place — the hero is the free trailer (D2 revised). |
 | V2-07 | Rebuild Home to the new section order | Hero → Continue → Watch rail → Journey preview → Countries strip → Atlas → Kids/Schools → Archive → Footer. |
 | V2-08 | `components/CountriesScreen.tsx` — the `/countries` page | Left rail of countries, centre atmosphere panel, right "journey ahead" + tags. |
 | V2-09 | **Move anthems into `/countries`** — flags, 54 countries, [PlayOnceRow](../app/src/components/PlayOnceRow.tsx) playback, honest "anthem coming" | D3. Retire the floating hero picker. |

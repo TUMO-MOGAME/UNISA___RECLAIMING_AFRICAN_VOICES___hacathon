@@ -42,7 +42,7 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 | # | Decision |
 |---|----------|
 | D1 | Nav = `Journey · Watch · Atlas · Archive · Kids · Schools` + country ▾ + language ▾ + Passport chip |
-| D2 | The hero SA-road trail **stays** and now *links into* a deeper `/journey` page |
+| D2 *(revised)* | The hero SA-road trail is the **free trailer** — it opens **in place**, exactly as before. The deeper staged `/journey` page is reached from the nav and is where future chapters get locked. |
 | D3 | Country selection **moves** to a new `/countries` page — the 54 flags + national anthems move with it |
 | D4 | **Keep** the current palette (black `#000000` + sa-blue `#1A85A7`); take the new designs' structure, not their gold/brown skin |
 | D5 | Progress is **local-only** — no accounts, no PII. Schools ships over seeded demo data |
@@ -174,6 +174,32 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-26 (late night)** — **Week 3 rooms built: Passport, Kids, Schools (V2-22 → V2-27).**
+  `PassportScreen` — level, stars, streak, journey progress, the 27-totem card grid with locked slots,
+  country stamps, and a two-step **"Forget everything"** erasure. It deliberately holds no name, no
+  photo and no account: a passport is normally the most identifying thing a person carries, and this
+  one carries none of it, which is why it can be shown to a child with no consent flow.
+  `KidsScreen` + `KidsStageScreen` — real greetings per language, an animal of the day, and a picture
+  quiz that asks for the **real totem term** in the reader's own language family (Tau, Nkwe, Kwena),
+  so a child learning "Tau is the lion" has learnt something true and sourced. No penalty, no timer.
+  The grown-ups gate is a 3-second hold — friction, not security, and the comment says so rather than
+  implying a lock that isn't there.
+  `SchoolsScreen` — a working dashboard over **seeded demo data**, with the demo banner on screen at
+  all times rather than in a footnote. Under D5 the app holds no learner records, so there is nothing
+  real to show; a plausible-looking dashboard that didn't say so would be a lie told in UI.
+  CAPS alignment is claimed only at **topic level** against the DBE Senior Phase document — no outcome
+  codes are invented, and `schools.ts` says outright that any specific code must be read from CAPS itself.
+  Deleted `ComingSoon.tsx` — every room is now real, which is what its own comment said to do.
+
+- **2026-08-26 (late)** — **D2 reversed at Tumo's request, and the second sound credit got its face.**
+  The hero walk is now confirmed as the **free trailer**: "Start the journey" opens the SA road in
+  place, exactly as it always did, no lock and no sign-in. The deeper staged `/journey` page is reached
+  from the nav and is where future chapters will be locked. `onStartJourney` stays in `useHomeJourney`
+  as a documented escape hatch but is **deliberately unwired** — the comment now says that instead of
+  claiming the opposite. Plan §2, §3 and V2-06 updated so the doc no longer contradicts the code.
+  Footer: pulled the real **Baobab Roots Collective** channel avatar (the baobab-and-roots mark) and
+  bundled it at 160×160 webp to match African Tribe Echoes exactly; the Lucide placeholder is gone.
 
 - **2026-08-26 (late)** — **The core loop is closed: Journey + stages + quiz (V2-16 → V2-19).**
   `JourneyScreen` walks all **25 real milestones** from `history-trail.ts` rather than the source

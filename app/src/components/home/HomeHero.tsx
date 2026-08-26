@@ -19,9 +19,12 @@ import { Icon } from "../../ui";
 // dot-stories all behave exactly as they did on the old landing page. Nothing here is restyled.
 // See docs/13-architecture-v2-plan.md §3.
 //
-// TRANSITIONAL SEAM (D2): `onStartJourney` is optional. While it is absent, "Start the journey" opens
-// the in-place overlay exactly as before. Once the dedicated /journey page lands (V2-16) the app passes
-// it, the hero becomes the cinematic preview that *links into* that page, and the overlay retires.
+// D2 (revised 2026-08-26): the hero's walk is the FREE TRAILER and stays exactly as it always was —
+// tap "Start the journey" and the SA road opens in place, 1652 to today, no lock and no sign-in.
+// `onStartJourney` is therefore left UNWIRED on purpose. It is not dead code waiting to be switched
+// on; it is the escape hatch if the hero is ever meant to hand off instead.
+//
+// The deeper, staged /journey page is reached from the nav, and is where future chapters get locked.
 
 const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 const SLATE = "#000000"; // ground → pure black
@@ -61,8 +64,8 @@ export function useHomeJourney({
 }: {
   /** Notifies the app when the journey or a full-screen dot-story is active (hides the floating chatbot). */
   onStoryActiveChange?: (active: boolean) => void;
-  /** D2 seam — when provided, "Start the journey" navigates to the /journey page instead of opening
-   *  the in-place overlay. Absent for now, so behaviour is identical to the old landing page. */
+  /** Deliberately not passed by the app (D2, revised): the hero's walk is the free trailer and opens
+   *  in place. Provide this only if the hero should hand off to the /journey page instead. */
   onStartJourney?: () => void;
 }) {
   // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
@@ -84,7 +87,7 @@ export function useHomeJourney({
       Animated.timing(scrimOpacity, { toValue: open ? 0.62 : 0, duration: 420, useNativeDriver: true }),
     ]);
   const openMap = () => {
-    // D2: once the /journey page exists, the hero hands off to it instead of opening the overlay.
+    // Normally absent — the hero plays the free trailer in place (D2, revised).
     if (onStartJourney) {
       onStartJourney();
       return;

@@ -106,9 +106,6 @@ export function SiteFooter({
                 <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
               </Pressable>
 
-              {/* No channel avatar is bundled for this one yet, so a Lucide mark stands in and the
-                  plate still reads as intentional. Drop a webp into assets/brand/ and swap the
-                  fallback View for an Image when you have the artwork. */}
               <Pressable
                 onPress={() => Linking.openURL(SOUND_CREDIT_2_URL)}
                 style={({ pressed, hovered }: any) => [
@@ -119,9 +116,11 @@ export function SiteFooter({
                 accessibilityRole="link"
                 accessibilityLabel="Baobab Roots Collective on YouTube — opens in browser"
               >
-                <View style={[styles.creditAvatar, styles.creditAvatarFallback]}>
-                  <Icon.Music size={16} color={colors.dsBlue} />
-                </View>
+                <Image
+                  source={require("../../../assets/brand/baobab-roots-collective.webp")}
+                  style={styles.creditAvatar}
+                  resizeMode="cover"
+                />
                 <View style={styles.creditText}>
                   <Text style={styles.creditName}>Baobab Roots Collective</Text>
                   <View style={styles.creditSub}>
@@ -240,12 +239,6 @@ const styles = StyleSheet.create({
   },
   solanaLogo: { width: 132, height: 20 }, // 640x95 source ≈ 6.7:1
   creditAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1A1A1A" },
-  creditAvatarFallback: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "rgba(26,133,167,0.45)",
-  },
   creditText: { gap: 2 },
   creditName: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 14, letterSpacing: 0.2 },
   creditSub: { flexDirection: "row", alignItems: "center", gap: 4 },

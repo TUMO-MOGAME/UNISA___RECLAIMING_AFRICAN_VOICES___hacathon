@@ -37,11 +37,14 @@ import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
 import { Lang } from "./src/content/types";
 import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
-import { ComingSoon } from "./src/components/shell/ComingSoon";
 import { CountriesScreen } from "./src/components/CountriesScreen";
 import { WatchScreen } from "./src/components/WatchScreen";
 import { JourneyScreen } from "./src/components/JourneyScreen";
 import { StageScreen } from "./src/components/StageScreen";
+import { PassportScreen } from "./src/components/PassportScreen";
+import { KidsScreen } from "./src/components/KidsScreen";
+import { KidsStageScreen } from "./src/components/KidsStageScreen";
+import { SchoolsScreen } from "./src/components/SchoolsScreen";
 import { historyTrail } from "./src/content/history-trail";
 import { stageId } from "./src/services/progress/progress";
 import type { NavId } from "./src/components/shell/nav";
@@ -307,10 +310,42 @@ export default function App() {
             onBack={back}
           />
         );
-      case "kids":
-      case "schools":
       case "passport":
-        return <ComingSoon room={route.name} lang={lang} onHome={() => setStack([{ name: "home" }])} />;
+        return (
+          <PassportScreen
+            lang={lang}
+            country={country}
+            progress={progress.progress}
+            persists={progress.persists}
+            onReset={progress.reset}
+            onJourney={() => push({ name: "journey" })}
+          />
+        );
+      case "kids":
+        return (
+          <KidsScreen
+            lang={lang}
+            progress={progress.progress}
+            onPlay={(totemId) => push({ name: "kidsStage", id: totemId })}
+            onCards={() => push({ name: "passport" })}
+            onExit={() => setStack([{ name: "home" }])}
+          />
+        );
+      case "kidsStage":
+        return (
+          <KidsStageScreen
+            lang={lang}
+            totemId={route.id}
+            onNext={(nextId) => setStack((st) => [...st.slice(0, -1), { name: "kidsStage", id: nextId }])}
+            onBack={back}
+            onEarn={(totemId) => {
+              progress.awardCard(totemId);
+              progress.touchToday();
+            }}
+          />
+        );
+      case "schools":
+        return <SchoolsScreen lang={lang} onOpenStage={(id) => push({ name: "stage", id })} />;
       case "countries":
         return (
           <CountriesScreen
@@ -336,7 +371,6 @@ export default function App() {
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
             onStoryActiveChange={setStoryActive}
-            onJourney={() => push({ name: "journey" })}
           />
         );
     }
