@@ -194,6 +194,32 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
   file version that no longer existed on disk. Treat a single tsc result as suspect if files changed
   under it — re-run before believing it.
 
+- **2026-08-27** — **The Journey is live: V2-16, V2-17, V2-18, V2-19 done. D2 closed.**
+  **Quiz (V2-17)** `content/quiz.ts` — 14 questions across 14 milestones, each answerable from that
+  milestone's own sourced note. The integrity rule is now **structural, not just intent**: 10 tests in
+  `quiz.test.ts` enforce one correct answer, a real milestone link, an explanation, no duplicate
+  options — and one test pins the 1652 question so the colonial "empty land" myth can never become the
+  correct answer. Wrong options are mostly **real facts from other milestones**, so a wrong guess never
+  teaches fiction.
+  **Journey (V2-16)** All **25** grounded milestones as stages, not the source design's 12 invented
+  chapters — more history, same effort. A stage unlocks when the one before it is done; finished
+  stages stay open. Progress bar, stars, cards, level, and the trail's citation at the foot.
+  **Stage (V2-18/19)** WATCH → QUIZ → REWARD. Honest about gaps: no film shows the picture and the
+  record instead of faking one; no quiz goes straight to the reward instead of inventing a question.
+  The reward is a real totem from `content/totems.ts` with its clans, its terms in three language
+  groups, and its source shown.
+  **D2 closed:** the hero's "Start the journey" now hands off to `/journey` via the `onStartJourney`
+  seam left in Week 1. The in-place overlay path is retired.
+  **Watch out — typecheck cost is trending badly.** Inlining the stage case in App's route switch made
+  tsc walk the now 24-member route union per narrowing and **stop finishing at all** (two 5-minute
+  timeouts). Extracting it to a top-level `StageRoute` component fixed it, but the full typecheck is
+  now **157s, up from ~7s**. Week 3 adds three more routes. See "Open decisions" — this needs a real
+  fix, not another extraction.
+  Still open in Week 2: **V2-15** (the WatchItemScreen player page) and **V2-20** (the resume bar).
+  Watch cards currently open the existing CinematicReader, which is a real player — the dedicated
+  watch page with its provenance panel is still to come.
+  Verified: typecheck clean · **109/109 tests** · web bundle green.
+
 - **2026-08-26 (night)** — **Week 2 started: progress store + Watch library. Footer credits changed.**
   **V2-13** `services/progress/` — pure reducers in `progress.ts` (14 unit tests) plus the platform
   split the Archive uses: web persists to localStorage, native is session-only with `persists:false`

@@ -94,6 +94,42 @@ const ATLAS_ROOMS = new Set(["atlas", "provinces", "province", "city", "presiden
 const ARCHIVE_ROOMS = new Set(["archive", "heritage", "about"]);
 const ROOT_ROOMS = new Set(["home", "journey", "watch", "kids", "schools", "passport", "countries"]);
 
+// One Journey stage. Lives out here on purpose: inlining it in App's route switch made the
+// type-checker recurse over the (now 24-member) route union until it stopped finishing.
+function StageRoute({
+  milestoneId,
+  lang,
+  country,
+  progress,
+  onBack,
+}: {
+  milestoneId: string;
+  lang: Lang;
+  country: string;
+  progress: ReturnType<typeof useProgress>;
+  onBack: () => void;
+}) {
+  // Stages are numbered from 1 along the trail, so a stage id stays stable as the trail grows.
+  const idx = historyTrail.findIndex((m) => m.id === milestoneId);
+  if (idx < 0) return null;
+  const n = idx + 1;
+  const sid = stageId(country, n);
+  return (
+    <StageScreen
+      milestoneId={milestoneId}
+      lang={lang}
+      stageNumber={n}
+      alreadyDone={progress.progress.stagesDone.includes(sid)}
+      onComplete={(cardId) => {
+        progress.completeStage(sid);
+        if (cardId) progress.awardCard(cardId);
+        progress.touchToday();
+      }}
+      onBack={onBack}
+    />
+  );
+}
+
 export default function App() {
   // Default language is always English (the guaranteed base for every string); the picker switches it
   // app-wide, and any language without reviewed copy honestly falls back to English (see i18n/localize).
@@ -259,27 +295,18 @@ export default function App() {
             onOpenStage={(milestoneId) => push({ name: "stage", id: milestoneId })}
           />
         );
-      case "stage": {
-        // Stages are numbered from 1 along the trail, so the id is stable even if the trail grows.
-        const idx = historyTrail.findIndex((m) => m.id === route.id);
-        if (idx < 0) return null;
-        const n = idx + 1;
-        const sid = stageId(country, n);
+      case "stage":
+        // Rendered by a top-level component, not inline. Inlining this block made tsc walk the whole
+        // route union per narrowing and stop finishing — the same trap the shell groupings hit.
         return (
-          <StageScreen
+          <StageRoute
             milestoneId={route.id}
             lang={lang}
-            stageNumber={n}
-            alreadyDone={progress.progress.stagesDone.includes(sid)}
-            onComplete={(cardId) => {
-              progress.completeStage(sid);
-              if (cardId) progress.awardCard(cardId);
-              progress.touchToday();
-            }}
+            country={country}
+            progress={progress}
             onBack={back}
           />
         );
-      }
       case "kids":
       case "schools":
       case "passport":
