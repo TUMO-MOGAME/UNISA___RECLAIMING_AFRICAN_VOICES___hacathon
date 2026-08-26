@@ -175,6 +175,28 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## 🗒️ Log
 
+- **2026-08-26 (evening)** — **Countries + Atlas hub done (V2-08 → V2-10); branch pushed.**
+  `CountriesScreen` carries all 54 nations, searchable, with the national anthems moved out of the
+  hero dropdown (D3). `AtlasRooms` gathers Provinces · Presidents · Heroes · Totems · Days under the
+  Atlas, which D1 left without a top-level slot; those five screens are untouched.
+  **Grounding call:** the source design's per-country "atmosphere" copy (Ghana's kente, Mali's griots,
+  Ethiopia's Adwa…) is **not** reproduced — it traces to nothing in this repo. Only South Africa has
+  researched content, so only South Africa gets a journey; the other 53 carry an honest
+  "not yet researched" note.
+  Tumo asked whether the styling followed the source design — it did not, in three ways: the palette
+  (D4, deliberate), the invented copy (integrity rule, deliberate), and the cinematic layout, which
+  I had dropped **everywhere** including for South Africa. That third one was over-caution, not a
+  principle: South Africa has real cached art, a real 12-chapter trail, real provinces. Fixed — the
+  live country now gets the full treatment (Ken Burns backdrop from existing art, display name, and a
+  "journey ahead" rail built from the **sourced** `history-trail` milestones with the citation shown);
+  the other 53 keep the quiet panel. The design is earned by content rather than faked.
+  Verified: typecheck clean · 85/85 tests · web bundle green.
+  **Repo hygiene fix:** several files had been flipped LF → CRLF by scripted edits, which inflated the
+  diff from ~2.2k real changed lines to ~6.2k and would have made the commit unreviewable. Normalised
+  back to LF (this repo is LF) before committing. Worth remembering: write files with an explicit
+  `newline=''` when scripting edits on Windows.
+  Pushed as `feat/architecture-v2` (2 commits).
+
 - **2026-08-26 (later still)** — **The shell is live: V2-01 → V2-04 done.** Tumo picked header
   **direction C, two-tier** from three mockups
   ([artifact](https://claude.ai/code/artifact/5259ecef-c9b6-46b4-bd46-e424feceb344)): tier 1 carries the

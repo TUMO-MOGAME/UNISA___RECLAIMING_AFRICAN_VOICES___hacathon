@@ -70,9 +70,9 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 - [x] V2-05 Extract the footer → `shell/SiteFooter.tsx` **verbatim** (D6), rendered on every route
 - [x] V2-06 Extract the hero → `home/HomeHero.tsx` **verbatim** (D6); `onStart` → `/journey` (D2)
 - [ ] V2-07 Rebuild Home to the new section order
-- [ ] V2-08 `CountriesScreen.tsx` — country rail + atmosphere panel + "the journey ahead"
-- [ ] V2-09 Move the 54 flags + national anthems into `/countries` (D3); retire the floating hero picker
-- [ ] V2-10 `AtlasHubScreen.tsx` — gathers Provinces · Presidents · Heroes · Totems · Days
+- [x] V2-08 `CountriesScreen.tsx` — country rail + atmosphere panel + "the journey ahead"
+- [x] V2-09 Move the 54 flags + national anthems into `/countries` (D3); retire the floating hero picker
+- [x] V2-10 `AtlasHubScreen.tsx` — gathers Provinces · Presidents · Heroes · Totems · Days
 - [ ] V2-11 Archive gains its Trust sub-nav (Heritage Ledger, Sources & provenance)
 - [ ] V2-12 **Week gate** — tsc clean · web bundle green · every pre-v2 route re-walked · STATUS updated
 

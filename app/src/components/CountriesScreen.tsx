@@ -5,8 +5,12 @@ import { t } from "../i18n";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
 import { PlayOnceRow } from "./PlayOnceRow";
+import { SceneImage } from "./SceneImage";
+import { LinearGradient } from "expo-linear-gradient";
+import { modules } from "../content";
+import { sceneImageSource } from "../content/images";
 import { countries, countryByCode, DEFAULT_COUNTRY, type Country } from "../content/anthems";
-import { historyTrail } from "../content/history-trail";
+import { historyTrail, historyTrailSource } from "../content/history-trail";
 import { LANGUAGES } from "../i18n";
 
 // The Countries room (v2 D3) — the browsable home for all 54 African nations and their national
@@ -86,11 +90,26 @@ const UI = {
     en: "What's here", tn: "Se se leng teng", af: "Wat hier is", zu: "Okukhona lapha", xh: "Okukhoyo apha",
     nso: "Seo se lego mo", st: "Se teng mona", ss: "Lokukhona lapha", ts: "Leswi nga kona", nr: "Okukhona lapha", ve: "Zwine zwa vha hone",
   },
+  ahead: {
+    en: "The journey ahead", tn: "Leeto le le fa pele", af: "Die reis wat voorlê", zu: "Uhambo olungaphambili", xh: "Uhambo olusezayo",
+    nso: "Leeto leo le lego pele", st: "Leeto le ka pele", ss: "Luhambo lolungembili", ts: "Riendzo leri nga mahlweni", nr: "Ikhambo elingaphambili", ve: "Lwendo lwa phanḓa",
+  },
+  more: {
+    en: "and more", tn: "le tse dingwe", af: "en meer", zu: "nokunye", xh: "nokunye",
+    nso: "le tše dingwe", st: "le tse ding", ss: "nalokunye", ts: "na swin'wana", nr: "nokhunye", ve: "na zwinwe",
+  },
   count: {
     en: "54 nations", tn: "Dinaga di le 54", af: "54 nasies", zu: "Izizwe ezingu-54", xh: "Izizwe ezingama-54",
     nso: "Dinaga tše 54", st: "Dinaha tse 54", ss: "Tive letingu-54", ts: "Matiko ya 54", nr: "Iintjhaba ezingu-54", ve: "Mashango a 54",
   },
 };
+
+/** The cinematic backdrop for the live country — existing cached art, nothing newly generated. */
+function heroArt() {
+  const m = modules[0];
+  const sc = m.scenes[0];
+  return sceneImageSource(m.id, sc.id, sc.imagePrompt, { seed: sc.seed, w: 1400, h: 900 });
+}
 
 /** Only South Africa has researched content in this repo today. */
 const LIVE = new Set([DEFAULT_COUNTRY]);
@@ -148,19 +167,78 @@ export function CountriesScreen({
     </View>
   );
 
-  const detail = (
+  // South Africa is the only researched nation, so it is the only one that earns the cinematic
+  // treatment: real cached art behind it, the display name, and a journey rail built from the
+  // sourced history-trail milestones. The other 53 get the quiet panel — the design has to be
+  // earned by content, not faked.
+  const detail = live ? (
+    <View style={styles.cinema}>
+      <View style={StyleSheet.absoluteFill}>
+        <SceneImage source={heroArt()} kenBurns />
+      </View>
+      <LinearGradient
+        colors={["rgba(0,0,0,0.45)", "rgba(0,0,0,0.55)", "rgba(0,0,0,0.93)"]}
+        locations={[0, 0.4, 1]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <View style={wide ? styles.cinemaBodyWide : styles.cinemaBody}>
+        <View style={styles.cinemaMain}>
+          <View style={[styles.badge, styles.badgeLive]}>
+            <View style={styles.liveDot} />
+            <Text style={[styles.badgeText, styles.badgeTextLive]}>{t(UI.live, lang)}</Text>
+          </View>
+          <Text style={styles.cinemaName}>{sel.name}</Text>
+          <Text style={styles.cinemaTag}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
+
+          <View style={styles.facts}>
+            <Fact icon={<Icon.MessageCircle size={14} color={colors.dsBlue} />} text={`${LANGUAGES.length} official languages`} />
+            <Fact icon={<Icon.Route size={14} color={colors.dsBlue} />} text={`${historyTrail.length} milestones · 1652 → today`} />
+            <Fact icon={<Icon.BookOpen size={14} color={colors.dsBlue} />} text="4 great books · the Cultural Atlas" />
+            <Fact icon={<Icon.Map size={14} color={colors.dsBlue} />} text="9 provinces · totems · national days" />
+          </View>
+
+          <Pressable onPress={onEnter} style={styles.cta} accessibilityRole="link">
+            <Text style={styles.ctaText}>{t(UI.enter, lang)}</Text>
+            <Icon.ArrowRight size={16} color={colors.night} />
+          </Pressable>
+
+          <View style={styles.anthemSlot}>
+            <Text style={styles.blockLabel}>{t(UI.anthem, lang)}</Text>
+            {sel.anthem ? (
+              <PlayOnceRow source={sel.anthem} title={t(UI.anthem, lang)} by={sel.anthemBy} lang={lang} />
+            ) : (
+              <Text style={styles.quiet}>{t(UI.anthemComing, lang)}</Text>
+            )}
+          </View>
+        </View>
+
+        {/* The journey ahead — real, sourced milestones, not invented chapter titles. */}
+        <View style={styles.aheadPanel}>
+          <Text style={styles.blockLabel}>{t(UI.ahead, lang)}</Text>
+          {historyTrail.slice(0, 5).map((m) => (
+            <View key={m.id} style={styles.aheadRow}>
+              <Text style={styles.aheadYear}>{m.year}</Text>
+              <Text style={styles.aheadTitle} numberOfLines={2}>{m.title}</Text>
+            </View>
+          ))}
+          <Text style={styles.aheadMore}>
+            + {historyTrail.length - 5} {t(UI.more, lang)}
+          </Text>
+          <Text style={styles.aheadSource}>{historyTrailSource}</Text>
+        </View>
+      </View>
+    </View>
+  ) : (
     <View style={styles.detail}>
       <Image source={sel.flag} style={styles.bigFlag} resizeMode="cover" accessibilityLabel={`${sel.name} flag`} />
       <Text style={styles.name}>{sel.name}</Text>
 
-      <View style={[styles.badge, live ? styles.badgeLive : styles.badgeSoon]}>
-        {live ? <View style={styles.liveDot} /> : <Icon.Clock size={11} color="rgba(255,255,255,0.6)" />}
-        <Text style={[styles.badgeText, live && styles.badgeTextLive]}>
-          {live ? t(UI.live, lang) : t(UI.soon, lang)}
-        </Text>
+      <View style={[styles.badge, styles.badgeSoon]}>
+        <Icon.Clock size={11} color="rgba(255,255,255,0.6)" />
+        <Text style={styles.badgeText}>{t(UI.soon, lang)}</Text>
       </View>
 
-      {/* ── The anthem, re-homed from the old hero dropdown (D3) ── */}
       <View style={styles.block}>
         <Text style={styles.blockLabel}>{t(UI.anthem, lang)}</Text>
         {sel.anthem ? (
@@ -170,26 +248,9 @@ export function CountriesScreen({
         )}
       </View>
 
-      {/* ── The journey — real content only ── */}
-      {live ? (
-        <View style={styles.block}>
-          <Text style={styles.blockLabel}>{t(UI.whatsHere, lang)}</Text>
-          <View style={styles.facts}>
-            <Fact icon={<Icon.MessageCircle size={14} color={colors.dsBlue} />} text={`${LANGUAGES.length} official languages`} />
-            <Fact icon={<Icon.Route size={14} color={colors.dsBlue} />} text={`${historyTrail.length} milestones · 1652 → today`} />
-            <Fact icon={<Icon.BookOpen size={14} color={colors.dsBlue} />} text="4 great books · the Cultural Atlas" />
-            <Fact icon={<Icon.Flag size={14} color={colors.dsBlue} />} text="9 provinces · totems · national days" />
-          </View>
-          <Pressable onPress={onEnter} style={styles.cta} accessibilityRole="link">
-            <Text style={styles.ctaText}>{t(UI.enter, lang)}</Text>
-            <Icon.ArrowRight size={16} color={colors.night} />
-          </Pressable>
-        </View>
-      ) : (
-        <View style={styles.block}>
-          <Text style={styles.quiet}>{t(UI.notReady, lang)}</Text>
-        </View>
-      )}
+      <View style={styles.block}>
+        <Text style={styles.quiet}>{t(UI.notReady, lang)}</Text>
+      </View>
     </View>
   );
 
@@ -306,7 +367,70 @@ const styles = StyleSheet.create({
   rowName: { flex: 1, color: "rgba(255,255,255,0.72)", fontFamily: fonts.bodyMedium, fontSize: 14.5 },
   rowNameOn: { color: "#FFFFFF", fontFamily: fonts.bodySemi },
 
-  // ── Detail pane ──
+  // ── Cinematic detail (live countries only) ──
+  cinema: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 560,
+    borderRadius: radius.md,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    justifyContent: "flex-end",
+  },
+  cinemaBody: { padding: spacing.lg, gap: spacing.lg },
+  cinemaBodyWide: { padding: spacing.xl, flexDirection: "row", gap: spacing.xl, alignItems: "flex-end" },
+  cinemaMain: { flex: 1, minWidth: 0, gap: spacing.sm },
+  cinemaName: {
+    color: "#FFFFFF",
+    fontFamily: fonts.display,
+    fontSize: 56,
+    lineHeight: 56,
+    letterSpacing: -1.6,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 18,
+  },
+  cinemaTag: {
+    color: "rgba(255,255,255,0.9)",
+    fontFamily: fonts.bodySemi,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginBottom: spacing.sm,
+  },
+  anthemSlot: { marginTop: spacing.md, gap: spacing.sm, maxWidth: 420 },
+
+  // "The journey ahead" — a glass panel over the art, like the source design's right rail.
+  aheadPanel: {
+    width: 300,
+    flexShrink: 0,
+    gap: spacing.sm,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    borderRadius: radius.md,
+    padding: spacing.md,
+  },
+  aheadRow: { flexDirection: "row", alignItems: "flex-start", gap: spacing.md },
+  aheadYear: {
+    width: 46,
+    color: colors.dsBlue,
+    fontFamily: fonts.bodyBold,
+    fontSize: 13,
+    letterSpacing: 0.2,
+    paddingTop: 1,
+  },
+  aheadTitle: { flex: 1, color: "rgba(255,255,255,0.88)", fontFamily: fonts.body, fontSize: 13.5, lineHeight: 19 },
+  aheadMore: { color: "rgba(255,255,255,0.45)", fontFamily: fonts.bodySemi, fontSize: 12, marginTop: 2 },
+  aheadSource: {
+    color: "rgba(255,255,255,0.38)",
+    fontFamily: fonts.serifItalic,
+    fontSize: 10.5,
+    lineHeight: 15,
+    marginTop: spacing.sm,
+  },
+
+  // ── Detail pane (not-yet-researched countries) ──
   detail: { flex: 1, minWidth: 0, gap: spacing.md },
   bigFlag: { width: 96, height: 64, borderRadius: radius.sm, backgroundColor: "#222" },
   name: { color: "#FFFFFF", fontFamily: fonts.display, fontSize: 40, lineHeight: 42, letterSpacing: -1 },
