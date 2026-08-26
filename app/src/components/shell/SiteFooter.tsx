@@ -4,6 +4,7 @@ import { Lang } from "../../content/types";
 import { t } from "../../i18n";
 import { colors, spacing, radius, fonts } from "../../theme/tokens";
 import { Icon } from "../../ui";
+import { TumooloMark } from "./TumooloMark";
 
 // The site footer — lifted out of HomeGallery so the shell can render it on EVERY route
 // (Architecture v2, D6). See docs/13-architecture-v2-plan.md §3.
@@ -72,9 +73,7 @@ export function SiteFooter({
               accessibilityRole="link"
               accessibilityLabel="tumoolo.tech — opens in browser"
             >
-              <Text style={styles.studioName}>
-                tumoolo<Text style={styles.studioSuffix}>.tech</Text>
-              </Text>
+              <TumooloMark height={20} />
               <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
             </Pressable>
 
@@ -210,8 +209,6 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     paddingHorizontal: 14,
   },
-  studioName: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 16, letterSpacing: -0.2 },
-  studioSuffix: { color: colors.dsBlue },
 
   creditStack: { gap: spacing.sm },
   creditLabel: { marginTop: spacing.md },
