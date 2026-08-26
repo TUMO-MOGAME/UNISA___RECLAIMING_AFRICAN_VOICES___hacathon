@@ -39,8 +39,10 @@ import { Lang } from "./src/content/types";
 import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
 import { ComingSoon } from "./src/components/shell/ComingSoon";
 import { CountriesScreen } from "./src/components/CountriesScreen";
+import { WatchScreen } from "./src/components/WatchScreen";
 import type { NavId } from "./src/components/shell/nav";
 import { DEFAULT_COUNTRY } from "./src/content/anthems";
+import { useProgress } from "./src/services/progress/useProgress";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
 
@@ -95,6 +97,8 @@ export default function App() {
   // Selected country — moved out of the hero into the shell header (v2 D3), so it is shared app-wide
   // and the forthcoming /countries page can drive it too.
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  // Device-local progress (D5) — no account, no PII, never leaves the device.
+  const progress = useProgress();
   // Route HISTORY (not a single route): push to navigate, pop to go back — so Back always returns
   // to where the user actually came from (e.g. Reader→Atlas, City→Province, Archive→President).
   const [stack, setStack] = useState<Route[]>([{ name: "home" }]);
@@ -235,6 +239,13 @@ export default function App() {
       // The v2 rooms. Each is an honest placeholder naming what lands there and when, until its
       // real screen arrives in Weeks 2–3 — a live nav item must never be a dead link.
       case "watch":
+        return (
+          <WatchScreen
+            lang={lang}
+            progress={progress.progress}
+            onOpen={(id) => push({ name: "reader", id })}
+          />
+        );
       case "journey":
       case "kids":
       case "schools":
@@ -314,7 +325,7 @@ export default function App() {
               active={activeNav}
               onNavigate={goto}
               overHero={overHero}
-              cards={0}
+              cards={progress.progress.cards.length}
               onAbout={() => push({ name: "about" })}
               onHeritage={() => push({ name: "heritage" })}
             >

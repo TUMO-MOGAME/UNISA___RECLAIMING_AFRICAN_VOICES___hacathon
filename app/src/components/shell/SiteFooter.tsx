@@ -5,15 +5,21 @@ import { t } from "../../i18n";
 import { colors, spacing, radius, fonts } from "../../theme/tokens";
 import { Icon } from "../../ui";
 
-// The site footer — lifted verbatim out of HomeGallery so the shell can render it on EVERY route
-// (Architecture v2, D6). Nothing here is restyled: same wordmark, same partner plates, same sound
-// credit, same built-with strip, same fine print. If this looks different from the old home-page
-// footer, the change is wrong. See docs/13-architecture-v2-plan.md §3.
+// The site footer — lifted out of HomeGallery so the shell can render it on EVERY route
+// (Architecture v2, D6). See docs/13-architecture-v2-plan.md §3.
+//
+// The extraction itself was verbatim. The credits were then changed on 2026-08-26 at Tumo's
+// request: the UNISA and Botlhale AI partner plates came out, tumoolo.tech went in as the studio
+// that built the app, and Baobab Roots Collective joined African Tribe Echoes as a sound credit.
+// The layout, type and spacing are otherwise untouched.
 
 const KICKER = "Reclaiming African Voices";
 // The ambient African music/soundscapes across the app are sampled from this YouTube channel —
 // credited + linked here so listeners can hear the full pieces at the source.
 const SOUND_CREDIT_URL = "https://www.youtube.com/@AfricanTribeEchoes";
+const SOUND_CREDIT_2_URL = "https://www.youtube.com/@BaobabRootsCollective";
+// The studio that built Ubuntu Heritage.
+const STUDIO_URL = "https://www.tumoolo.tech/";
 const SOLANA_URL = "https://solana.com";
 const BLUE = "#1A85A7"; // accent only — rules, borders, links
 
@@ -55,55 +61,78 @@ export function SiteFooter({
           </View>
           {/* Middle: partners */}
           <View style={styles.partners}>
-            <Text style={styles.partnersLabel}>In partnership with</Text>
-            <View style={styles.partnerMarks}>
-              {/* Real partner logos on white plates so the dark/coloured marks stay legible on
-                  the navy footer (logos kept in their own brand colours — not recoloured). */}
-              <View style={styles.partnerPlate}>
-                <Image
-                  source={require("../../../assets/brand/unisa.webp")}
-                  style={styles.unisaLogo}
-                  resizeMode="contain"
-                  accessibilityLabel="University of South Africa (UNISA)"
-                />
-              </View>
-              <View style={styles.partnerPlate}>
-                <Image
-                  source={require("../../../assets/brand/botlhale-chip.webp")}
-                  style={styles.botlhaleChip}
-                  resizeMode="contain"
-                  accessibilityLabel="Botlhale AI"
-                />
-                <Text style={styles.botlhaleName}>Botlhale AI</Text>
-              </View>
-            </View>
-            {/* Sound credit — the ambient music/soundscapes are sampled from this YouTube
-                channel. Clickable so listeners can hear the full pieces at the source. */}
-            <Text style={[styles.partnersLabel, styles.creditLabel]}>Sounds & music by</Text>
+            <Text style={styles.partnersLabel}>Built by</Text>
             <Pressable
-              onPress={() => Linking.openURL(SOUND_CREDIT_URL)}
+              onPress={() => Linking.openURL(STUDIO_URL)}
               style={({ pressed, hovered }: any) => [
-                styles.creditPlate,
+                styles.studioPlate,
                 hovered && styles.creditPlateHover,
                 pressed && styles.creditPlatePressed,
               ]}
               accessibilityRole="link"
-              accessibilityLabel="African Tribe Echoes on YouTube — opens in browser"
+              accessibilityLabel="tumoolo.tech — opens in browser"
             >
-              <Image
-                source={require("../../../assets/brand/african-tribe-echoes.webp")}
-                style={styles.creditAvatar}
-                resizeMode="cover"
-              />
-              <View style={styles.creditText}>
-                <Text style={styles.creditName}>African Tribe Echoes</Text>
-                <View style={styles.creditSub}>
-                  <Icon.Headphones size={12} color="rgba(255,255,255,0.6)" />
-                  <Text style={styles.creditRole}>Full tracks on YouTube</Text>
-                </View>
-              </View>
+              <Text style={styles.studioName}>
+                tumoolo<Text style={styles.studioSuffix}>.tech</Text>
+              </Text>
               <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
             </Pressable>
+
+            {/* Sound credits — the ambient music/soundscapes are sampled from these YouTube
+                channels. Clickable so listeners can hear the full pieces at the source. */}
+            <Text style={[styles.partnersLabel, styles.creditLabel]}>Sounds & music by</Text>
+            <View style={styles.creditStack}>
+              <Pressable
+                onPress={() => Linking.openURL(SOUND_CREDIT_URL)}
+                style={({ pressed, hovered }: any) => [
+                  styles.creditPlate,
+                  hovered && styles.creditPlateHover,
+                  pressed && styles.creditPlatePressed,
+                ]}
+                accessibilityRole="link"
+                accessibilityLabel="African Tribe Echoes on YouTube — opens in browser"
+              >
+                <Image
+                  source={require("../../../assets/brand/african-tribe-echoes.webp")}
+                  style={styles.creditAvatar}
+                  resizeMode="cover"
+                />
+                <View style={styles.creditText}>
+                  <Text style={styles.creditName}>African Tribe Echoes</Text>
+                  <View style={styles.creditSub}>
+                    <Icon.Headphones size={12} color="rgba(255,255,255,0.6)" />
+                    <Text style={styles.creditRole}>Full tracks on YouTube</Text>
+                  </View>
+                </View>
+                <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
+              </Pressable>
+
+              {/* No channel avatar is bundled for this one yet, so a Lucide mark stands in and the
+                  plate still reads as intentional. Drop a webp into assets/brand/ and swap the
+                  fallback View for an Image when you have the artwork. */}
+              <Pressable
+                onPress={() => Linking.openURL(SOUND_CREDIT_2_URL)}
+                style={({ pressed, hovered }: any) => [
+                  styles.creditPlate,
+                  hovered && styles.creditPlateHover,
+                  pressed && styles.creditPlatePressed,
+                ]}
+                accessibilityRole="link"
+                accessibilityLabel="Baobab Roots Collective on YouTube — opens in browser"
+              >
+                <View style={[styles.creditAvatar, styles.creditAvatarFallback]}>
+                  <Icon.Music size={16} color={colors.dsBlue} />
+                </View>
+                <View style={styles.creditText}>
+                  <Text style={styles.creditName}>Baobab Roots Collective</Text>
+                  <View style={styles.creditSub}>
+                    <Icon.Headphones size={12} color="rgba(255,255,255,0.6)" />
+                    <Text style={styles.creditRole}>Full tracks on YouTube</Text>
+                  </View>
+                </View>
+                <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
+              </Pressable>
+            </View>
           </View>
           {/* Right: links + built-with (grouped here so the partners column stays compact) */}
           <View style={[styles.footerLinks, wide && styles.footerLinksWide]}>
@@ -116,7 +145,7 @@ export function SiteFooter({
               <Text style={styles.footerLinkText}>{t(UI.heritage, lang)}</Text>
             </Pressable>
             {/* Built with — the tech the app runs on. Sits under the on-chain Heritage Ledger link
-                (Solana anchors it). Distinct from "In partnership with": tech used ≠ endorsement.
+                (Solana anchors it). Distinct from "Built by": tech used ≠ endorsement.
                 Light Solana logotype on the navy ground (high-contrast, per Solana's guidelines). */}
             <View style={[styles.builtWith, wide && styles.builtWithWide]}>
               <Text style={styles.partnersLabel}>Built with</Text>
@@ -166,20 +195,25 @@ const styles = StyleSheet.create({
 
   partners: {},
   partnersLabel: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: spacing.sm },
-  partnerMarks: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.md },
 
-  partnerPlate: {
+  // The studio that built the app. A wordmark plate rather than a logo — no mark is bundled, and a
+  // made-up one would be worse than none.
+  studioPlate: {
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    backgroundColor: "#FFFFFF",
-    borderRadius: radius.sm,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.14)",
+    borderRadius: radius.md,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
   },
-  unisaLogo: { width: 92, height: 28 },
-  botlhaleChip: { width: 26, height: 26 },
+  studioName: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 16, letterSpacing: -0.2 },
+  studioSuffix: { color: colors.dsBlue },
 
+  creditStack: { gap: spacing.sm },
   creditLabel: { marginTop: spacing.md },
   creditPlate: {
     flexDirection: "row",
@@ -209,11 +243,16 @@ const styles = StyleSheet.create({
   },
   solanaLogo: { width: 132, height: 20 }, // 640x95 source ≈ 6.7:1
   creditAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1A1A1A" },
+  creditAvatarFallback: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(26,133,167,0.45)",
+  },
   creditText: { gap: 2 },
   creditName: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 14, letterSpacing: 0.2 },
   creditSub: { flexDirection: "row", alignItems: "center", gap: 4 },
   creditRole: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 11, letterSpacing: 0.2 },
-  botlhaleName: { color: colors.dsSlate, fontFamily: fonts.heading, fontSize: 15, letterSpacing: 0.2 },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.live },
   footerFine: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.body, fontSize: 12, lineHeight: 18 },
   creatorLabel: { marginTop: spacing.lg, marginBottom: 4 },

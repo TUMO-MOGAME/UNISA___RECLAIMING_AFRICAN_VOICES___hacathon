@@ -78,8 +78,8 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 
 ### Week 2 — Watch and Journey, the core loop (2–8 Sep)
 
-- [ ] V2-13 `services/progress/` — types + local store (web + native) + hook (D5), unit-tested
-- [ ] V2-14 `WatchScreen.tsx` — featured + rails + filter chips + search (existing content only)
+- [x] V2-13 `services/progress/` — types + local store (web + native) + hook (D5), unit-tested
+- [x] V2-14 `WatchScreen.tsx` — featured + rails + filter chips + search (existing content only)
 - [ ] V2-15 `WatchItemScreen.tsx` — player · Child⇄Adult · language ▾ · **Sources & provenance** · Ask Ubuntu
 - [ ] V2-16 `JourneyScreen.tsx` — staged trail (done/current/locked) from `history-trail.ts`
 - [ ] V2-17 `content/quiz.ts` + grounded questions for chapters 1–3 — every distractor must be defensible

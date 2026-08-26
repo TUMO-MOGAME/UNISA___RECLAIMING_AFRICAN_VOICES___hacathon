@@ -175,6 +175,28 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## 🗒️ Log
 
+- **2026-08-26 (night)** — **Week 2 started: progress store + Watch library. Footer credits changed.**
+  **V2-13** `services/progress/` — pure reducers in `progress.ts` (14 unit tests) plus the platform
+  split the Archive uses: web persists to localStorage, native is session-only with `persists:false`
+  so the Passport can say so honestly rather than implying a guarantee (no AsyncStorage dependency in
+  this project yet). Holds **no personal data** — no name, no account, nothing identifying; a test
+  asserts the shape's key list so nobody can quietly add an identifying field. Reducers are
+  idempotent and never regress: a card cannot be collected twice, a re-watch cannot rewind progress,
+  a retaken quiz cannot lower a score, and `normalise()` survives a corrupt stored blob.
+  **V2-14** `WatchScreen` — the browsable library, built only from existing modules. The source
+  design's Totems / National Days / Nine Provinces chips are **not** offered: in this codebase those
+  are Atlas screens, not modules with scenes, so those chips would promise films that do not exist.
+  Chips are All / The 4 Great Books / Cultural Atlas, plus search and real "% watched" from the store.
+  **Bug I introduced and fixed:** the WatchScreen render first landed in `navigateTo` (the chatbot's
+  orchestrator) instead of `renderRoute` — both switches open with the same `case "watch":` line. It
+  typechecked cleanly because the orchestrator's return type is loose, so tsc would never have caught
+  it; only reading the switch did. Worth remembering when scripting edits against this file.
+  **Footer (Tumo's request):** UNISA and Botlhale AI partner plates removed; **tumoolo.tech** added as
+  "Built by"; **Baobab Roots Collective** joins African Tribe Echoes under sound credits. Tumo's name
+  stays. No avatar is bundled for the new channel, so a Lucide mark stands in — drop a webp into
+  `assets/brand/` to swap it.
+  Verified: typecheck clean · **99/99 tests** · web bundle green.
+
 - **2026-08-26 (evening)** — **Countries + Atlas hub done (V2-08 → V2-10); branch pushed.**
   `CountriesScreen` carries all 54 nations, searchable, with the national anthems moved out of the
   hero dropdown (D3). `AtlasRooms` gathers Provinces · Presidents · Heroes · Totems · Days under the
