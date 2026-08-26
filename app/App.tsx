@@ -36,6 +36,11 @@ import { ChatbotWidget } from "./src/components/ChatbotWidget";
 import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
 import { Lang } from "./src/content/types";
+import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
+import { ComingSoon } from "./src/components/shell/ComingSoon";
+import { CountriesScreen } from "./src/components/CountriesScreen";
+import type { NavId } from "./src/components/shell/nav";
+import { DEFAULT_COUNTRY } from "./src/content/anthems";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
 
@@ -65,12 +70,31 @@ type Route =
   | { name: "days" }
   | { name: "totems" }
   | { name: "heroes" }
-  | { name: "hero"; id: string };
+  | { name: "hero"; id: string }
+  // ── Architecture v2 rooms (docs/13-architecture-v2-plan.md §4) ──
+  | { name: "countries" }
+  | { name: "watch" }
+  | { name: "watchItem"; id: string }
+  | { name: "journey" }
+  | { name: "stage"; id: string }
+  | { name: "kids" }
+  | { name: "kidsStage"; id: string }
+  | { name: "schools" }
+  | { name: "passport" };
+
+// Route-name groupings for the shell. Deliberately `Set<string>` (see the note in App below).
+const OWN_SCROLL = new Set(["home", "atlas", "provinces", "presidents", "president", "days", "totems", "heroes", "hero"]);
+const ATLAS_ROOMS = new Set(["atlas", "provinces", "province", "city", "presidents", "president", "days", "totems", "heroes", "hero", "reader"]);
+const ARCHIVE_ROOMS = new Set(["archive", "heritage", "about"]);
+const ROOT_ROOMS = new Set(["home", "journey", "watch", "kids", "schools", "passport", "countries"]);
 
 export default function App() {
   // Default language is always English (the guaranteed base for every string); the picker switches it
   // app-wide, and any language without reviewed copy honestly falls back to English (see i18n/localize).
   const [lang, setLang] = useState<Lang>(DEFAULT_LANG);
+  // Selected country — moved out of the hero into the shell header (v2 D3), so it is shared app-wide
+  // and the forthcoming /countries page can drive it too.
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
   // Route HISTORY (not a single route): push to navigate, pop to go back — so Back always returns
   // to where the user actually came from (e.g. Reader→Atlas, City→Province, Archive→President).
   const [stack, setStack] = useState<Route[]>([{ name: "home" }]);
@@ -104,6 +128,12 @@ export default function App() {
       case "archive":
       case "heritage":
       case "about":
+      case "countries":
+      case "watch":
+      case "journey":
+      case "kids":
+      case "schools":
+      case "passport":
         push({ name: pageId } as Route);
         break;
       default:
@@ -158,7 +188,18 @@ export default function App() {
         ) : null;
       }
       case "atlas":
-        return <AtlasScreen lang={lang} onBack={back} onOpen={(id) => push({ name: "reader", id })} />;
+        return (
+          <AtlasScreen
+            lang={lang}
+            onBack={back}
+            onOpen={(id) => push({ name: "reader", id })}
+            onProvinces={() => push({ name: "provinces" })}
+            onPresidents={() => push({ name: "presidents" })}
+            onHeroes={() => push({ name: "heroes" })}
+            onTotems={() => push({ name: "totems" })}
+            onDays={() => push({ name: "days" })}
+          />
+        );
       case "about":
         return <AboutSourcesScreen lang={lang} onBack={back} />;
       case "archive":
@@ -191,6 +232,23 @@ export default function App() {
         const h = heroById(route.id);
         return h ? <HeroScreen hero={h} onBack={back} lang={lang} /> : null;
       }
+      // The v2 rooms. Each is an honest placeholder naming what lands there and when, until its
+      // real screen arrives in Weeks 2–3 — a live nav item must never be a dead link.
+      case "watch":
+      case "journey":
+      case "kids":
+      case "schools":
+      case "passport":
+        return <ComingSoon room={route.name} lang={lang} onHome={() => setStack([{ name: "home" }])} />;
+      case "countries":
+        return (
+          <CountriesScreen
+            lang={lang}
+            country={country}
+            onChange={setCountry}
+            onEnter={() => push({ name: "journey" })}
+          />
+        );
       default:
         return (
           <HomeGallery
@@ -212,42 +270,62 @@ export default function App() {
     }
   }
 
-  // Home + Reader are full-bleed (hero image / immersive reader); every other screen is a content
-  // page that reads better as a centred column on wide screens instead of stretching edge-to-edge.
-  // These pages use the full-width two-pane "index" layout (SideIndexScroll); the rest stay centred.
-  const fullBleed =
-    route.name === "home" ||
-    route.name === "reader" ||
-    route.name === "atlas" ||
-    route.name === "provinces" ||
-    route.name === "presidents" ||
-    route.name === "president" || // wide layout: important-dates sidebar + content
-    route.name === "days" ||
-    route.name === "totems" || // wide layout: totems sidebar + content
-    route.name === "heroes" ||
-    route.name === "hero"; // wide layout: heroes sidebar + content
+  // ── Shell configuration (v2 §5) ────────────────────────────────────────
+  // NOTE: these lists are plain `string[]`, and the route name is widened to `string` before any
+  // lookup. Matching them against the Route union instead makes tsc walk the whole union per call
+  // and blows its stack (the same recursion this file already guards elsewhere). Keep it as strings.
+  //
+  // "own"       — the route scrolls itself (its own ScrollView or SideIndexScroll two-pane layout).
+  // "immersive" — no chrome: the Reader, a film, a dot-story fill the viewport.
+  // "page"      — the shell scrolls it and appends the footer. Everything else.
+  const name: string = route.name;
+  const shellMode: ShellMode =
+    name === "reader" ? "immersive" : OWN_SCROLL.has(name) ? "own" : "page";
+
+  // Which nav item to mark. The Atlas rooms all belong to Atlas; the Trust screens to Archive.
+  const activeNav: NavId | null = ATLAS_ROOMS.has(name)
+    ? "atlas"
+    : ARCHIVE_ROOMS.has(name)
+      ? "archive"
+      : ROOT_ROOMS.has(name)
+        ? (name as NavId)
+        : null;
+
+  // Home's hero is full-bleed, so the header sits transparently on top of it rather than above it.
+  const overHero = name === "home";
+
+  const goto = (id: NavId) => {
+    if (id === "home") setStack([{ name: "home" }]);
+    else push({ name: id } as Route);
+  };
 
   return (
     <SafeAreaProvider>
       <View style={styles.app}>
         <StatusBar style="light" />
-        {/* Full-bleed on web — the app fills the whole viewport like a website. Content screens are
-            centred to a readable max-width; the hero/reader fill the screen. */}
         <View style={styles.frame}>
           {ready && (
-            <Fade key={routeKey} style={{ flex: 1 }}>
-              {fullBleed ? (
-                renderRoute()
-              ) : (
-                <View style={styles.centerWrap}>
-                  <View style={styles.centerInner}>{renderRoute()}</View>
-                </View>
-              )}
-            </Fade>
+            <AppShell
+              mode={storyActive ? "immersive" : shellMode}
+              lang={lang}
+              onLangChange={setLang}
+              country={country}
+              onCountryChange={setCountry}
+              active={activeNav}
+              onNavigate={goto}
+              overHero={overHero}
+              cards={0}
+              onAbout={() => push({ name: "about" })}
+              onHeritage={() => push({ name: "heritage" })}
+            >
+              <Fade key={routeKey} style={{ flex: 1 }}>
+                {renderRoute()}
+              </Fade>
+            </AppShell>
           )}
         </View>
         {/* The conversational guide floats above every screen (answers only from site content; can
-            navigate). Rendered outside the route Fade so it persists across navigation. */}
+            navigate). Rendered outside the shell so it persists across navigation. */}
         {ready && !storyActive && <ChatbotWidget lang={lang} onNavigate={navigateTo} />}
       </View>
     </SafeAreaProvider>

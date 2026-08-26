@@ -6,17 +6,12 @@ import { sceneImageSource } from "../content/images";
 import { t } from "../i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import { SceneImage } from "./SceneImage";
-import { LanguagePicker } from "./LanguagePicker";
-import { CountryPicker } from "./CountryPicker";
-import { DEFAULT_COUNTRY } from "../content/anthems";
-import { HistoryTrail, type HistoryTrailHandle } from "./HistoryTrail";
-import { historyTrailSource, historyTrail, type HistoryMilestone } from "../content/history-trail";
-import { JourneyStory } from "./JourneyStory";
-import { mediaFor, hasStory } from "../content/journey-media";
 import { PressScale, Reveal } from "./Motion";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
 import { Journey } from "./Journey";
+import { SiteFooter } from "./shell/SiteFooter";
+import { HomeHero, HomeJourneyStory, useHomeJourney } from "./home/HomeHero";
 import { literatureJourney } from "../content/journey";
 
 // The front door — a scrolling "Modern South Africa" landing page: a full-bleed hero, then a stack of
@@ -27,10 +22,8 @@ import { literatureJourney } from "../content/journey";
 const KICKER = "Reclaiming African Voices";
 // The ambient African music/soundscapes across the app are sampled from this YouTube channel —
 // credited + linked in the footer so listeners can hear the full pieces at the source.
-const SOUND_CREDIT_URL = "https://www.youtube.com/@AfricanTribeEchoes";
 // "Built with" tech credit — Solana anchors the on-chain Heritage Ledger. Links to the tech's site,
 // not an endorsement. Official logo used per Solana's brand guidelines (light logotype on a dark bg).
-const SOLANA_URL = "https://solana.com";
 const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 
 // UI chrome in all 11 official languages so the whole interface switches, not just EN/Setswana. These
@@ -191,23 +184,6 @@ const UI = {
     en: "Meet the heroes", tn: "Kopana le bagaki", af: "Ontmoet die helde", zu: "Hlangana namaqhawe", xh: "Dibana namaqhawe",
     nso: "Kopana le bagale", st: "Kopana le bahale", ss: "Hlangana nemacawe", ts: "Hlangana ni tinhenha", nr: "Hlangana namaqhawe", ve: "Ṱangana na vhahali",
   },
-  startJourney: { en: "Start the journey", tn: "Simolola leeto", af: "Begin die reis", zu: "Qala uhambo", xh: "Qala uhambo", nso: "Thoma leeto", st: "Qala leeto", ss: "Cala luhambo", ts: "Sungula riendzo", nr: "Thoma ikhambo", ve: "Thoma lwendo" },
-  keepWalking: { en: "Keep walking", tn: "Tswelela pele", af: "Stap verder", zu: "Qhubeka uhambe", xh: "Qhubeka uhambe", nso: "Tšwela pele", st: "Tsoela pele", ss: "Chubeka uhambe", ts: "Famba emahlweni", nr: "Ragela phambili", ve: "Bvelani phanḓa" },
-  journeyDone: { en: "Restart the journey", tn: "Simolola leeto gape", af: "Herbegin die reis", zu: "Qalisa kabusha uhambo", xh: "Qalisa kwakhona uhambo", nso: "Thoma leeto gape", st: "Qala leeto hape", ss: "Cala kabusha luhambo", ts: "Sungula nakambe riendzo", nr: "Thoma godu ikhambo", ve: "Thoma hafhu lwendo" },
-  storySkip: { en: "Skip", tn: "Tlola", af: "Slaan oor", zu: "Yeqa", xh: "Tsiba", nso: "Fetiša", st: "Tlōla", ss: "Yeca", ts: "Tlula", nr: "Yeqa", ve: "Fhirisa" },
-  storyBack: { en: "Back", tn: "Morago", af: "Terug", zu: "Emuva", xh: "Emva", nso: "Morago", st: "Morao", ss: "Emuva", ts: "Endzhaku", nr: "Emuva", ve: "Murahu" },
-  storyWatch: { en: "Watch the film", tn: "Lebelela filimi", af: "Kyk die film", zu: "Buka ifilimu", xh: "Bukela ifilimu", nso: "Lebelela filimi", st: "Sheba filimi", ss: "Buka ifilimu", ts: "Languta filimi", nr: "Buka ifilimu", ve: "Lavhelesa filimi" },
-  storyInterpretation: { en: "Artistic interpretation", tn: "Setshwantsho sa botaki (e seng senepe)", af: "Artistieke vertolking", zu: "Ukuhunyushwa kobuciko", xh: "Utoliko lobugcisa", nso: "Tlhathollo ya bokgabo", st: "Tlhaloso ya bonono", ss: "Kuhunyushwa kwebuciko", ts: "Nhlamuselo ya vutshila", nr: "Ukuhlathululwa kobuciko", ve: "Ṱhalutshedzo ya vhutsila" },
-  playStory: { en: "Play the story", tn: "Bapala kanegelo", af: "Speel die storie", zu: "Dlala indaba", xh: "Dlala ibali", nso: "Bapala kanegelo", st: "Bapala pale", ss: "Dlala indzaba", ts: "Tlanga ntsheketo", nr: "Dlala indaba", ve: "Tambani tshiitwa" },
-  closeJourney: { en: "Close the journey", tn: "Tswala leeto", af: "Sluit die reis", zu: "Vala uhambo", xh: "Vala uhambo", nso: "Tswalela leeto", st: "Koala leeto", ss: "Vala luhambo", ts: "Pfala riendzo", nr: "Vala ikhambo", ve: "Vala lwendo" },
-  journeyHint: {
-    en: "1652 → today · tap a year", tn: "1652 → gompieno · tobetsa ngwaga", af: "1652 → vandag · tik 'n jaar", zu: "1652 → namuhla · thepha unyaka", xh: "1652 → namhlanje · cofa unyaka",
-    nso: "1652 → lehono · kgotla ngwaga", st: "1652 → kajeno · tobetsa selemo", ss: "1652 → lamuhla · tsindza umnyaka", ts: "1652 → namuntlha · tsindziya lembe", nr: "1652 → namhlanjesi · thepha umnyaka", ve: "1652 → ṋamusi · pusani ṅwaha",
-  },
-  journeyTitle: {
-    en: "The journey of a nation", tn: "Leeto la setšhaba", af: "Die reis van 'n nasie", zu: "Uhambo lwesizwe", xh: "Uhambo lwesizwe",
-    nso: "Leeto la setšhaba", st: "Leeto la setjhaba", ss: "Luhambo lwesive", ts: "Riendzo ra rixaka", nr: "Ikhambo lesitjhaba", ve: "Lwendo lwa lushaka",
-  },
   daysKicker: {
     en: "Days we remember", tn: "Malatsi a re a gakologelwang", af: "Dae wat ons onthou", zu: "Izinsuku esizikhumbulayo", xh: "Iintsuku esizikhumbulayo",
     nso: "Matšatši ao re a gopolago", st: "Matsatsi ao re a hopolang", ss: "Emalanga lesiwakhumbulako", ts: "Masiku lawa hi ma tsundzukaka", nr: "Amalanga esiwakhumbulako", ve: "Maḓuvha ane ra a humbula",
@@ -257,14 +233,6 @@ const UI = {
   archiveCta: {
     en: "Record a story", tn: "Gatisa kanegelo", af: "Neem 'n storie op", zu: "Qopha indaba", xh: "Rekhoda ibali",
     nso: "Gatiša kanegelo", st: "Rekota pale", ss: "Bhala indzaba", ts: "Rhekhoda ntsheketo", nr: "Bhala indaba", ve: "Rekhoda tshiitwa",
-  },
-  about: {
-    en: "About the Sources", tn: "Ka ga Metswedi", af: "Oor die bronne", zu: "Mayelana Nemithombo", xh: "Malunga Nemithombo",
-    nso: "Ka ga Methopo", st: "Mabapi le Mehlodi", ss: "Mayelana Nemitfombo", ts: "Mayelana ni Tihlovo", nr: "Malunga Nemithombo", ve: "Nga ha Zwiko",
-  },
-  heritage: {
-    en: "Heritage Ledger · on-chain", tn: "Rekoto ya Boswa · mo blockchain", af: "Erfenisregister · op-ketting", zu: "Irejista Yamagugu · ku-blockchain", xh: "Irejista Yelifa · kwi-blockchain",
-    nso: "Rejista ya Bohwa · go blockchain", st: "Rejista ya Lefa · ho blockchain", ss: "Irejista Yelifa · ku-blockchain", ts: "Rejista ya Ndzhaka · eka blockchain", nr: "Irejista Yelifa · ku-blockchain", ve: "Rejista ya Ifa · kha blockchain",
   },
   scrollDown: {
     en: "Scroll down for more", tn: "Kgweetla tlase go bona go feta", af: "Rol af vir meer", zu: "Skrola phansi ukuze uthole okwengeziwe", xh: "Skrola ezantsi ukuze ufumane okungakumbi",
@@ -320,8 +288,6 @@ export function HomeGallery({
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
   // Drives scroll-in reveals + image parallax across the page.
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Selected country (defaults to South Africa) — drives the flag shown + which anthem plays.
-  const [country, setCountry] = useState(DEFAULT_COUNTRY);
 
   // Scroll affordances: a bouncing "scroll down for more" cue near the top, and a "back to top"
   // button once the reader nears the bottom of this long landing page.
@@ -350,54 +316,14 @@ export function HomeGallery({
   const scrollToTop = () => scrollRef.current?.scrollTo({ y: 0, animated: true });
   const scrollDownOne = () => scrollRef.current?.scrollTo({ y: Math.max(height * 0.94, 520), animated: true });
 
-  // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
-  // journey brings it forward (bright + tappable) and fades the big words back.
-  const [mapOpen, setMapOpen] = useState(false);
-  const [milestone, setMilestone] = useState<HistoryMilestone | null>(null);
-  // The walk is driven from the caption card via this handle; walkState picks the label + disables mid-step.
-  const trailRef = useRef<HistoryTrailHandle>(null);
-  const [walkState, setWalkState] = useState<{ atLast: boolean; walking: boolean }>({ atLast: false, walking: false });
-  // The "dot story" (full-screen picture → film) currently playing, or null.
-  const [storyId, setStoryId] = useState<string | null>(null);
-  const trailOpacity = useRef(new Animated.Value(0.16)).current;
-  const wordsOpacity = useRef(new Animated.Value(1)).current;
-  const scrimOpacity = useRef(new Animated.Value(0)).current;
-  const animateTo = (open: boolean) =>
-    Animated.parallel([
-      Animated.timing(trailOpacity, { toValue: open ? 1 : 0.16, duration: 420, useNativeDriver: true }),
-      Animated.timing(wordsOpacity, { toValue: open ? 0.12 : 1, duration: 420, useNativeDriver: true }),
-      Animated.timing(scrimOpacity, { toValue: open ? 0.62 : 0, duration: 420, useNativeDriver: true }),
-    ]);
-  const openMap = () => {
-    setMapOpen(true);
-    animateTo(true).start();
-    // Right after starting the journey, open the opening milestone's story (1652: the arrival) —
-    // full-screen picture then film. Skipping returns to the walk.
-    const firstId = historyTrail[0]?.id;
-    if (firstId && hasStory(firstId)) setStoryId(firstId);
-  };
-  const closeMap = () => { setMapOpen(false); setMilestone(null); setStoryId(null); animateTo(false).start(); };
-
-  const storyMilestone = storyId ? historyTrail.find((m) => m.id === storyId) ?? null : null;
-  const storyMedia = storyId ? mediaFor(storyId) : undefined;
-
-  // Hide the floating chatbot for the whole journey (walk + full-screen story) so it never crowds the
-  // caption's controls on a phone; reset on unmount.
-  useEffect(() => {
-    onStoryActiveChange?.(mapOpen || !!(storyMilestone && storyMedia));
-    return () => onStoryActiveChange?.(false);
-  }, [storyId, mapOpen]);
+  // The hero's journey state now lives in home/HomeHero (v2 D6); the page keeps a handle so the
+  // hero and the full-screen dot-story stay in sync across the ScrollView boundary.
+  const journey = useHomeJourney({ onStoryActiveChange });
 
   return (
     <View style={styles.root}>
-      {/* Country picker (left) + language picker (right) float over the hero, mirrored */}
-      <View style={styles.countryBar} pointerEvents="box-none">
-        <CountryPicker country={country} onChange={setCountry} lang={lang} />
-      </View>
-      <View style={styles.langBar} pointerEvents="box-none">
-        <LanguagePicker lang={lang} onChange={onLangChange} />
-      </View>
-
+      {/* The country + language pickers moved into the shell header (v2 D1/D3), so they are now
+          persistent on every route instead of floating over this one hero. */}
       <ScrollCtx.Provider value={{ scrollY, vh: height }}>
       <Animated.ScrollView
         ref={scrollRef}
@@ -411,106 +337,9 @@ export function HomeGallery({
         })}
       >
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
-        <View style={[styles.hero, { height: heroH }]}>
-          <View style={StyleSheet.absoluteFill}>
-            <SceneImage source={heroSource(modules[0], 1400, 1600)} kenBurns />
-          </View>
-          <LinearGradient
-            colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.9)"]}
-            locations={[0, 0.45, 1]}
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-          />
-
-          {/* darkening scrim that deepens when the journey opens, so the trail reads clearly */}
-          <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.mapScrim, { opacity: scrimOpacity }]} />
-
-          {/* the history trail — dim behind the words by default, bright + tappable when open. The
-              start flag lives inside it (planted on the 1652 dot) so it never drifts. */}
-          <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-            <HistoryTrail
-              ref={trailRef}
-              active={mapOpen}
-              dimOpacity={trailOpacity}
-              onSelect={setMilestone}
-              selectedId={milestone?.id}
-              onStart={openMap}
-              startLabel={t(UI.startJourney, lang)}
-              onWalkChange={setWalkState}
-            />
-          </View>
-
-          {/* the big words — bright by default, faded back when the journey opens. Nothing here is
-              tappable, so the layer never intercepts clicks meant for the trail / start flag behind it. */}
-          <Animated.View style={[styles.heroInner, { opacity: wordsOpacity }]} pointerEvents="none">
-            <Reveal style={styles.heroTitleWrap}>
-              <Text style={[styles.heroTitle, wide && styles.heroTitleWide]}>Ubuntu{"\n"}Heritage</Text>
-            </Reveal>
-            <Reveal delay={150} style={[styles.heroCard, wide && styles.heroCardWide]}>
-              <Text style={styles.heroCardTitle}>Reclaiming African Voices</Text>
-              <Text style={styles.heroCardSub}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
-            </Reveal>
-          </Animated.View>
-
-          {/* journey controls + selected-year caption (only while open) */}
-          {mapOpen ? (
-            <View style={styles.mapUI} pointerEvents="box-none">
-              {/* close sits on the LEFT (where the start flag was) so it never collides with the
-                  language picker in the top-right */}
-              <View style={styles.mapTop} pointerEvents="box-none">
-                <PressScale style={styles.mapClose} onPress={closeMap} accessibilityLabel={t(UI.closeJourney, lang)}>
-                  <Icon.X size={18} color="#fff" />
-                </PressScale>
-                <View style={styles.mapTopText} pointerEvents="none">
-                  <Text style={styles.mapKicker}>{t(UI.journeyTitle, lang)}</Text>
-                  <Text style={styles.mapHint}>{t(UI.journeyHint, lang)}</Text>
-                </View>
-              </View>
-
-              {milestone ? (
-                <View style={styles.mapCaption} pointerEvents="box-none">
-                  <Text style={styles.capYear}>{milestone.year}</Text>
-                  <Text style={styles.capTitle}>{milestone.title}</Text>
-                  <Text style={styles.capNote}>{milestone.note}</Text>
-                  {/* Both actions live here (fixed, never under a dot): the primary gold "Keep walking"
-                      advances the walk; the outlined "Play the story" opens this year's picture/film. */}
-                  <View style={styles.capBtnRow}>
-                    {!walkState.atLast ? (
-                      <Pressable
-                        style={[styles.walkCta, walkState.walking && styles.walkCtaDisabled]}
-                        onPress={() => trailRef.current?.walkNext()}
-                        disabled={walkState.walking}
-                        accessibilityRole="button"
-                        accessibilityLabel={t(UI.keepWalking, lang)}
-                      >
-                        <Text style={styles.walkCtaText}>{t(UI.keepWalking, lang)}</Text>
-                        <Icon.ChevronRight size={15} color={colors.night} />
-                      </Pressable>
-                    ) : (
-                      <Pressable
-                        style={styles.walkCta}
-                        onPress={() => trailRef.current?.restart()}
-                        accessibilityRole="button"
-                        accessibilityLabel={t(UI.journeyDone, lang)}
-                      >
-                        <Icon.RotateCcw size={14} color={colors.night} />
-                        <Text style={styles.walkCtaText}>{t(UI.journeyDone, lang)}</Text>
-                      </Pressable>
-                    )}
-                    {hasStory(milestone.id) ? (
-                      <PressScale style={styles.storyBtn} onPress={() => setStoryId(milestone.id)} accessibilityLabel={t(UI.playStory, lang)}>
-                        <Icon.Play size={13} color={colors.gold} fill={colors.gold} />
-                        <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
-                      </PressScale>
-                    ) : null}
-                  </View>
-                </View>
-              ) : (
-                <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
-              )}
-            </View>
-          ) : null}
-        </View>
+        {/* Extracted verbatim to home/HomeHero (v2 D6). The SA road, the guided walk and the
+            dot-stories are unchanged; only their file moved. */}
+        <HomeHero lang={lang} journey={journey} />
 
         {/* ── THE LITERATURE — illustrated bookshelf (slate) ─────────────────── */}
         <LiteratureShelf lang={lang} onOpen={onOpen} />
@@ -564,7 +393,7 @@ export function HomeGallery({
         {/* ── HEROES OF THE NATION (slate) ───────────────────────────────────── */}
         <Section
           tone="slate"
-          image={heroSource(modules[1])}
+          image={require("../../assets/generated/heroes-heroines-card.webp")}
           kicker={t(UI.heroesKicker, lang)}
           title={t(UI.heroesTitle, lang)}
           intro={t(UI.heroesSub, lang)}
@@ -596,111 +425,8 @@ export function HomeGallery({
         </Section>
 
         {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-        <View style={styles.footer}>
-          <View style={[styles.footerInner, wide && styles.footerInnerWide]}>
-            <View style={wide ? styles.footerMainWide : styles.footerMain}>
-              {/* Left: wordmark + tagline */}
-              <View style={styles.footerBrandCol}>
-                <Text style={styles.footerBrand}>Ubuntu Heritage</Text>
-                <Text style={styles.footerLede}>
-                  South Africa's foundational literature and heritage — vivid, multilingual and free.
-                </Text>
-                <Text style={[styles.partnersLabel, styles.creatorLabel]}>Created by</Text>
-                <Text style={styles.creatorName}>Tumo Olorato Mogame</Text>
-              </View>
-              {/* Middle: partners */}
-              <View style={styles.partners}>
-                <Text style={styles.partnersLabel}>In partnership with</Text>
-                <View style={styles.partnerMarks}>
-                  {/* Real partner logos on white plates so the dark/coloured marks stay legible on
-                      the navy footer (logos kept in their own brand colours — not recoloured). */}
-                  <View style={styles.partnerPlate}>
-                    <Image
-                      source={require("../../assets/brand/unisa.webp")}
-                      style={styles.unisaLogo}
-                      resizeMode="contain"
-                      accessibilityLabel="University of South Africa (UNISA)"
-                    />
-                  </View>
-                  <View style={styles.partnerPlate}>
-                    <Image
-                      source={require("../../assets/brand/botlhale-chip.webp")}
-                      style={styles.botlhaleChip}
-                      resizeMode="contain"
-                      accessibilityLabel="Botlhale AI"
-                    />
-                    <Text style={styles.botlhaleName}>Botlhale AI</Text>
-                  </View>
-                </View>
-                {/* Sound credit — the ambient music/soundscapes are sampled from this YouTube
-                    channel. Clickable so listeners can hear the full pieces at the source. */}
-                <Text style={[styles.partnersLabel, styles.creditLabel]}>Sounds & music by</Text>
-                <Pressable
-                  onPress={() => Linking.openURL(SOUND_CREDIT_URL)}
-                  style={({ pressed, hovered }: any) => [
-                    styles.creditPlate,
-                    hovered && styles.creditPlateHover,
-                    pressed && styles.creditPlatePressed,
-                  ]}
-                  accessibilityRole="link"
-                  accessibilityLabel="African Tribe Echoes on YouTube — opens in browser"
-                >
-                  <Image
-                    source={require("../../assets/brand/african-tribe-echoes.webp")}
-                    style={styles.creditAvatar}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.creditText}>
-                    <Text style={styles.creditName}>African Tribe Echoes</Text>
-                    <View style={styles.creditSub}>
-                      <Icon.Headphones size={12} color="rgba(255,255,255,0.6)" />
-                      <Text style={styles.creditRole}>Full tracks on YouTube</Text>
-                    </View>
-                  </View>
-                  <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
-                </Pressable>
-              </View>
-              {/* Right: links + built-with (grouped here so the partners column stays compact) */}
-              <View style={[styles.footerLinks, wide && styles.footerLinksWide]}>
-                <Pressable style={styles.footerLink} onPress={onAbout}>
-                  <Text style={styles.footerLinkText}>{t(UI.about, lang)}</Text>
-                  <Icon.ArrowRight size={16} color={colors.dsBlue} />
-                </Pressable>
-                <Pressable style={styles.footerLink} onPress={onHeritage}>
-                  <View style={styles.liveDot} />
-                  <Text style={styles.footerLinkText}>{t(UI.heritage, lang)}</Text>
-                </Pressable>
-                {/* Built with — the tech the app runs on. Sits under the on-chain Heritage Ledger link
-                    (Solana anchors it). Distinct from "In partnership with": tech used ≠ endorsement.
-                    Light Solana logotype on the navy ground (high-contrast, per Solana's guidelines). */}
-                <View style={[styles.builtWith, wide && styles.builtWithWide]}>
-                  <Text style={styles.partnersLabel}>Built with</Text>
-                  <Pressable
-                    onPress={() => Linking.openURL(SOLANA_URL)}
-                    style={({ pressed, hovered }: any) => [
-                      styles.builtWithPlate,
-                      hovered && styles.creditPlateHover,
-                      pressed && styles.creditPlatePressed,
-                    ]}
-                    accessibilityRole="link"
-                    accessibilityLabel="Built with Solana — opens solana.com in browser"
-                  >
-                    <Image
-                      source={require("../../assets/brand/solana.webp")}
-                      style={styles.solanaLogo}
-                      resizeMode="contain"
-                      accessibilityLabel="Solana"
-                    />
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-            {/* Bottom bar: fine print under a hairline */}
-            <View style={styles.footerBar}>
-              <Text style={styles.footerFine}>{KICKER} · POPIA-compliant · built on free-tier, African-built AI</Text>
-            </View>
-          </View>
-        </View>
+        {/* Extracted verbatim to shell/SiteFooter so every route can render it (v2 D6). */}
+        <SiteFooter lang={lang} onAbout={onAbout} onHeritage={onHeritage} />
       </Animated.ScrollView>
       </ScrollCtx.Provider>
 
@@ -721,20 +447,9 @@ export function HomeGallery({
         )}
       </View>
 
-      {/* Full-screen "dot story" — opens on the picture, then plays the film. Skip/Back return here. */}
-      {storyMilestone && storyMedia ? (
-        <JourneyStory
-          milestone={storyMilestone}
-          media={storyMedia}
-          onClose={() => setStoryId(null)}
-          labels={{
-            skip: t(UI.storySkip, lang),
-            back: t(UI.storyBack, lang),
-            watch: t(UI.storyWatch, lang),
-            interpretation: t(UI.storyInterpretation, lang),
-          }}
-        />
-      ) : null}
+      {/* Full-screen "dot story" — extracted to home/HomeHero (v2 D6). Stays a SIBLING of the
+          ScrollView so it covers the viewport, not the scroll content. */}
+      <HomeJourneyStory lang={lang} journey={journey} />
     </View>
   );
 }
@@ -949,7 +664,6 @@ const SLATE = "#000000"; // ground → pure black
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: SLATE },
-  langBar: { position: "absolute", top: 0, right: 0, zIndex: 20, paddingTop: spacing.lg, paddingRight: spacing.lg },
   // Right-edge scroll cue, vertically centred.
   scrollCue: { position: "absolute", right: spacing.lg, top: 0, bottom: 0, justifyContent: "center", zIndex: 30 },
   cueBtn: {
@@ -967,60 +681,13 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  countryBar: { position: "absolute", top: 0, left: 0, zIndex: 20, paddingTop: spacing.lg, paddingLeft: spacing.lg },
 
   // Hero
-  hero: { width: "100%", justifyContent: "flex-end", backgroundColor: SLATE },
-  heroInner: { flex: 1, justifyContent: "space-between", paddingHorizontal: spacing.lg, paddingTop: 90, paddingBottom: spacing.xl },
-  heroTitleWrap: { alignItems: "center", flex: 1, justifyContent: "center" },
-  heroTitle: {
-    color: "#FFFFFF",
-    fontFamily: fonts.display,
-    fontSize: 60,
-    lineHeight: 60,
-    letterSpacing: -1,
-    textAlign: "center",
-    textShadowColor: "rgba(0,0,0,0.5)",
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 18,
-  },
-  heroTitleWide: { fontSize: 120, lineHeight: 116, letterSpacing: -2 },
-  heroCardWide: { paddingVertical: spacing.xl, paddingHorizontal: 48 },
-  heroCard: {
-    alignSelf: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.42)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.22)",
-    borderRadius: radius.md,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-  },
-  heroCardTitle: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 20, textAlign: "center" },
-  heroCardSub: { color: "rgba(255,255,255,0.9)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, marginTop: 8, textAlign: "center" },
 
   // History-trail journey
-  mapScrim: { backgroundColor: "#0a0703" },
-  mapUI: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "space-between", paddingHorizontal: spacing.lg, paddingTop: 76, paddingBottom: spacing.xl },
-  mapTop: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  mapTopText: { flex: 1 },
-  mapKicker: { color: "#E8B45A", fontFamily: fonts.displaySemi, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" },
-  mapHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 12, marginTop: 3 },
-  mapClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.12)", borderWidth: 1, borderColor: "rgba(255,255,255,0.28)", alignItems: "center", justifyContent: "center" },
-  mapCaption: { alignSelf: "center", maxWidth: 560, width: "100%", backgroundColor: "rgba(10,7,3,0.72)", borderWidth: 1, borderColor: "rgba(232,180,90,0.4)", borderRadius: radius.md, padding: spacing.md },
-  capYear: { color: "#E8B45A", fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
-  capTitle: { color: "#fff", fontFamily: fonts.heading, fontSize: 17, marginTop: 2 },
-  capNote: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.body, fontSize: 13, lineHeight: 20, marginTop: 6 },
   // Caption actions sit in one row; wrap on very narrow screens so both stay tappable.
-  capBtnRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.md },
   // Primary: solid gold — advances the guided walk.
-  walkCta: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 9, paddingHorizontal: 16 },
-  walkCtaText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
-  walkCtaDisabled: { opacity: 0.45 },
   // Secondary: outlined gold — opens this year's story (distinct from Keep walking so they're not confused).
-  storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(232,180,90,0.14)", borderWidth: 1, borderColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14 },
-  storyBtnText: { color: "#E8B45A", fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
-  mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 
   // Section
   section: { width: "100%", borderTopWidth: 8, borderTopColor: BLUE },
@@ -1083,73 +750,10 @@ const styles = StyleSheet.create({
   ctaText: { fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3, color: "#000000" },
 
   // Footer
-  footer: { backgroundColor: colors.dsNavyDeep, borderTopWidth: 8, borderTopColor: BLUE, paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
-  footerInner: { width: "100%", maxWidth: 1160, alignSelf: "center" },
-  footerInnerWide: { paddingHorizontal: 40 },
   // Narrow: stacked. Wide: brand left, links right — a compact two-column bar.
-  footerMain: { gap: spacing.md },
-  footerMainWide: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", columnGap: spacing.xl, rowGap: spacing.lg },
-  footerBrandCol: { flexShrink: 1 },
-  footerBrand: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 22, lineHeight: 26, letterSpacing: -0.4 },
-  footerLede: { color: "rgba(255,255,255,0.72)", fontFamily: fonts.body, fontSize: 14, lineHeight: 21, marginTop: spacing.xs, maxWidth: 360 },
-  footerLinks: { gap: spacing.sm },
-  footerLinksWide: { alignItems: "flex-end" },
-  footerLink: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  footerLinkText: { color: "#FFFFFF", fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1, textTransform: "uppercase" },
-  footerBar: { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.12)", marginTop: spacing.lg, paddingTop: spacing.md },
   // Partner strip — real logos on white plates, sits in the middle of the footer row.
-  partners: {},
-  partnersLabel: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: spacing.sm },
-  partnerMarks: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.md },
   // White plate keeps each logo legible + un-recoloured on the dark footer.
-  partnerPlate: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    backgroundColor: "#FFFFFF",
-    borderRadius: radius.sm,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  unisaLogo: { width: 92, height: 28 },
-  botlhaleChip: { width: 26, height: 26 },
   // Sound credit — a clickable card on the navy footer linking out to the music source channel.
-  creditLabel: { marginTop: spacing.md },
-  creditPlate: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-    borderRadius: radius.md,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  creditPlateHover: { backgroundColor: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.28)" },
-  creditPlatePressed: { opacity: 0.8 },
-  // Built-with — grouped in the right column under the Heritage Ledger link so the footer stays short.
-  builtWith: { marginTop: spacing.md, gap: spacing.sm, alignItems: "flex-start" }, // left when narrow
-  builtWithWide: { alignItems: "flex-end" }, // right-align to match the links when wide
-  // Light border so it reads as a subtle credit chip; logo on the dark ground.
-  builtWithPlate: {
-    backgroundColor: "rgba(255,255,255,0.04)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-    borderRadius: radius.md,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  solanaLogo: { width: 132, height: 20 }, // 640x95 source ≈ 6.7:1
-  creditAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1A1A1A" },
-  creditText: { gap: 2 },
-  creditName: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 14, letterSpacing: 0.2 },
-  creditSub: { flexDirection: "row", alignItems: "center", gap: 4 },
-  creditRole: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 11, letterSpacing: 0.2 },
-  botlhaleName: { color: colors.dsSlate, fontFamily: fonts.heading, fontSize: 15, letterSpacing: 0.2 },
-  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.live },
-  footerFine: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.body, fontSize: 12, lineHeight: 18 },
-  creatorLabel: { marginTop: spacing.lg, marginBottom: 4 },
-  creatorName: { color: "#FFFFFF", fontFamily: fonts.serif, fontSize: 15 },
+  // Built-with — grouped in the right column under the Heritage Ledger link so the footer stays short. // left when narrow // right-align to match the links when wide
+  // Light border so it reads as a subtle credit chip; logo on the dark ground. // 640x95 source ≈ 6.7:1
 });

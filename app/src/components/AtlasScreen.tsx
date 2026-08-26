@@ -9,6 +9,7 @@ import { Screen, ScreenHeader, Icon, backLabelFor } from "../ui";
 import { SceneImage } from "./SceneImage";
 import { PressScale } from "./Motion";
 import { SideIndexScroll } from "./SideIndexScroll";
+import { AtlasRooms } from "./AtlasRooms";
 import { FeatureEntry } from "./FeatureEntry";
 import { Journey } from "./Journey";
 import { atlasJourney } from "../content/journey";
@@ -98,10 +99,21 @@ export function AtlasScreen({
   lang,
   onBack,
   onOpen,
+  onProvinces,
+  onPresidents,
+  onHeroes,
+  onTotems,
+  onDays,
 }: {
   lang: Lang;
   onBack: () => void;
   onOpen: (id: string) => void;
+  // v2 V2-10: the Atlas is now the hub for these rooms, since D1 gave them no top-level slot.
+  onProvinces: () => void;
+  onPresidents: () => void;
+  onHeroes: () => void;
+  onTotems: () => void;
+  onDays: () => void;
 }) {
   const { width } = useWindowDimensions();
   const wide = width >= 900;
@@ -129,6 +141,14 @@ export function AtlasScreen({
         <Icon.Play size={17} color="#000000" fill="#000000" />
         <Text style={s.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
       </Pressable>
+      <AtlasRooms
+        lang={lang}
+        onProvinces={onProvinces}
+        onPresidents={onPresidents}
+        onHeroes={onHeroes}
+        onTotems={onTotems}
+        onDays={onDays}
+      />
     </View>
   );
 

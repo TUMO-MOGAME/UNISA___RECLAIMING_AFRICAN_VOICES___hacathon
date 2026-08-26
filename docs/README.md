@@ -18,6 +18,7 @@ Read in order, or jump to what you need. Governance lives at the repo root
 | 10 | [**Status & Roadmap**](10-status-and-roadmap.md) | **What's live now · built-needs-a-key · deferred/planned** — the honest state |
 | 11 | [Blockchain Heritage Plan](11-blockchain-heritage-plan.md) | On-chain provenance (Solana devnet), POPIA-safe design |
 | 12 | [Living Archive Plan](12-living-archive-plan.md) | Mantswe a Batho consensus + Ingestion Library |
+| 13 | [Architecture v2 Plan](13-architecture-v2-plan.md) | **Current programme** — the 3-week multi-page transformation (26 Aug → 15 Sep) |
 
 > **Naming note:** the product was renamed **Maloba → Ubuntu Heritage** (2026-07-03). Some deeper docs
 > below still use the working name "Maloba"; the on-chain provenance memos keep the historical name

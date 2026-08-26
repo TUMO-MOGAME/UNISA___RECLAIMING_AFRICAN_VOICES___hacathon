@@ -4,7 +4,7 @@
 > of "done." For the structured **implemented vs. planned** view, see
 > [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-07-08 — by Tumo (via Claude)_
+_Last updated: 2026-08-26 — by Tumo (via Claude)_
 
 ---
 
@@ -27,8 +27,54 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
+| **🏗️ Architecture v2 — multi-page transformation** (3 weeks, 26 Aug → 15 Sep) | 🟡 **in progress — Week 1** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
+
+---
+
+## 🏗️ Architecture v2 — the current programme
+
+The app is moving from **one long scrolling page** to a **site with rooms**: a persistent shell, a
+browsable cinematic library, and a watch → quiz → collect loop. Full plan, task IDs and week gates in
+**[docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md)**.
+
+**Six decisions locked with Tumo on 2026-08-26:**
+
+| # | Decision |
+|---|----------|
+| D1 | Nav = `Journey · Watch · Atlas · Archive · Kids · Schools` + country ▾ + language ▾ + Passport chip |
+| D2 | The hero SA-road trail **stays** and now *links into* a deeper `/journey` page |
+| D3 | Country selection **moves** to a new `/countries` page — the 54 flags + national anthems move with it |
+| D4 | **Keep** the current palette (black `#000000` + sa-blue `#1A85A7`); take the new designs' structure, not their gold/brown skin |
+| D5 | Progress is **local-only** — no accounts, no PII. Schools ships over seeded demo data |
+| D6 | The **hero section** and the **footer** are kept byte-for-byte and reused everywhere |
+
+| Week | Window | Focus | Gate |
+|------|--------|-------|------|
+| **1** | 26 Aug → 1 Sep | Shell, persistent header/footer, `/countries` + anthems, Atlas hub | Every nav item lands on a real page; hero + footer visually unchanged |
+| **2** | 2 Sep → 8 Sep | `/watch` library + player, `/journey` stages, quiz, heritage cards, progress store | Watch → quiz → reward completes and survives a refresh |
+| **3** | 9 Sep → 15 Sep | Passport, Kids mode, Schools dashboard, i18n sweep, a11y, POPIA review | All 11 languages · no new PII · tsc + bundle + tests green |
+
+**De-scope order if the window tightens:** Schools → Kids stage flow → quiz chapters beyond 3 → Watch search.
+**Never cut:** the shell, the kept hero/footer, `/countries` + anthems, i18n, POPIA.
+
+---
 
 ## ⏭️ Next action
+
+**Architecture v2, Week 1 — the shell and the split** (see [the plan](docs/13-architecture-v2-plan.md) §7):
+
+1. **V2-01** Extend the `Route` union in [App.tsx](app/App.tsx) with the nine new routes.
+2. **V2-05 / V2-06** Extract the **footer** and the **hero** out of `HomeGallery` **verbatim** into
+   `shell/SiteFooter.tsx` and `home/HomeHero.tsx`. Extract first, commit, verify, *then* re-wire — never
+   refactor and restyle in the same step (D6: if it looks different, it's wrong).
+3. **V2-02 / V2-03 / V2-04** Build `AppShell` + `SiteHeader` (D1 nav) + `MobileTabBar`, and render the
+   kept footer on every route.
+4. **V2-08 / V2-09** Build `/countries` and move the 54 flags + national anthems into it (D3).
+5. **V2-10** Build the Atlas hub so Provinces · Presidents · Heroes · Totems · Days keep a home under D1.
+6. **V2-12 (week gate)** `npx tsc --noEmit` clean, web bundle green, and **every pre-v2 route re-walked**
+   to prove nothing broke.
+
+### Parked (pre-v2, still open)
 
 1. **Record the demo video** — follow the shot-by-shot script in [specs/demo-video-script.md](specs/demo-video-script.md)
    (~2:55, web target). Do one dry run of record→consent→delete first; art is cached so nothing pops
@@ -46,7 +92,17 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
 4. Persistence: WatermelonDB so recordings survive reload (T024). Optional: NativeWind (T006).
 5. Phase 3: ElevenLabs static intro · record the 2–3 min demo video · finalise the written narrative.
 
-## 🗓️ Timeline (today: 2026-06-29)
+## 🗓️ Timeline (today: 2026-08-26)
+
+### Architecture v2 (current programme)
+
+| Phase | What | Target window | Status |
+|-------|------|---------------|--------|
+| **5.1 Shell** | Persistent header/footer · route split · `/countries` + anthems · Atlas hub | 26 Aug – 1 Sep | 🟡 in progress |
+| **5.2 Core loop** | `/watch` + player · `/journey` stages · quiz · heritage cards · progress store | 2 Sep – 8 Sep | ⬜ |
+| **5.3 Rooms + polish** | Passport · Kids · Schools · i18n sweep · a11y · POPIA review | 9 Sep – 15 Sep | ⬜ |
+
+### Hackathon (complete)
 
 | Phase | What | Target window | Status |
 |-------|------|---------------|--------|
@@ -118,6 +174,55 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-26 (later still)** — **The shell is live: V2-01 → V2-04 done.** Tumo picked header
+  **direction C, two-tier** from three mockups
+  ([artifact](https://claude.ai/code/artifact/5259ecef-c9b6-46b4-bd46-e424feceb344)): tier 1 carries the
+  wordmark + country ▾ + language ▾ + Passport chip, tier 2 carries the six D1 nav items, and the
+  signature 8px sa-blue rule caps it. Built `shell/nav.ts` (one source of truth for the header, the tab
+  bar **and** the chatbot's `navigate_to`, so the three can't drift), `SiteHeader`, `MobileTabBar`
+  (4 tabs — Journey · Watch · Atlas · Me), `AppShell` (three modes: page / own-scroll / immersive) and
+  `ComingSoon`. Extended the `Route` union with the nine v2 rooms; the country picker moved out of the
+  hero into the header and its state is now app-wide (D3 groundwork). Added 7 Lucide icons.
+  Unbuilt rooms serve an honest "being built · Week N" placeholder rather than a dead link — the Week 1
+  gate says every nav item lands on a real page, and a page pretending to be finished fails it too.
+  **Performance trap worth remembering:** writing the shell's route groupings as `Route["name"][]` and
+  calling `.includes(route.name)` made tsc walk the whole (now much larger) union on every call — the
+  typecheck went from seconds to not finishing in 7 minutes. Rewritten as module-level `Set<string>`
+  with the route name widened to `string`; back to seconds. The union-recursion warning already in
+  App.tsx now applies to lookups too, and there is a comment there saying so.
+  Verified: typecheck clean · **85/85 tests** · `expo export --platform web` green.
+  **Needs Tumo's eye:** the nav labels in `shell/nav.ts` are machine-quality across the 10 non-English
+  languages — the Setswana especially should be checked (Leeto / Lebelela / Polokelo / Bana / Dikolo).
+
+- **2026-08-26 (later)** — **V2-05 + V2-06 done: hero and footer extracted verbatim.** On branch
+  `feat/architecture-v2`. The footer moved to `components/shell/SiteFooter.tsx` and the hero to
+  `components/home/HomeHero.tsx`, both **byte-for-byte** — same markup, same styles, same strings (D6).
+  One structural note: `JourneyStory` renders `position:absolute` and must stay a **sibling** of the
+  ScrollView (inside it, "absolute" would resolve against the scroll *content*, so the full-screen film
+  would sit at the top of the page instead of over the viewport). So the hero ships as a hook plus two
+  pieces — `useHomeJourney` (shared state) + `HomeHero` (in-scroll) + `HomeJourneyStory` (sibling
+  overlay) — which keeps behaviour identical and makes the Week 2 move to `/journey` a contained lift.
+  Added the D2 seam: `onStartJourney` is optional and currently unwired, so "Start the journey" still
+  opens the in-place overlay exactly as before. Pruned what the move orphaned: 4 imports, 13 UI strings,
+  37 styles, 2 constants. `HomeGallery` is **1155 → 772 lines**. Verified: `npm run typecheck` clean ·
+  **85/85 tests** · `expo export --platform web` green. **Pre-existing issue found (not caused by this
+  work):** bare `npx tsc --noEmit` crashes with a stack overflow on this codebase — confirmed by
+  stashing the changes and reproducing on clean `main`. `npm run typecheck` already carries the
+  workaround (`node --stack-size=8000`); use that, not bare `tsc`.
+
+- **2026-08-26** — **Architecture v2 planned and started.** Unpacked the three new standalone design
+  bundles (Website, Countries, Wireframes 2a–2h) and read them against the live app. Found three
+  conflicting navs across the source designs, and that the existing Atlas/Provinces/Presidents/Heroes/
+  Totems/Days/Archive/Ledger screens had **no home** in any of them — resolved as **D1**. Confirmed Kids,
+  Schools, quizzes, stars/streaks, heritage cards and the Passport are **entirely net-new** (zero code
+  today), which is the bulk of the programme. Locked six decisions with Tumo (D1–D6): keep the hero
+  SA-road trail and the footer byte-for-byte, move country selection **and the national anthems** to a
+  new `/countries` page, keep the black + sa-blue palette rather than the designs' gold/brown, and keep
+  all progress **local-only** so no minor's data ever leaves the device. Wrote the 3-week plan
+  ([docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md)): 31 tasks, three week gates, a
+  fixed de-scope order, and a definition of done. Backlog added as **Phase 5** in
+  [specs/tasks.md](specs/tasks.md). Now starting Week 1 (the shell and the split).
 
 - **2026-07-08** — **Journey walk-control fix + phone-mode pass.** Fixed the reported bug: on the guided
   walk, the floating "Keep walking" button sat *under* the caption card and its taps landed on "Play the
