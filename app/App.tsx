@@ -40,6 +40,10 @@ import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
 import { ComingSoon } from "./src/components/shell/ComingSoon";
 import { CountriesScreen } from "./src/components/CountriesScreen";
 import { WatchScreen } from "./src/components/WatchScreen";
+import { JourneyScreen } from "./src/components/JourneyScreen";
+import { StageScreen } from "./src/components/StageScreen";
+import { historyTrail } from "./src/content/history-trail";
+import { stageId } from "./src/services/progress/progress";
 import type { NavId } from "./src/components/shell/nav";
 import { DEFAULT_COUNTRY } from "./src/content/anthems";
 import { useProgress } from "./src/services/progress/useProgress";
@@ -247,6 +251,35 @@ export default function App() {
           />
         );
       case "journey":
+        return (
+          <JourneyScreen
+            lang={lang}
+            country={country}
+            progress={progress.progress}
+            onOpenStage={(milestoneId) => push({ name: "stage", id: milestoneId })}
+          />
+        );
+      case "stage": {
+        // Stages are numbered from 1 along the trail, so the id is stable even if the trail grows.
+        const idx = historyTrail.findIndex((m) => m.id === route.id);
+        if (idx < 0) return null;
+        const n = idx + 1;
+        const sid = stageId(country, n);
+        return (
+          <StageScreen
+            milestoneId={route.id}
+            lang={lang}
+            stageNumber={n}
+            alreadyDone={progress.progress.stagesDone.includes(sid)}
+            onComplete={(cardId) => {
+              progress.completeStage(sid);
+              if (cardId) progress.awardCard(cardId);
+              progress.touchToday();
+            }}
+            onBack={back}
+          />
+        );
+      }
       case "kids":
       case "schools":
       case "passport":
@@ -276,6 +309,7 @@ export default function App() {
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
             onStoryActiveChange={setStoryActive}
+            onJourney={() => push({ name: "journey" })}
           />
         );
     }

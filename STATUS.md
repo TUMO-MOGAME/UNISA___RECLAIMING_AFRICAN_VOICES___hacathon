@@ -175,6 +175,25 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## 🗒️ Log
 
+- **2026-08-26 (late)** — **The core loop is closed: Journey + stages + quiz (V2-16 → V2-19).**
+  `JourneyScreen` walks all **25 real milestones** from `history-trail.ts` rather than the source
+  design's twelve invented chapters — sourced history costs nothing extra and is better history.
+  A stage opens when the one before it is done; finished stages stay open, so progress is never taken
+  away. `StageScreen` runs wireframe 2e: **WATCH → QUIZ → REWARD**, with a heritage card from
+  `totems.ts` assigned in order so a stage always yields the same card.
+  **Grounding (V2-17):** 17 questions across 13 milestones in `content/quiz.ts`, each answerable from
+  the milestone's own cited note. Two rules hold: a distractor is normally a *real* fact from another
+  milestone, so a half-remembered wrong answer is still true; and every question carries an
+  explanation shown either way. The one deliberate exception is the "the land was empty" option at
+  1652 — the terra nullius myth, offered **only** so choosing it is corrected on the spot. A test pins
+  that it can never become the correct answer.
+  **D2 is now live:** the hero's "Start the journey" hands off to `/journey` instead of opening its
+  in-place overlay; the seam added in V2-06 is wired through `HomeGallery`.
+  Verified: typecheck clean · **109/109 tests** · web bundle green.
+  **Note on the toolchain:** the typecheck ran >7 min twice today and once reported an error against a
+  file version that no longer existed on disk. Treat a single tsc result as suspect if files changed
+  under it — re-run before believing it.
+
 - **2026-08-26 (night)** — **Week 2 started: progress store + Watch library. Footer credits changed.**
   **V2-13** `services/progress/` — pure reducers in `progress.ts` (14 unit tests) plus the platform
   split the Archive uses: web persists to localStorage, native is session-only with `persists:false`

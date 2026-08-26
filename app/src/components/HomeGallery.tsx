@@ -267,6 +267,7 @@ export function HomeGallery({
   onTotems,
   onHeroes,
   onStoryActiveChange,
+  onJourney,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -282,6 +283,8 @@ export function HomeGallery({
   onHeroes: () => void;
   /** Notifies the app when a full-screen dot-story opens/closes (to hide the floating chatbot). */
   onStoryActiveChange?: (active: boolean) => void;
+  /** D2 — the hero's "Start the journey" now opens the dedicated /journey page. */
+  onJourney?: () => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
@@ -318,7 +321,7 @@ export function HomeGallery({
 
   // The hero's journey state now lives in home/HomeHero (v2 D6); the page keeps a handle so the
   // hero and the full-screen dot-story stay in sync across the ScrollView boundary.
-  const journey = useHomeJourney({ onStoryActiveChange });
+  const journey = useHomeJourney({ onStoryActiveChange, onStartJourney: onJourney });
 
   return (
     <View style={styles.root}>

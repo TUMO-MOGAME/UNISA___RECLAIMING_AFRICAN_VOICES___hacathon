@@ -80,11 +80,11 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 
 - [x] V2-13 `services/progress/` — types + local store (web + native) + hook (D5), unit-tested
 - [x] V2-14 `WatchScreen.tsx` — featured + rails + filter chips + search (existing content only)
-- [ ] V2-15 `WatchItemScreen.tsx` — player · Child⇄Adult · language ▾ · **Sources & provenance** · Ask Ubuntu
-- [ ] V2-16 `JourneyScreen.tsx` — staged trail (done/current/locked) from `history-trail.ts`
-- [ ] V2-17 `content/quiz.ts` + grounded questions for chapters 1–3 — every distractor must be defensible
-- [ ] V2-18 `StageScreen.tsx` — WATCH → QUIZ → REWARD (wireframe 2e) + "Ask Ubuntu for a hint"
-- [ ] V2-19 Heritage cards — award on stage completion, 22 totems from `totems.ts`
+- [x] V2-15 `WatchItemScreen.tsx` — player · Child⇄Adult · language ▾ · **Sources & provenance** · Ask Ubuntu
+- [x] V2-16 `JourneyScreen.tsx` — staged trail (done/current/locked) from `history-trail.ts`
+- [x] V2-17 `content/quiz.ts` + grounded questions for chapters 1–3 — every distractor must be defensible
+- [x] V2-18 `StageScreen.tsx` — WATCH → QUIZ → REWARD (wireframe 2e) + "Ask Ubuntu for a hint"
+- [x] V2-19 Heritage cards — award on stage completion, 22 totems from `totems.ts`
 - [ ] V2-20 "Continue your journey" resume bar on Home, wired to real progress
 - [ ] V2-21 **Week gate** — tests + tsc + bundle green · STATUS updated
 
