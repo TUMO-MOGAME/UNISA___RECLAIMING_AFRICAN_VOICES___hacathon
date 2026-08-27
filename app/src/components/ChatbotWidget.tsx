@@ -15,6 +15,7 @@ import { Icon } from "../ui";
 import { askChatbot, chatbotHasKey, type ChatTurn } from "../services/chatbot";
 import { loadChat, saveChat, clearChat } from "../services/chatbot/memory";
 import { CHAT_UI } from "../services/chatbot/uiStrings";
+import { onAsk } from "../services/chatbot/askBus";
 import { t } from "../i18n";
 import type { Lang } from "../content/types";
 
@@ -97,6 +98,19 @@ export function ChatbotWidget({ lang, onNavigate }: { lang: Lang; onNavigate: (p
       scrollDown();
     }
   }
+
+  // Let a screen hand the guide a question (services/chatbot/askBus). `send` closes over the
+  // conversation, so the listener reads it through a ref instead of re-subscribing on every message.
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  useEffect(
+    () =>
+      onAsk((q) => {
+        setOpen(true);
+        void sendRef.current(q);
+      }),
+    []
+  );
 
   // Collapsed: floating action button.
   if (!open) {

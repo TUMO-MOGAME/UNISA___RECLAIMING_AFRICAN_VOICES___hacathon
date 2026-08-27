@@ -1,23 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, Text, Pressable, Animated, Image, Modal, StyleSheet, useWindowDimensions, Linking } from "react-native";
 import { Module, Lang } from "../content/types";
+import type { Progress } from "../services/progress/progress";
 import { modules, atlasModules } from "../content";
 import { sceneImageSource } from "../content/images";
 import { t } from "../i18n";
 import { LinearGradient } from "expo-linear-gradient";
 import { SceneImage } from "./SceneImage";
-import { LanguagePicker } from "./LanguagePicker";
-import { CountryPicker } from "./CountryPicker";
-import { DEFAULT_COUNTRY } from "../content/anthems";
-import { HistoryTrail, type HistoryTrailHandle } from "./HistoryTrail";
-import { historyTrailSource, historyTrail, type HistoryMilestone } from "../content/history-trail";
-import { JourneyStory } from "./JourneyStory";
-import { mediaFor, hasStory } from "../content/journey-media";
 import { PressScale, Reveal } from "./Motion";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
 import { Journey } from "./Journey";
+import { SiteFooter } from "./shell/SiteFooter";
+import { HomeHero, HomeJourneyStory, useHomeJourney } from "./home/HomeHero";
+import { ResumeBar } from "./home/ResumeBar";
 import { literatureJourney } from "../content/journey";
+import { countries } from "../content/anthems";
+import { historyTrail } from "../content/history-trail";
+import { journeyMedia } from "../content/journey-media";
 
 // The front door — a scrolling "Modern South Africa" landing page: a full-bleed hero, then a stack of
 // alternating image/text sections divided by thick sa-blue rules. Each section maps to real app
@@ -27,10 +27,8 @@ import { literatureJourney } from "../content/journey";
 const KICKER = "Reclaiming African Voices";
 // The ambient African music/soundscapes across the app are sampled from this YouTube channel —
 // credited + linked in the footer so listeners can hear the full pieces at the source.
-const SOUND_CREDIT_URL = "https://www.youtube.com/@AfricanTribeEchoes";
 // "Built with" tech credit — Solana anchors the on-chain Heritage Ledger. Links to the tech's site,
 // not an endorsement. Official logo used per Solana's brand guidelines (light logotype on a dark bg).
-const SOLANA_URL = "https://solana.com";
 const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 
 // UI chrome in all 11 official languages so the whole interface switches, not just EN/Setswana. These
@@ -91,6 +89,11 @@ const UI = {
     en: "Explore the atlas", tn: "Sekaseka atlase", af: "Verken die atlas", zu: "Hlola i-athrasi", xh: "Phonononga i-atlasi",
     nso: "Utolla athlase", st: "Hlahloba atlase", ss: "Hlola i-athlasi", ts: "Kambela atlasi", nr: "Hlola i-atlasi", ve: "Ṱolisisa athilasi",
   },
+  // NOTE (V2-07): the *Kicker / *Sub / *Cta strings for Totems, Provinces, Presidents, Heroes and
+  // National Days are no longer rendered — those five lost their own Home bands and are now chips
+  // under the single Atlas section, labelled with `totems` / `provinces` / `presidents` /
+  // `heroesTitle` / `days`. The copy is kept rather than deleted: it is reviewed-quality text in
+  // eleven languages, and if a band ever comes back it should come back with its own words.
   totemsKicker: {
     en: "The Living World", tn: "Lefatshe le le Tshelang", af: "Die Lewende Wêreld", zu: "Izwe Eliphilayo", xh: "Ilizwe Eliphilayo",
     nso: "Lefase le le Phelago", st: "Lefatshe le Phelang", ss: "Live Leliphilako", ts: "Misava leyi Hanyaka", nr: "Iphasi Eliphilako", ve: "Shango ḽi Tshilaho",
@@ -191,23 +194,6 @@ const UI = {
     en: "Meet the heroes", tn: "Kopana le bagaki", af: "Ontmoet die helde", zu: "Hlangana namaqhawe", xh: "Dibana namaqhawe",
     nso: "Kopana le bagale", st: "Kopana le bahale", ss: "Hlangana nemacawe", ts: "Hlangana ni tinhenha", nr: "Hlangana namaqhawe", ve: "Ṱangana na vhahali",
   },
-  startJourney: { en: "Start the journey", tn: "Simolola leeto", af: "Begin die reis", zu: "Qala uhambo", xh: "Qala uhambo", nso: "Thoma leeto", st: "Qala leeto", ss: "Cala luhambo", ts: "Sungula riendzo", nr: "Thoma ikhambo", ve: "Thoma lwendo" },
-  keepWalking: { en: "Keep walking", tn: "Tswelela pele", af: "Stap verder", zu: "Qhubeka uhambe", xh: "Qhubeka uhambe", nso: "Tšwela pele", st: "Tsoela pele", ss: "Chubeka uhambe", ts: "Famba emahlweni", nr: "Ragela phambili", ve: "Bvelani phanḓa" },
-  journeyDone: { en: "Restart the journey", tn: "Simolola leeto gape", af: "Herbegin die reis", zu: "Qalisa kabusha uhambo", xh: "Qalisa kwakhona uhambo", nso: "Thoma leeto gape", st: "Qala leeto hape", ss: "Cala kabusha luhambo", ts: "Sungula nakambe riendzo", nr: "Thoma godu ikhambo", ve: "Thoma hafhu lwendo" },
-  storySkip: { en: "Skip", tn: "Tlola", af: "Slaan oor", zu: "Yeqa", xh: "Tsiba", nso: "Fetiša", st: "Tlōla", ss: "Yeca", ts: "Tlula", nr: "Yeqa", ve: "Fhirisa" },
-  storyBack: { en: "Back", tn: "Morago", af: "Terug", zu: "Emuva", xh: "Emva", nso: "Morago", st: "Morao", ss: "Emuva", ts: "Endzhaku", nr: "Emuva", ve: "Murahu" },
-  storyWatch: { en: "Watch the film", tn: "Lebelela filimi", af: "Kyk die film", zu: "Buka ifilimu", xh: "Bukela ifilimu", nso: "Lebelela filimi", st: "Sheba filimi", ss: "Buka ifilimu", ts: "Languta filimi", nr: "Buka ifilimu", ve: "Lavhelesa filimi" },
-  storyInterpretation: { en: "Artistic interpretation", tn: "Setshwantsho sa botaki (e seng senepe)", af: "Artistieke vertolking", zu: "Ukuhunyushwa kobuciko", xh: "Utoliko lobugcisa", nso: "Tlhathollo ya bokgabo", st: "Tlhaloso ya bonono", ss: "Kuhunyushwa kwebuciko", ts: "Nhlamuselo ya vutshila", nr: "Ukuhlathululwa kobuciko", ve: "Ṱhalutshedzo ya vhutsila" },
-  playStory: { en: "Play the story", tn: "Bapala kanegelo", af: "Speel die storie", zu: "Dlala indaba", xh: "Dlala ibali", nso: "Bapala kanegelo", st: "Bapala pale", ss: "Dlala indzaba", ts: "Tlanga ntsheketo", nr: "Dlala indaba", ve: "Tambani tshiitwa" },
-  closeJourney: { en: "Close the journey", tn: "Tswala leeto", af: "Sluit die reis", zu: "Vala uhambo", xh: "Vala uhambo", nso: "Tswalela leeto", st: "Koala leeto", ss: "Vala luhambo", ts: "Pfala riendzo", nr: "Vala ikhambo", ve: "Vala lwendo" },
-  journeyHint: {
-    en: "1652 → today · tap a year", tn: "1652 → gompieno · tobetsa ngwaga", af: "1652 → vandag · tik 'n jaar", zu: "1652 → namuhla · thepha unyaka", xh: "1652 → namhlanje · cofa unyaka",
-    nso: "1652 → lehono · kgotla ngwaga", st: "1652 → kajeno · tobetsa selemo", ss: "1652 → lamuhla · tsindza umnyaka", ts: "1652 → namuntlha · tsindziya lembe", nr: "1652 → namhlanjesi · thepha umnyaka", ve: "1652 → ṋamusi · pusani ṅwaha",
-  },
-  journeyTitle: {
-    en: "The journey of a nation", tn: "Leeto la setšhaba", af: "Die reis van 'n nasie", zu: "Uhambo lwesizwe", xh: "Uhambo lwesizwe",
-    nso: "Leeto la setšhaba", st: "Leeto la setjhaba", ss: "Luhambo lwesive", ts: "Riendzo ra rixaka", nr: "Ikhambo lesitjhaba", ve: "Lwendo lwa lushaka",
-  },
   daysKicker: {
     en: "Days we remember", tn: "Malatsi a re a gakologelwang", af: "Dae wat ons onthou", zu: "Izinsuku esizikhumbulayo", xh: "Iintsuku esizikhumbulayo",
     nso: "Matšatši ao re a gopolago", st: "Matsatsi ao re a hopolang", ss: "Emalanga lesiwakhumbulako", ts: "Masiku lawa hi ma tsundzukaka", nr: "Amalanga esiwakhumbulako", ve: "Maḓuvha ane ra a humbula",
@@ -258,14 +244,6 @@ const UI = {
     en: "Record a story", tn: "Gatisa kanegelo", af: "Neem 'n storie op", zu: "Qopha indaba", xh: "Rekhoda ibali",
     nso: "Gatiša kanegelo", st: "Rekota pale", ss: "Bhala indzaba", ts: "Rhekhoda ntsheketo", nr: "Bhala indaba", ve: "Rekhoda tshiitwa",
   },
-  about: {
-    en: "About the Sources", tn: "Ka ga Metswedi", af: "Oor die bronne", zu: "Mayelana Nemithombo", xh: "Malunga Nemithombo",
-    nso: "Ka ga Methopo", st: "Mabapi le Mehlodi", ss: "Mayelana Nemitfombo", ts: "Mayelana ni Tihlovo", nr: "Malunga Nemithombo", ve: "Nga ha Zwiko",
-  },
-  heritage: {
-    en: "Heritage Ledger · on-chain", tn: "Rekoto ya Boswa · mo blockchain", af: "Erfenisregister · op-ketting", zu: "Irejista Yamagugu · ku-blockchain", xh: "Irejista Yelifa · kwi-blockchain",
-    nso: "Rejista ya Bohwa · go blockchain", st: "Rejista ya Lefa · ho blockchain", ss: "Irejista Yelifa · ku-blockchain", ts: "Rejista ya Ndzhaka · eka blockchain", nr: "Irejista Yelifa · ku-blockchain", ve: "Rejista ya Ifa · kha blockchain",
-  },
   scrollDown: {
     en: "Scroll down for more", tn: "Kgweetla tlase go bona go feta", af: "Rol af vir meer", zu: "Skrola phansi ukuze uthole okwengeziwe", xh: "Skrola ezantsi ukuze ufumane okungakumbi",
     nso: "Kgweetša tlase go bona tše dingwe", st: "Thella tlase ho bona tse ding", ss: "Skrola phansi kutfola lokunye", ts: "Sereleta ehansi ku vona swin'wana", nr: "Skrola phasi bona okhunye", ve: "Sombani fhasi u vhona zwinwe",
@@ -273,6 +251,116 @@ const UI = {
   backToTop: {
     en: "Back to top", tn: "Boela kwa godimo", af: "Terug na bo", zu: "Buyela phezulu", xh: "Buyela phezulu",
     nso: "Boela godimo", st: "Khutlela hodimo", ss: "Buyela etulu", ts: "Vuyela ehenhla", nr: "Buyela phezulu", ve: "Vhuyelela nṱha",
+  },
+
+  // ── v2 Home order (V2-07): the rooms the front page now hands off to ──
+  libraryCta: {
+    en: "Browse the whole library", tn: "Bona laeborari yotlhe", af: "Blaai deur die hele biblioteek", zu: "Bheka wonke umtapo", xh: "Khangela lonke ithala leencwadi",
+    nso: "Lebelela laeborari ka moka", st: "Sheba laeborari kaofela", ss: "Buka wonkhe umtapo", ts: "Languta layiburari hinkwayo", nr: "Qala woke umtapo", ve: "Sedzani layiburari yoṱhe",
+  },
+  journeyKicker: {
+    en: "The Journey", tn: "Leeto", af: "Die Reis", zu: "Uhambo", xh: "Uhambo",
+    nso: "Leeto", st: "Leeto", ss: "Luhambo", ts: "Riendzo", nr: "Ikhambo", ve: "Lwendo",
+  },
+  journeyTitle: {
+    en: "Walk the timeline", tn: "Tsamaya mo nakong", af: "Stap deur die tydlyn", zu: "Hamba ngomlando", xh: "Hamba ngexesha",
+    nso: "Sepela ka nako", st: "Tsamaya ka nako", ss: "Hamba ngemlandvo", ts: "Famba hi nkarhi", nr: "Khamba ngomlando", ve: "Tshimbilani nga tshifhinga",
+  },
+  journeySub: {
+    en: "Every milestone on this road is sourced. Watch a moment, answer a grounded question, collect a heritage card.",
+    tn: "Kgato nngwe le nngwe mo tseleng e e na le motswedi. Lebelela nako, araba potso e e theilweng, o tseye karata ya boswa.",
+    af: "Elke mylpaal op hierdie pad het 'n bron. Kyk 'n oomblik, beantwoord 'n gegronde vraag, versamel 'n erfeniskaart.",
+    zu: "Sonke isigaba salo mgwaqo sinomthombo. Buka isikhathi, phendula umbuzo osekelwe, uthole ikhadi lamagugu.",
+    xh: "Lonke inqanaba lale ndlela linomthombo. Bukela umzuzu, phendula umbuzo osekelweyo, uqokelele ikhadi lelifa.",
+    nso: "Kgato ye nngwe le ye nngwe tseleng ye e na le mothopo. Lebelela nako, araba potšišo yeo e theilwego, o kgoboketše karata ya bohwa.",
+    st: "Mohato o mong le o mong tseleng ena o na le mohlodi. Sheba nako, araba potso e thehilweng, o bokelle karete ya lefa.",
+    ss: "Sonkhe sigaba salomgwaco sinemtfombo. Buka sikhatsi, phendvula umbuto losekelwe, utfole likhadi lelifa.",
+    ts: "Goza rin'wana na rin'wana ka gondzo leri ri na xihlovo. Languta nkarhi, hlamula xivutiso lexi seketeriweke, u hlengeleta khadi ra ndzhaka.",
+    nr: "Soke isigaba salomgwaqo sinomthombo. Buka isikhathi, phendula umbuzo osekelweko, uthole ikharada yelifa.",
+    ve: "Ḽiga ḽiṅwe na ḽiṅwe kha yeneyi nḓila ḽi na tshiko. Lavhelesa tshifhinga, fhindula mbudziso yo thewaho, kuvhanganya khadi ya ifa.",
+  },
+  journeyCta: {
+    en: "Open the journey", tn: "Bula leeto", af: "Open die reis", zu: "Vula uhambo", xh: "Vula uhambo",
+    nso: "Bula leeto", st: "Bula leeto", ss: "Vula luhambo", ts: "Pfula riendzo", nr: "Vula ikhambo", ve: "Vulani lwendo",
+  },
+  milestones: {
+    en: "milestones", tn: "dikgato", af: "mylpale", zu: "izigaba", xh: "amanqanaba",
+    nso: "dikgato", st: "mehato", ss: "tigaba", ts: "magoza", nr: "iingaba", ve: "maga",
+  },
+  countriesKicker: {
+    en: "The continent", tn: "Kontinente", af: "Die vasteland", zu: "Izwekazi", xh: "Ilizwekazi",
+    nso: "Kontinente", st: "Kontinente", ss: "Lizwekazi", ts: "Kontinente", nr: "Ikontinenti", ve: "Kontinente",
+  },
+  countriesTitle: {
+    en: "Africa's nations", tn: "Merafe ya Aforika", af: "Afrika se nasies", zu: "Izizwe zase-Afrika", xh: "Izizwe zase-Afrika",
+    nso: "Ditšhaba tša Afrika", st: "Dichaba tsa Afrika", ss: "Tive tase-Afrika", ts: "Matiko ya Afrika", nr: "Iintjhaba ze-Afrika", ve: "Dzitshaka dza Afrika",
+  },
+  countriesSub: {
+    en: "Every African nation has its flag here, and its anthem as the recordings arrive. South Africa is where this journey runs deepest today.",
+    tn: "Setšhaba sengwe le sengwe sa Aforika se na le folaga ya sona fa, le pina ya sona ya bosetšhaba fa direkoto di goroga. Aforika Borwa ke fa leeto le le tseneletseng thata gompieno.",
+    af: "Elke Afrika-nasie het sy vlag hier, en sy volkslied sodra die opnames beskikbaar is. Suid-Afrika is waar hierdie reis vandag die diepste loop.",
+    zu: "Sonke isizwe sase-Afrika sinefulegi laso lapha, neculo laso lesizwe njengoba amarekhodi efika. INingizimu Afrika yilapho lolu hambo lujule khona namuhla.",
+    xh: "Sonke isizwe sase-Afrika sinefulegi laso apha, nengoma yaso yesizwe njengoko iirekhodi zifika. UMzantsi Afrika kulapho olu hambo lunzulu khona namhlanje.",
+    nso: "Setšhaba se sengwe le se sengwe sa Afrika se na le folaga ya sona mo, le koša ya sona ya setšhaba ge direkoto di fihla. Afrika Borwa ke moo leeto le le tseneletšego kudu lehono.",
+    st: "Setjhaba se seng le se seng sa Afrika se na le folaga ya sona mona, le pina ya sona ya setjhaba ha direkoto di fihla. Afrika Borwa ke moo leeto lena le tebileng haholo kajeno.",
+    ss: "Sonkhe sive sase-Afrika sinelifulegi laso lapha, neliculo laso lesive njengoba emarekhodi efika. INingizimu Afrika kulapho loluhambo lujule khona lamuhla.",
+    ts: "Tiko rin'wana na rin'wana ra Afrika ri na ni mujeko wa rona laha, ni risimu ra rona ra tiko loko tirhekhodo ti fika. Afrika-Dzonga hi kona laha riendzo leri ri enteke swinene namuntlha.",
+    nr: "Soke isitjhaba se-Afrika sinefulege laso lapha, nengoma yaso yesitjhaba njengombana amarekhodo afika. ISewula Afrika kulapho ikhambo leli elitjhinga khona namhlanjesi.",
+    ve: "Tshaka iṅwe na iṅwe ya Afrika i na na fulaga yayo hafha, na luimbo lwayo lwa lushaka musi dzirekhodo dzi tshi swika. Afrika Tshipembe ndi hune lwendo ulu lwa dzika vhukuma ṋamusi.",
+  },
+  countriesCta: {
+    en: "Choose a country", tn: "Tlhopha naga", af: "Kies 'n land", zu: "Khetha izwe", xh: "Khetha ilizwe",
+    nso: "Kgetha naga", st: "Kgetha naha", ss: "Khetsa live", ts: "Hlawula tiko", nr: "Khetha inarha", ve: "Nangani shango",
+  },
+  roomsLabel: {
+    en: "Inside the Atlas", tn: "Mo teng ga Atlase", af: "Binne die Atlas", zu: "Ngaphakathi kwe-Athulasi", xh: "Ngaphakathi kwe-Atlasi",
+    nso: "Ka gare ga Atlase", st: "Ka hare ho Atlase", ss: "Ngekhatsi kwe-Athilasi", ts: "Endzeni ka Atlasi", nr: "Ngaphakathi kwe-Athulasi", ve: "Nga ngomu ha Atlasi",
+  },
+  familyKicker: {
+    en: "For families and classrooms", tn: "Go malapa le diphaposi tsa borutelo", af: "Vir gesinne en klaskamers", zu: "Kwemindeni namakilasi", xh: "Kwiintsapho neegumbi zokufundela",
+    nso: "Go malapa le diphapoši tša borutelo", st: "Bakeng sa malapa le diphaposi tsa borutelo", ss: "Kwemindeni nemakilasi", ts: "Eka mindyangu ni tiklasi", nr: "Kwemindeni namakilasi", ve: "Kha miṱa na kilasi",
+  },
+  kidsTitle: {
+    en: "Kids", tn: "Bana", af: "Kinders", zu: "Izingane", xh: "Abantwana",
+    nso: "Bana", st: "Bana", ss: "Bantfwana", ts: "Vana", nr: "Abantwana", ve: "Vhana",
+  },
+  kidsSub: {
+    en: "Audio-first stories with an animal guide, big picture answers, and cards to collect.",
+    tn: "Dikanegelo tsa go reediwa le mokaedi wa phologolo, dikarabo tse dikgolo tsa ditshwantsho, le dikarata tsa go kgobokanya.",
+    af: "Klankgedrewe stories met 'n dieregids, groot prentjie-antwoorde en kaarte om te versamel.",
+    zu: "Izindaba ezilalelwayo ezinomhlahlandlela oyisilwane, izimpendulo ezinezithombe ezinkulu, namakhadi okuqoqa.",
+    xh: "Amabali amamelwayo anesikhokelo esisilwanyana, iimpendulo ezinemifanekiso emikhulu, namakhadi okuqokelela.",
+    nso: "Dikanegelo tša go theeletšwa tšeo di nago le mohlahli wa phoofolo, dikarabo tše dikgolo tša diswantšho, le dikarata tša go kgoboketša.",
+    st: "Dipale tse mamelwang tse nang le motataisi wa phoofolo, dikarabo tse kgolo tsa ditshwantsho, le dikarete tsa ho bokella.",
+    ss: "Tindzaba letilalelwako letinemcondzisi lesilwane, timphendvulo letinetitfombe letinkhulu, nemakhadi ekucocelela.",
+    ts: "Mintsheketo yo yingiseriwa leyi nga ni murhetani wa xiharhi, tinhlamulo ta swifaniso leswikulu, ni tikhadi to hlengeleta.",
+    nr: "Iindaba ezilalelwako ezinomkhombandlela osilwana, iimpendulo ezineenthombe ezikhulu, namakharada wokubuthelela.",
+    ve: "Zwiitwa zwi thetshelesiwaho zwi re na mulangi wa phukha, phindulo dza zwifanyiso zwihulwane, na khadi dza u kuvhanganya.",
+  },
+  kidsCta: {
+    en: "Open Kids mode", tn: "Bula mokgwa wa bana", af: "Open Kinder-modus", zu: "Vula imodi yezingane", xh: "Vula imowudi yabantwana",
+    nso: "Bula mokgwa wa bana", st: "Bula mokgwa wa bana", ss: "Vula imodi yebantfwana", ts: "Pfula xiyimo xa vana", nr: "Vula imodi yabantwana", ve: "Vulani nḓila ya vhana",
+  },
+  schoolsTitle: {
+    en: "Schools", tn: "Dikolo", af: "Skole", zu: "Izikole", xh: "Izikolo",
+    nso: "Dikolo", st: "Dikolo", ss: "Tikolo", ts: "Swikolo", nr: "Iimtjhana", ve: "Zwikolo",
+  },
+  schoolsSub: {
+    en: "A teacher's dashboard over a demo class: assigned chapter, completion, average score — no learner data leaves the device.",
+    tn: "Boto ya morutabana mo phaposing ya sekao: kgaolo e e abilweng, tswelelopele, maduo a a magareng — ga go na tshedimosetso ya moithuti e e tswang mo sedirisiweng.",
+    af: "'n Onderwyser se paneel oor 'n demo-klas: toegewese hoofstuk, voltooiing, gemiddelde punt — geen leerderdata verlaat die toestel nie.",
+    zu: "Ideshibhodi kathisha ekilasini lesibonelo: isahluko esabelwe, ukuqedela, amaphuzu amaphakathi — awukho ulwazi lomfundi oluphuma kudivayisi.",
+    xh: "Ideshibhodi katitshala kwiklasi yomzekelo: isahluko esabelweyo, ukugqiba, amanqaku aphakathi — akukho lwazi lomfundi luphuma kwisixhobo.",
+    nso: "Deshiboto ya morutiši ka klaseng ya mohlala: kgaolo yeo e abilwego, phethagatšo, dintlha tša magareng — ga go na tshedimošo ya moithuti yeo e tšwago sedirišwaneng.",
+    st: "Deshiboto ya mosuwe sehlopheng sa mohlala: khaolo e abetsweng, ho phethwa, dintlha tse mahareng — ha ho tlhahisoleseding ya moithuti e tswang sesebedisweng.",
+    ss: "Ideshibhodi yathishela ekilasini lesibonelo: sehluko lesabelwe, kucedza, emaphuzu lasemkhatsini — akukho lwati lwemfundzi loluphuma kudivayisi.",
+    ts: "Dashiboto ya mudyondzisi eka klasi ya xikombiso: ndzima leyi averiweke, ku hetisisa, tinhlayo ta le xikarhi — a ku na vuxokoxoko bya mudyondzi lebyi humaka eka xitirhisiwa.",
+    nr: "Ideshibhodi kathitjhere eklasini yesibonelo: isahluko esabelweko, ukuqeda, amaphuzu asephakathi — akukho ilwazi lomfundi eliphuma kudivayisi.",
+    ve: "Dashiboto ya mudededzi kha kilasi ya tsumbo: ndima yo ṋekedzwaho, u fhedza, mbuelo ya vhukati — a hu na mafhungo a mugudi ane a bva kha tshishumiswa.",
+  },
+  schoolsCta: {
+    en: "Open the classroom", tn: "Bula phaposi ya borutelo", af: "Open die klaskamer", zu: "Vula ikilasi", xh: "Vula igumbi lokufundela",
+    nso: "Bula phapoši ya borutelo", st: "Bula phaposi ya borutelo", ss: "Vula likilasi", ts: "Pfula klasi", nr: "Vula ikilasi", ve: "Vulani kilasi",
   },
 };
 
@@ -299,6 +387,15 @@ export function HomeGallery({
   onTotems,
   onHeroes,
   onStoryActiveChange,
+  onJourney,
+  onWatch,
+  onJourneyRoom,
+  onCountries,
+  onKids,
+  onSchools,
+  country,
+  progress,
+  onResumeStage,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -314,14 +411,28 @@ export function HomeGallery({
   onHeroes: () => void;
   /** Notifies the app when a full-screen dot-story opens/closes (to hide the floating chatbot). */
   onStoryActiveChange?: (active: boolean) => void;
+  /** Escape hatch only — the hero's walk is the free trailer and opens in place (D2 revised). */
+  onJourney?: () => void;
+  /** The Watch room — the browsable library (v2 V2-07). */
+  onWatch: () => void;
+  /**
+   * The `/journey` ROOM, reached from the Journey-preview section. Deliberately not `onJourney`:
+   * that one is the hero's unwired escape hatch, and the hero's walk still opens in place (D2).
+   */
+  onJourneyRoom: () => void;
+  onCountries: () => void;
+  onKids: () => void;
+  onSchools: () => void;
+  /** For the resume bar: which country's journey, and how far along it is. */
+  country: string;
+  progress: Progress;
+  onResumeStage: (milestoneId: string) => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
   // Drives scroll-in reveals + image parallax across the page.
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Selected country (defaults to South Africa) — drives the flag shown + which anthem plays.
-  const [country, setCountry] = useState(DEFAULT_COUNTRY);
 
   // Scroll affordances: a bouncing "scroll down for more" cue near the top, and a "back to top"
   // button once the reader nears the bottom of this long landing page.
@@ -350,54 +461,14 @@ export function HomeGallery({
   const scrollToTop = () => scrollRef.current?.scrollTo({ y: 0, animated: true });
   const scrollDownOne = () => scrollRef.current?.scrollTo({ y: Math.max(height * 0.94, 520), animated: true });
 
-  // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
-  // journey brings it forward (bright + tappable) and fades the big words back.
-  const [mapOpen, setMapOpen] = useState(false);
-  const [milestone, setMilestone] = useState<HistoryMilestone | null>(null);
-  // The walk is driven from the caption card via this handle; walkState picks the label + disables mid-step.
-  const trailRef = useRef<HistoryTrailHandle>(null);
-  const [walkState, setWalkState] = useState<{ atLast: boolean; walking: boolean }>({ atLast: false, walking: false });
-  // The "dot story" (full-screen picture → film) currently playing, or null.
-  const [storyId, setStoryId] = useState<string | null>(null);
-  const trailOpacity = useRef(new Animated.Value(0.16)).current;
-  const wordsOpacity = useRef(new Animated.Value(1)).current;
-  const scrimOpacity = useRef(new Animated.Value(0)).current;
-  const animateTo = (open: boolean) =>
-    Animated.parallel([
-      Animated.timing(trailOpacity, { toValue: open ? 1 : 0.16, duration: 420, useNativeDriver: true }),
-      Animated.timing(wordsOpacity, { toValue: open ? 0.12 : 1, duration: 420, useNativeDriver: true }),
-      Animated.timing(scrimOpacity, { toValue: open ? 0.62 : 0, duration: 420, useNativeDriver: true }),
-    ]);
-  const openMap = () => {
-    setMapOpen(true);
-    animateTo(true).start();
-    // Right after starting the journey, open the opening milestone's story (1652: the arrival) —
-    // full-screen picture then film. Skipping returns to the walk.
-    const firstId = historyTrail[0]?.id;
-    if (firstId && hasStory(firstId)) setStoryId(firstId);
-  };
-  const closeMap = () => { setMapOpen(false); setMilestone(null); setStoryId(null); animateTo(false).start(); };
-
-  const storyMilestone = storyId ? historyTrail.find((m) => m.id === storyId) ?? null : null;
-  const storyMedia = storyId ? mediaFor(storyId) : undefined;
-
-  // Hide the floating chatbot for the whole journey (walk + full-screen story) so it never crowds the
-  // caption's controls on a phone; reset on unmount.
-  useEffect(() => {
-    onStoryActiveChange?.(mapOpen || !!(storyMilestone && storyMedia));
-    return () => onStoryActiveChange?.(false);
-  }, [storyId, mapOpen]);
+  // The hero's journey state now lives in home/HomeHero (v2 D6); the page keeps a handle so the
+  // hero and the full-screen dot-story stay in sync across the ScrollView boundary.
+  const journey = useHomeJourney({ onStoryActiveChange, onStartJourney: onJourney });
 
   return (
     <View style={styles.root}>
-      {/* Country picker (left) + language picker (right) float over the hero, mirrored */}
-      <View style={styles.countryBar} pointerEvents="box-none">
-        <CountryPicker country={country} onChange={setCountry} lang={lang} />
-      </View>
-      <View style={styles.langBar} pointerEvents="box-none">
-        <LanguagePicker lang={lang} onChange={onLangChange} />
-      </View>
-
+      {/* The country + language pickers moved into the shell header (v2 D1/D3), so they are now
+          persistent on every route instead of floating over this one hero. */}
       <ScrollCtx.Provider value={{ scrollY, vh: height }}>
       <Animated.ScrollView
         ref={scrollRef}
@@ -411,111 +482,27 @@ export function HomeGallery({
         })}
       >
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
-        <View style={[styles.hero, { height: heroH }]}>
-          <View style={StyleSheet.absoluteFill}>
-            <SceneImage source={heroSource(modules[0], 1400, 1600)} kenBurns />
-          </View>
-          <LinearGradient
-            colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0.15)", "rgba(0,0,0,0.9)"]}
-            locations={[0, 0.45, 1]}
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-          />
+        {/* Extracted verbatim to home/HomeHero (v2 D6). The SA road, the guided walk and the
+            dot-stories are unchanged; only their file moved. */}
+        <HomeHero lang={lang} journey={journey} />
 
-          {/* darkening scrim that deepens when the journey opens, so the trail reads clearly */}
-          <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.mapScrim, { opacity: scrimOpacity }]} />
+        {/* Resume bar — renders nothing until a stage has actually been finished (V2-20). */}
+        <ResumeBar lang={lang} country={country} progress={progress} onResume={onResumeStage} />
 
-          {/* the history trail — dim behind the words by default, bright + tappable when open. The
-              start flag lives inside it (planted on the 1652 dot) so it never drifts. */}
-          <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-            <HistoryTrail
-              ref={trailRef}
-              active={mapOpen}
-              dimOpacity={trailOpacity}
-              onSelect={setMilestone}
-              selectedId={milestone?.id}
-              onStart={openMap}
-              startLabel={t(UI.startJourney, lang)}
-              onWalkChange={setWalkState}
-            />
-          </View>
+        {/* ── WATCH — the library rail (V2-07 §3) ────────────────────────────── */}
+        {/* The four pillars are the films the Watch room leads with, so the bookshelf IS the rail;
+            "Browse the whole library" opens /watch, where the rest of the catalogue lives. */}
+        <LiteratureShelf lang={lang} onOpen={onOpen} onWatch={onWatch} />
 
-          {/* the big words — bright by default, faded back when the journey opens. Nothing here is
-              tappable, so the layer never intercepts clicks meant for the trail / start flag behind it. */}
-          <Animated.View style={[styles.heroInner, { opacity: wordsOpacity }]} pointerEvents="none">
-            <Reveal style={styles.heroTitleWrap}>
-              <Text style={[styles.heroTitle, wide && styles.heroTitleWide]}>Ubuntu{"\n"}Heritage</Text>
-            </Reveal>
-            <Reveal delay={150} style={[styles.heroCard, wide && styles.heroCardWide]}>
-              <Text style={styles.heroCardTitle}>Reclaiming African Voices</Text>
-              <Text style={styles.heroCardSub}>MANTSWE A MALOBA — VOICES OF YESTERDAY</Text>
-            </Reveal>
-          </Animated.View>
+        {/* ── JOURNEY PREVIEW (V2-07 §4) ─────────────────────────────────────── */}
+        <JourneyPreview lang={lang} country={country} progress={progress} onOpen={onJourneyRoom} />
 
-          {/* journey controls + selected-year caption (only while open) */}
-          {mapOpen ? (
-            <View style={styles.mapUI} pointerEvents="box-none">
-              {/* close sits on the LEFT (where the start flag was) so it never collides with the
-                  language picker in the top-right */}
-              <View style={styles.mapTop} pointerEvents="box-none">
-                <PressScale style={styles.mapClose} onPress={closeMap} accessibilityLabel={t(UI.closeJourney, lang)}>
-                  <Icon.X size={18} color="#fff" />
-                </PressScale>
-                <View style={styles.mapTopText} pointerEvents="none">
-                  <Text style={styles.mapKicker}>{t(UI.journeyTitle, lang)}</Text>
-                  <Text style={styles.mapHint}>{t(UI.journeyHint, lang)}</Text>
-                </View>
-              </View>
+        {/* ── THE CONTINENT — 54 countries (V2-07 §5) ────────────────────────── */}
+        <CountriesStrip lang={lang} country={country} onOpen={onCountries} />
 
-              {milestone ? (
-                <View style={styles.mapCaption} pointerEvents="box-none">
-                  <Text style={styles.capYear}>{milestone.year}</Text>
-                  <Text style={styles.capTitle}>{milestone.title}</Text>
-                  <Text style={styles.capNote}>{milestone.note}</Text>
-                  {/* Both actions live here (fixed, never under a dot): the primary gold "Keep walking"
-                      advances the walk; the outlined "Play the story" opens this year's picture/film. */}
-                  <View style={styles.capBtnRow}>
-                    {!walkState.atLast ? (
-                      <Pressable
-                        style={[styles.walkCta, walkState.walking && styles.walkCtaDisabled]}
-                        onPress={() => trailRef.current?.walkNext()}
-                        disabled={walkState.walking}
-                        accessibilityRole="button"
-                        accessibilityLabel={t(UI.keepWalking, lang)}
-                      >
-                        <Text style={styles.walkCtaText}>{t(UI.keepWalking, lang)}</Text>
-                        <Icon.ChevronRight size={15} color={colors.night} />
-                      </Pressable>
-                    ) : (
-                      <Pressable
-                        style={styles.walkCta}
-                        onPress={() => trailRef.current?.restart()}
-                        accessibilityRole="button"
-                        accessibilityLabel={t(UI.journeyDone, lang)}
-                      >
-                        <Icon.RotateCcw size={14} color={colors.night} />
-                        <Text style={styles.walkCtaText}>{t(UI.journeyDone, lang)}</Text>
-                      </Pressable>
-                    )}
-                    {hasStory(milestone.id) ? (
-                      <PressScale style={styles.storyBtn} onPress={() => setStoryId(milestone.id)} accessibilityLabel={t(UI.playStory, lang)}>
-                        <Icon.Play size={13} color={colors.gold} fill={colors.gold} />
-                        <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
-                      </PressScale>
-                    ) : null}
-                  </View>
-                </View>
-              ) : (
-                <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
-              )}
-            </View>
-          ) : null}
-        </View>
-
-        {/* ── THE LITERATURE — illustrated bookshelf (slate) ─────────────────── */}
-        <LiteratureShelf lang={lang} onOpen={onOpen} />
-
-        {/* ── CULTURAL ATLAS (black) ─────────────────────────────────────────── */}
+        {/* ── CULTURAL ATLAS (V2-07 §6) ──────────────────────────────────────── */}
+        {/* One Atlas section now, not six: Provinces, Presidents, Heroes, Totems and Days are rooms
+            INSIDE the Atlas hub (V2-10), so they keep a shortcut here rather than a band each. */}
         <Section
           tone="slate"
           reverse
@@ -525,64 +512,18 @@ export function HomeGallery({
           intro={t(UI.atlasSub, lang)}
         >
           <CtaButton label={t(UI.atlasCta, lang)} onPress={onAtlas} />
+          <Text style={styles.roomsLabel}>{t(UI.roomsLabel, lang).toUpperCase()}</Text>
+          <View style={styles.roomsRow}>
+            <RoomChip icon={<Icon.Map size={15} color={colors.dsBlue} />} label={t(UI.provinces, lang)} onPress={onProvinces} />
+            <RoomChip icon={<Icon.Crown size={15} color={colors.dsBlue} />} label={t(UI.presidents, lang)} onPress={onPresidents} />
+            <RoomChip icon={<Icon.Award size={15} color={colors.dsBlue} />} label={t(UI.heroesTitle, lang)} onPress={onHeroes} />
+            <RoomChip icon={<Icon.PawPrint size={15} color={colors.dsBlue} />} label={t(UI.totems, lang)} onPress={onTotems} />
+            <RoomChip icon={<Icon.CalendarDays size={15} color={colors.dsBlue} />} label={t(UI.days, lang)} onPress={onDays} />
+          </View>
         </Section>
 
-        {/* ── TOTEMS & CLANS (slate) ─────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={require("../../assets/animals/lion.webp")}
-          kicker={t(UI.totemsKicker, lang)}
-          title={t(UI.totems, lang)}
-          intro={t(UI.totemsSub, lang)}
-        >
-          <CtaButton label={t(UI.totemsCta, lang)} onPress={onTotems} />
-        </Section>
-
-        {/* ── THE NINE PROVINCES (slate) ─────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={heroSource(atlasModules[2])}
-          kicker={t(UI.provKicker, lang)}
-          title={t(UI.provinces, lang)}
-          intro={t(UI.provSub, lang)}
-        >
-          <CtaButton label={t(UI.provCta, lang)} onPress={onProvinces} />
-        </Section>
-
-        {/* ── THE PRESIDENTS (black) ─────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          reverse
-          image={heroSource(modules[2])}
-          kicker={t(UI.presKicker, lang)}
-          title={t(UI.presidents, lang)}
-          intro={t(UI.presSub, lang)}
-        >
-          <CtaButton label={t(UI.presCta, lang)} onPress={onPresidents} />
-        </Section>
-
-        {/* ── HEROES OF THE NATION (slate) ───────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={heroSource(modules[1])}
-          kicker={t(UI.heroesKicker, lang)}
-          title={t(UI.heroesTitle, lang)}
-          intro={t(UI.heroesSub, lang)}
-        >
-          <CtaButton label={t(UI.heroesCta, lang)} onPress={onHeroes} />
-        </Section>
-
-        {/* ── NATIONAL DAYS (slate) ──────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          reverse
-          image={heroSource(atlasModules[1])}
-          kicker={t(UI.daysKicker, lang)}
-          title={t(UI.days, lang)}
-          intro={t(UI.daysSub, lang)}
-        >
-          <CtaButton label={t(UI.daysCta, lang)} onPress={onDays} />
-        </Section>
+        {/* ── KIDS & SCHOOLS (V2-07 §7) ──────────────────────────────────────── */}
+        <KidsAndSchools lang={lang} onKids={onKids} onSchools={onSchools} />
 
         {/* ── COMMUNITY ARCHIVE (slate) ──────────────────────────────────────── */}
         <Section
@@ -596,111 +537,8 @@ export function HomeGallery({
         </Section>
 
         {/* ── FOOTER ─────────────────────────────────────────────────────────── */}
-        <View style={styles.footer}>
-          <View style={[styles.footerInner, wide && styles.footerInnerWide]}>
-            <View style={wide ? styles.footerMainWide : styles.footerMain}>
-              {/* Left: wordmark + tagline */}
-              <View style={styles.footerBrandCol}>
-                <Text style={styles.footerBrand}>Ubuntu Heritage</Text>
-                <Text style={styles.footerLede}>
-                  South Africa's foundational literature and heritage — vivid, multilingual and free.
-                </Text>
-                <Text style={[styles.partnersLabel, styles.creatorLabel]}>Created by</Text>
-                <Text style={styles.creatorName}>Tumo Olorato Mogame</Text>
-              </View>
-              {/* Middle: partners */}
-              <View style={styles.partners}>
-                <Text style={styles.partnersLabel}>In partnership with</Text>
-                <View style={styles.partnerMarks}>
-                  {/* Real partner logos on white plates so the dark/coloured marks stay legible on
-                      the navy footer (logos kept in their own brand colours — not recoloured). */}
-                  <View style={styles.partnerPlate}>
-                    <Image
-                      source={require("../../assets/brand/unisa.webp")}
-                      style={styles.unisaLogo}
-                      resizeMode="contain"
-                      accessibilityLabel="University of South Africa (UNISA)"
-                    />
-                  </View>
-                  <View style={styles.partnerPlate}>
-                    <Image
-                      source={require("../../assets/brand/botlhale-chip.webp")}
-                      style={styles.botlhaleChip}
-                      resizeMode="contain"
-                      accessibilityLabel="Botlhale AI"
-                    />
-                    <Text style={styles.botlhaleName}>Botlhale AI</Text>
-                  </View>
-                </View>
-                {/* Sound credit — the ambient music/soundscapes are sampled from this YouTube
-                    channel. Clickable so listeners can hear the full pieces at the source. */}
-                <Text style={[styles.partnersLabel, styles.creditLabel]}>Sounds & music by</Text>
-                <Pressable
-                  onPress={() => Linking.openURL(SOUND_CREDIT_URL)}
-                  style={({ pressed, hovered }: any) => [
-                    styles.creditPlate,
-                    hovered && styles.creditPlateHover,
-                    pressed && styles.creditPlatePressed,
-                  ]}
-                  accessibilityRole="link"
-                  accessibilityLabel="African Tribe Echoes on YouTube — opens in browser"
-                >
-                  <Image
-                    source={require("../../assets/brand/african-tribe-echoes.webp")}
-                    style={styles.creditAvatar}
-                    resizeMode="cover"
-                  />
-                  <View style={styles.creditText}>
-                    <Text style={styles.creditName}>African Tribe Echoes</Text>
-                    <View style={styles.creditSub}>
-                      <Icon.Headphones size={12} color="rgba(255,255,255,0.6)" />
-                      <Text style={styles.creditRole}>Full tracks on YouTube</Text>
-                    </View>
-                  </View>
-                  <Icon.ArrowUpRight size={16} color="rgba(255,255,255,0.55)" />
-                </Pressable>
-              </View>
-              {/* Right: links + built-with (grouped here so the partners column stays compact) */}
-              <View style={[styles.footerLinks, wide && styles.footerLinksWide]}>
-                <Pressable style={styles.footerLink} onPress={onAbout}>
-                  <Text style={styles.footerLinkText}>{t(UI.about, lang)}</Text>
-                  <Icon.ArrowRight size={16} color={colors.dsBlue} />
-                </Pressable>
-                <Pressable style={styles.footerLink} onPress={onHeritage}>
-                  <View style={styles.liveDot} />
-                  <Text style={styles.footerLinkText}>{t(UI.heritage, lang)}</Text>
-                </Pressable>
-                {/* Built with — the tech the app runs on. Sits under the on-chain Heritage Ledger link
-                    (Solana anchors it). Distinct from "In partnership with": tech used ≠ endorsement.
-                    Light Solana logotype on the navy ground (high-contrast, per Solana's guidelines). */}
-                <View style={[styles.builtWith, wide && styles.builtWithWide]}>
-                  <Text style={styles.partnersLabel}>Built with</Text>
-                  <Pressable
-                    onPress={() => Linking.openURL(SOLANA_URL)}
-                    style={({ pressed, hovered }: any) => [
-                      styles.builtWithPlate,
-                      hovered && styles.creditPlateHover,
-                      pressed && styles.creditPlatePressed,
-                    ]}
-                    accessibilityRole="link"
-                    accessibilityLabel="Built with Solana — opens solana.com in browser"
-                  >
-                    <Image
-                      source={require("../../assets/brand/solana.webp")}
-                      style={styles.solanaLogo}
-                      resizeMode="contain"
-                      accessibilityLabel="Solana"
-                    />
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-            {/* Bottom bar: fine print under a hairline */}
-            <View style={styles.footerBar}>
-              <Text style={styles.footerFine}>{KICKER} · POPIA-compliant · built on free-tier, African-built AI</Text>
-            </View>
-          </View>
-        </View>
+        {/* Extracted verbatim to shell/SiteFooter so every route can render it (v2 D6). */}
+        <SiteFooter lang={lang} onAbout={onAbout} onHeritage={onHeritage} />
       </Animated.ScrollView>
       </ScrollCtx.Provider>
 
@@ -721,20 +559,9 @@ export function HomeGallery({
         )}
       </View>
 
-      {/* Full-screen "dot story" — opens on the picture, then plays the film. Skip/Back return here. */}
-      {storyMilestone && storyMedia ? (
-        <JourneyStory
-          milestone={storyMilestone}
-          media={storyMedia}
-          onClose={() => setStoryId(null)}
-          labels={{
-            skip: t(UI.storySkip, lang),
-            back: t(UI.storyBack, lang),
-            watch: t(UI.storyWatch, lang),
-            interpretation: t(UI.storyInterpretation, lang),
-          }}
-        />
-      ) : null}
+      {/* Full-screen "dot story" — extracted to home/HomeHero (v2 D6). Stays a SIBLING of the
+          ScrollView so it covers the viewport, not the scroll content. */}
+      <HomeJourneyStory lang={lang} journey={journey} />
     </View>
   );
 }
@@ -825,7 +652,16 @@ function Section({
 // ── THE LITERATURE — a full-width "bookshelf": each of the four pillars is a book on the shelf, with
 // its own cover art, title, author·year, back-cover blurb and a "Begin reading" invitation. Unlike the
 // alternating Section, this band is full-width so the covers themselves carry the imagery. ────────────
-function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) => void }) {
+function LiteratureShelf({
+  lang,
+  onOpen,
+  onWatch,
+}: {
+  lang: Lang;
+  onOpen: (id: string) => void;
+  /** Into the Watch room, where the Atlas films sit alongside these four. */
+  onWatch: () => void;
+}) {
   const { width } = useWindowDimensions();
   const wide = width >= 768;
   const [journeyOpen, setJourneyOpen] = useState(false);
@@ -857,10 +693,22 @@ function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) =>
           <Text style={[styles.sectionIntro, wide && styles.sectionIntroWide, { color: colors.dsGray, maxWidth: 620 }]}>
             {t(UI.pillarsSub, lang)}
           </Text>
-          <Pressable style={styles.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
-            <Icon.Play size={17} color="#000000" fill="#000000" />
-            <Text style={styles.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
-          </Pressable>
+          <View style={styles.shelfActions}>
+            <Pressable style={styles.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
+              <Icon.Play size={17} color="#000000" fill="#000000" />
+              <Text style={styles.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.libraryBtn}
+              onPress={onWatch}
+              accessibilityRole="link"
+              accessibilityLabel={t(UI.libraryCta, lang)}
+            >
+              <Icon.Film size={16} color={colors.dsBlue} />
+              <Text style={styles.libraryBtnText}>{t(UI.libraryCta, lang)}</Text>
+              <Icon.ArrowRight size={15} color={colors.dsBlue} />
+            </Pressable>
+          </View>
         </View>
         <View style={styles.shelf}>
           {modules.map((m, i) => (
@@ -872,6 +720,170 @@ function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) =>
         <Journey slides={literatureJourney} lang={lang} onClose={() => setJourneyOpen(false)} />
       </Modal>
     </Animated.View>
+  );
+}
+
+// ── JOURNEY PREVIEW — a teaser for the /journey room (V2-07) ──────────────────────────────────────
+// Reads the SAME `history-trail.ts` the Journey and the hero walk read, so the years and the count on
+// the front page can never drift from the trail itself. The progress line only appears once there is
+// real progress to show — an empty "0 of 25" would be noise, not a promise.
+function JourneyPreview({
+  lang,
+  country,
+  progress,
+  onOpen,
+}: {
+  lang: Lang;
+  country: string;
+  progress: Progress;
+  onOpen: () => void;
+}) {
+  const total = historyTrail.length;
+  const done = progress.stagesDone.filter((s) => s.startsWith(`${country}:`)).length;
+  const first = historyTrail[0];
+  const last = historyTrail[total - 1];
+  // The next three milestones from where the walker actually is.
+  const upcoming = historyTrail.slice(Math.min(done, Math.max(0, total - 3)), Math.min(done + 3, total));
+
+  // The trail's own opening picture, so the preview and the walk show the same thing.
+  const image = journeyMedia[first.id]?.image ?? heroSource(atlasModules[2]);
+
+  return (
+    <Section
+      tone="slate"
+      image={image}
+      kicker={t(UI.journeyKicker, lang)}
+      title={t(UI.journeyTitle, lang)}
+      intro={t(UI.journeySub, lang)}
+    >
+      <Text style={styles.roomsLabel}>
+        {first.year} – {last.year} · {done > 0 ? `${done} / ${total}` : total} {t(UI.milestones, lang)}
+      </Text>
+      <View style={styles.trailPeek}>
+        {upcoming.map((m) => (
+          <View key={m.id} style={styles.trailPeekItem}>
+            <Text style={styles.trailPeekYear}>{m.year}</Text>
+            <Text style={styles.trailPeekTitle} numberOfLines={1}>
+              {m.title}
+            </Text>
+          </View>
+        ))}
+      </View>
+      <CtaButton label={t(UI.journeyCta, lang)} onPress={onOpen} />
+    </Section>
+  );
+}
+
+// ── THE CONTINENT — the /countries room (V2-07) ───────────────────────────────────────────────────
+// A band of real flags rather than a claim about them. The selected country leads; the count is read
+// off the data so it stays true as anthems and nations are added.
+function CountriesStrip({ lang, country, onOpen }: { lang: Lang; country: string; onOpen: () => void }) {
+  const { width } = useWindowDimensions();
+  const shown = Math.max(8, Math.min(18, Math.floor(width / 46)));
+  const selected = countries.find((c) => c.code === country);
+  // The selected country first, then the rest in their listed order.
+  const rail = [
+    ...(selected ? [selected] : []),
+    ...countries.filter((c) => c.code !== country),
+  ].slice(0, shown);
+
+  return (
+    <View style={styles.countriesBand}>
+      <View style={styles.countriesInner}>
+        <View style={styles.accentBar} />
+        <Text style={[styles.sectionKicker, { color: colors.dsBlue }]}>{t(UI.countriesKicker, lang).toUpperCase()}</Text>
+        <Text style={[styles.sectionTitle, { color: "#FFFFFF" }]}>{t(UI.countriesTitle, lang)}</Text>
+        <Text style={[styles.sectionIntro, { color: colors.dsGray, maxWidth: 640 }]}>{t(UI.countriesSub, lang)}</Text>
+
+        <Pressable
+          style={styles.flagRail}
+          onPress={onOpen}
+          accessibilityRole="link"
+          accessibilityLabel={`${t(UI.countriesCta, lang)} — ${countries.length}`}
+        >
+          {rail.map((c) => (
+            <Image
+              key={c.code}
+              source={c.flag}
+              style={[styles.railFlag, c.code === country && styles.railFlagOn]}
+              resizeMode="cover"
+            />
+          ))}
+          <View style={styles.railMore}>
+            <Text style={styles.railMoreText}>+{countries.length - rail.length}</Text>
+          </View>
+        </Pressable>
+
+        <CtaButton label={t(UI.countriesCta, lang)} onPress={onOpen} />
+      </View>
+    </View>
+  );
+}
+
+// ── KIDS & SCHOOLS — the two rooms built for the people who use this in a home or a classroom ─────
+function KidsAndSchools({ lang, onKids, onSchools }: { lang: Lang; onKids: () => void; onSchools: () => void }) {
+  const { width } = useWindowDimensions();
+  const wide = width >= 768;
+  return (
+    <View style={styles.familyBand}>
+      <View style={styles.countriesInner}>
+        <View style={styles.accentBar} />
+        <Text style={[styles.sectionKicker, { color: colors.dsBlue }]}>{t(UI.familyKicker, lang).toUpperCase()}</Text>
+        <View style={[styles.familyRow, wide && styles.familyRowWide]}>
+          <FamilyCard
+            icon={<Icon.Smile size={22} color={colors.dsBlue} />}
+            title={t(UI.kidsTitle, lang)}
+            sub={t(UI.kidsSub, lang)}
+            cta={t(UI.kidsCta, lang)}
+            onPress={onKids}
+          />
+          <FamilyCard
+            icon={<Icon.GraduationCap size={22} color={colors.dsBlue} />}
+            title={t(UI.schoolsTitle, lang)}
+            sub={t(UI.schoolsSub, lang)}
+            cta={t(UI.schoolsCta, lang)}
+            onPress={onSchools}
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function FamilyCard({
+  icon,
+  title,
+  sub,
+  cta,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  sub: string;
+  cta: string;
+  onPress: () => void;
+}) {
+  return (
+    <PressScale style={styles.familyCard} onPress={onPress} accessibilityLabel={`${title} — ${cta}`}>
+      {icon}
+      <Text style={styles.familyTitle}>{title}</Text>
+      <Text style={styles.familySub}>{sub}</Text>
+      <View style={styles.familyCtaRow}>
+        <Text style={styles.familyCtaText}>{cta.toUpperCase()}</Text>
+        <Icon.ArrowRight size={15} color={colors.dsBlue} />
+      </View>
+    </PressScale>
+  );
+}
+
+// A shortcut into one Atlas room, sitting under the single Atlas section (V2-07 folds the five
+// former room bands into these chips so nothing lost its entry point from Home).
+function RoomChip({ icon, label, onPress }: { icon: React.ReactNode; label: string; onPress: () => void }) {
+  return (
+    <PressScale style={styles.roomChip} onPress={onPress} accessibilityLabel={label}>
+      {icon}
+      <Text style={styles.roomChipText}>{label}</Text>
+    </PressScale>
   );
 }
 
@@ -949,7 +961,6 @@ const SLATE = "#000000"; // ground → pure black
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: SLATE },
-  langBar: { position: "absolute", top: 0, right: 0, zIndex: 20, paddingTop: spacing.lg, paddingRight: spacing.lg },
   // Right-edge scroll cue, vertically centred.
   scrollCue: { position: "absolute", right: spacing.lg, top: 0, bottom: 0, justifyContent: "center", zIndex: 30 },
   cueBtn: {
@@ -967,60 +978,13 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  countryBar: { position: "absolute", top: 0, left: 0, zIndex: 20, paddingTop: spacing.lg, paddingLeft: spacing.lg },
 
   // Hero
-  hero: { width: "100%", justifyContent: "flex-end", backgroundColor: SLATE },
-  heroInner: { flex: 1, justifyContent: "space-between", paddingHorizontal: spacing.lg, paddingTop: 90, paddingBottom: spacing.xl },
-  heroTitleWrap: { alignItems: "center", flex: 1, justifyContent: "center" },
-  heroTitle: {
-    color: "#FFFFFF",
-    fontFamily: fonts.display,
-    fontSize: 60,
-    lineHeight: 60,
-    letterSpacing: -1,
-    textAlign: "center",
-    textShadowColor: "rgba(0,0,0,0.5)",
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 18,
-  },
-  heroTitleWide: { fontSize: 120, lineHeight: 116, letterSpacing: -2 },
-  heroCardWide: { paddingVertical: spacing.xl, paddingHorizontal: 48 },
-  heroCard: {
-    alignSelf: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.42)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.22)",
-    borderRadius: radius.md,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-  },
-  heroCardTitle: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 20, textAlign: "center" },
-  heroCardSub: { color: "rgba(255,255,255,0.9)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, marginTop: 8, textAlign: "center" },
 
   // History-trail journey
-  mapScrim: { backgroundColor: "#0a0703" },
-  mapUI: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "space-between", paddingHorizontal: spacing.lg, paddingTop: 76, paddingBottom: spacing.xl },
-  mapTop: { flexDirection: "row", alignItems: "center", gap: spacing.md },
-  mapTopText: { flex: 1 },
-  mapKicker: { color: "#E8B45A", fontFamily: fonts.displaySemi, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" },
-  mapHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 12, marginTop: 3 },
-  mapClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.12)", borderWidth: 1, borderColor: "rgba(255,255,255,0.28)", alignItems: "center", justifyContent: "center" },
-  mapCaption: { alignSelf: "center", maxWidth: 560, width: "100%", backgroundColor: "rgba(10,7,3,0.72)", borderWidth: 1, borderColor: "rgba(232,180,90,0.4)", borderRadius: radius.md, padding: spacing.md },
-  capYear: { color: "#E8B45A", fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
-  capTitle: { color: "#fff", fontFamily: fonts.heading, fontSize: 17, marginTop: 2 },
-  capNote: { color: "rgba(255,255,255,0.8)", fontFamily: fonts.body, fontSize: 13, lineHeight: 20, marginTop: 6 },
   // Caption actions sit in one row; wrap on very narrow screens so both stay tappable.
-  capBtnRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.sm, marginTop: spacing.md },
   // Primary: solid gold — advances the guided walk.
-  walkCta: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 9, paddingHorizontal: 16 },
-  walkCtaText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 0.3 },
-  walkCtaDisabled: { opacity: 0.45 },
   // Secondary: outlined gold — opens this year's story (distinct from Keep walking so they're not confused).
-  storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(232,180,90,0.14)", borderWidth: 1, borderColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14 },
-  storyBtnText: { color: "#E8B45A", fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
-  mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 
   // Section
   section: { width: "100%", borderTopWidth: 8, borderTopColor: BLUE },
@@ -1044,6 +1008,106 @@ const styles = StyleSheet.create({
   journeyBtn: { flexDirection: "row", alignItems: "center", gap: spacing.sm, alignSelf: "flex-start", backgroundColor: "#FFFFFF", borderRadius: radius.pill, paddingVertical: 12, paddingHorizontal: 20, marginTop: spacing.lg },
   journeyBtnText: { color: "#000000", fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3 },
   shelf: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.lg },
+
+  // ── v2 Home sections (V2-07) ──
+  shelfActions: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: spacing.md },
+  libraryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.22)",
+    borderRadius: radius.pill,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: spacing.lg,
+  },
+  libraryBtnText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 14.5 },
+
+  // Small label above a row of chips / a stat line inside a Section.
+  roomsLabel: {
+    color: colors.dsGray,
+    fontFamily: fonts.bodyBold,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  roomsRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  roomChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    borderRadius: radius.pill,
+    paddingVertical: 9,
+    paddingHorizontal: 15,
+  },
+  roomChipText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 13.5 },
+
+  // Journey preview: the next few milestones, straight off the trail.
+  trailPeek: { gap: spacing.sm, marginBottom: spacing.md },
+  trailPeekItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    borderLeftWidth: 2,
+    borderLeftColor: BLUE,
+    paddingLeft: spacing.md,
+  },
+  trailPeekYear: { color: BLUE, fontFamily: fonts.bodyBold, fontSize: 13, width: 44 },
+  trailPeekTitle: { color: "rgba(255,255,255,0.82)", fontFamily: fonts.body, fontSize: 14, flexShrink: 1 },
+
+  // The continent band.
+  countriesBand: {
+    width: "100%",
+    backgroundColor: SLATE,
+    borderTopWidth: 8,
+    borderTopColor: BLUE,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  countriesInner: { maxWidth: 1200, alignSelf: "center", width: "100%" },
+  flagRail: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginTop: spacing.lg },
+  railFlag: { width: 34, height: 23, borderRadius: 3, backgroundColor: "#222", opacity: 0.65 },
+  railFlagOn: { opacity: 1, borderWidth: 1.5, borderColor: BLUE },
+  railMore: {
+    height: 23,
+    paddingHorizontal: 9,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  railMoreText: { color: colors.dsGray, fontFamily: fonts.bodyBold, fontSize: 12 },
+
+  // Kids + Schools.
+  familyBand: {
+    width: "100%",
+    backgroundColor: SLATE,
+    borderTopWidth: 8,
+    borderTopColor: BLUE,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  familyRow: { gap: spacing.md, marginTop: spacing.md },
+  familyRowWide: { flexDirection: "row" },
+  familyCard: {
+    flex: 1,
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    backgroundColor: "#141414",
+  },
+  familyTitle: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 26, letterSpacing: -0.4 },
+  familySub: { color: colors.dsGray, fontFamily: fonts.body, fontSize: 14.5, lineHeight: 23 },
+  familyCtaRow: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: spacing.xs },
+  familyCtaText: { color: BLUE, fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6 },
   bookCol: { width: "23.5%" }, // 4-up shelf row on wide
   bookColNarrow: { width: "100%" },
   bookCard: {
@@ -1083,73 +1147,10 @@ const styles = StyleSheet.create({
   ctaText: { fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3, color: "#000000" },
 
   // Footer
-  footer: { backgroundColor: colors.dsNavyDeep, borderTopWidth: 8, borderTopColor: BLUE, paddingHorizontal: spacing.lg, paddingVertical: spacing.lg },
-  footerInner: { width: "100%", maxWidth: 1160, alignSelf: "center" },
-  footerInnerWide: { paddingHorizontal: 40 },
   // Narrow: stacked. Wide: brand left, links right — a compact two-column bar.
-  footerMain: { gap: spacing.md },
-  footerMainWide: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", columnGap: spacing.xl, rowGap: spacing.lg },
-  footerBrandCol: { flexShrink: 1 },
-  footerBrand: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 22, lineHeight: 26, letterSpacing: -0.4 },
-  footerLede: { color: "rgba(255,255,255,0.72)", fontFamily: fonts.body, fontSize: 14, lineHeight: 21, marginTop: spacing.xs, maxWidth: 360 },
-  footerLinks: { gap: spacing.sm },
-  footerLinksWide: { alignItems: "flex-end" },
-  footerLink: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  footerLinkText: { color: "#FFFFFF", fontFamily: fonts.bodyBold, fontSize: 13, letterSpacing: 1, textTransform: "uppercase" },
-  footerBar: { borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.12)", marginTop: spacing.lg, paddingTop: spacing.md },
   // Partner strip — real logos on white plates, sits in the middle of the footer row.
-  partners: {},
-  partnersLabel: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.bodySemi, fontSize: 11, letterSpacing: 2, textTransform: "uppercase", marginBottom: spacing.sm },
-  partnerMarks: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: spacing.md },
   // White plate keeps each logo legible + un-recoloured on the dark footer.
-  partnerPlate: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    backgroundColor: "#FFFFFF",
-    borderRadius: radius.sm,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  unisaLogo: { width: 92, height: 28 },
-  botlhaleChip: { width: 26, height: 26 },
   // Sound credit — a clickable card on the navy footer linking out to the music source channel.
-  creditLabel: { marginTop: spacing.md },
-  creditPlate: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-    borderRadius: radius.md,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  creditPlateHover: { backgroundColor: "rgba(255,255,255,0.12)", borderColor: "rgba(255,255,255,0.28)" },
-  creditPlatePressed: { opacity: 0.8 },
-  // Built-with — grouped in the right column under the Heritage Ledger link so the footer stays short.
-  builtWith: { marginTop: spacing.md, gap: spacing.sm, alignItems: "flex-start" }, // left when narrow
-  builtWithWide: { alignItems: "flex-end" }, // right-align to match the links when wide
-  // Light border so it reads as a subtle credit chip; logo on the dark ground.
-  builtWithPlate: {
-    backgroundColor: "rgba(255,255,255,0.04)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.14)",
-    borderRadius: radius.md,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  solanaLogo: { width: 132, height: 20 }, // 640x95 source ≈ 6.7:1
-  creditAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#1A1A1A" },
-  creditText: { gap: 2 },
-  creditName: { color: "#FFFFFF", fontFamily: fonts.heading, fontSize: 14, letterSpacing: 0.2 },
-  creditSub: { flexDirection: "row", alignItems: "center", gap: 4 },
-  creditRole: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 11, letterSpacing: 0.2 },
-  botlhaleName: { color: colors.dsSlate, fontFamily: fonts.heading, fontSize: 15, letterSpacing: 0.2 },
-  liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.live },
-  footerFine: { color: "rgba(255,255,255,0.5)", fontFamily: fonts.body, fontSize: 12, lineHeight: 18 },
-  creatorLabel: { marginTop: spacing.lg, marginBottom: 4 },
-  creatorName: { color: "#FFFFFF", fontFamily: fonts.serif, fontSize: 15 },
+  // Built-with — grouped in the right column under the Heritage Ledger link so the footer stays short. // left when narrow // right-align to match the links when wide
+  // Light border so it reads as a subtle credit chip; logo on the dark ground. // 640x95 source ≈ 6.7:1
 });

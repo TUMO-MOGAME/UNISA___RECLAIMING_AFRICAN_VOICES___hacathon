@@ -4,7 +4,7 @@
 > of "done." For the structured **implemented vs. planned** view, see
 > [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-07-08 — by Tumo (via Claude)_
+_Last updated: 2026-08-27 — by Tumo (via Claude)_
 
 ---
 
@@ -27,8 +27,74 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
+| **🏗️ Architecture v2 — multi-page transformation** | 🟢 **30 of 31 tasks done (26–27 Aug)** — every room is live and the Watch page carries its provenance block; the one open task is the **V2-12 browser re-walk** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
+
+---
+
+## 🏗️ Architecture v2 — the current programme
+
+The app is moving from **one long scrolling page** to a **site with rooms**: a persistent shell, a
+browsable cinematic library, and a watch → quiz → collect loop. Full plan, task IDs and week gates in
+**[docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md)**.
+
+**Six decisions locked with Tumo on 2026-08-26:**
+
+| # | Decision |
+|---|----------|
+| D1 | Nav = `Journey · Watch · Atlas · Archive · Kids · Schools` + country ▾ + language ▾ + Passport chip |
+| D2 *(revised)* | The hero SA-road trail is the **free trailer** — it opens **in place**, exactly as before. The deeper staged `/journey` page is reached from the nav and is where future chapters get locked. |
+| D3 | Country selection **moves** to a new `/countries` page — the 54 flags + national anthems move with it |
+| D4 | **Keep** the current palette (black `#000000` + sa-blue `#1A85A7`); take the new designs' structure, not their gold/brown skin |
+| D5 | Progress is **local-only** — no accounts, no PII. Schools ships over seeded demo data |
+| D6 | The **hero section** and the **footer** are kept byte-for-byte and reused everywhere |
+
+| Week | Window | Focus | Gate |
+|------|--------|-------|------|
+| **1** | 26 Aug → 1 Sep | Shell, persistent header/footer, `/countries` + anthems, Atlas hub | Every nav item lands on a real page; hero + footer visually unchanged |
+| **2** | 2 Sep → 8 Sep | `/watch` library + player, `/journey` stages, quiz, heritage cards, progress store | Watch → quiz → reward completes and survives a refresh |
+| **3** | 9 Sep → 15 Sep | Passport, Kids mode, Schools dashboard, i18n sweep, a11y, POPIA review | All 11 languages · no new PII · tsc + bundle + tests green |
+
+**De-scope order if the window tightens:** Schools → Kids stage flow → quiz chapters beyond 3 → Watch search.
+**Never cut:** the shell, the kept hero/footer, `/countries` + anthems, i18n, POPIA.
+
+---
 
 ## ⏭️ Next action
+
+Architecture v2 is **30 of 31**. V2-07, V2-11 and V2-15 all landed on 27 Aug. **One task is still
+open, and it is the one a machine cannot finish:**
+
+- **V2-12 — the Week 1 gate.** Three of its four conditions are met and re-verified: typecheck
+  clean, web bundle green, and route wiring now pinned by a test
+  ([app/src/routes.test.ts](app/src/routes.test.ts)) that fails the build if a route loses its
+  `case`, if the nav points at a room that does not exist, or if the chatbot cannot open one.
+  **What is still not done is the part that matters: nobody has re-walked every pre-v2 route in a
+  browser and looked at it.** No test in this repo can see a layout. This needs Tumo at the keyboard
+  (`npm run web`), walking Home → Reader → Atlas → Provinces → Province → City → Presidents →
+  President → Heroes → Hero → Totems → Days → Archive → Ledger → About, plus the new rooms, and
+  confirming the **hero and the footer look exactly as they did** (D6). Until that happens V2-12
+  stays unticked.
+
+Then:
+
+1. **Tumo's language review.** The v2 UI strings are machine-quality across the 10 non-English
+   languages. The **Setswana** especially wants your eye — the nav (`shell/nav.ts`), the Kids
+   greetings (`KidsScreen.tsx`), and the Passport privacy copy. **New on 27 Aug and unreviewed:**
+   the Watch page's provenance labels (`WatchItemScreen.tsx` — "Sources & provenance", "Adapted
+   from", "The passage behind each scene"), the new Home sections (`HomeGallery.tsx` — the Journey
+   preview, the continent band, Kids/Schools) and the Archive's Trust chips (`ArchiveScreen.tsx`).
+   These sit on the most integrity-sensitive surface in the app, so a wrong word costs more here
+   than elsewhere.
+2. **Accessibility retrofit on the pre-v2 screens** — 25 unlabelled controls, listed in the
+   2026-08-27 log entry. Its own task, deliberately not folded into v2.
+3. **Native persistence for progress** — web persists; native is session-only and says so. Lands with
+   WatermelonDB alongside the Archive's own native persistence (T024).
+4. **Quiz coverage** — 17 questions across 13 of the 25 milestones. The remaining 12 need sourced
+   questions before those stages feel finished.
+5. **Locked chapters on `/journey`** — the free/paid split Tumo described. The hero trailer is free
+   and stays free; the gating mechanism itself is not built.
+
+### Parked (pre-v2, still open)
 
 1. **Record the demo video** — follow the shot-by-shot script in [specs/demo-video-script.md](specs/demo-video-script.md)
    (~2:55, web target). Do one dry run of record→consent→delete first; art is cached so nothing pops
@@ -46,7 +112,17 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
 4. Persistence: WatermelonDB so recordings survive reload (T024). Optional: NativeWind (T006).
 5. Phase 3: ElevenLabs static intro · record the 2–3 min demo video · finalise the written narrative.
 
-## 🗓️ Timeline (today: 2026-06-29)
+## 🗓️ Timeline (today: 2026-08-26)
+
+### Architecture v2 (current programme)
+
+| Phase | What | Target window | Status |
+|-------|------|---------------|--------|
+| **5.1 Shell** | Persistent header/footer · route split · `/countries` + anthems · Atlas hub | 26 Aug – 1 Sep | ✅ done |
+| **5.2 Core loop** | `/watch` + player · `/journey` stages · quiz · heritage cards · progress store | 2 Sep – 8 Sep | ✅ done (early) |
+| **5.3 Rooms + polish** | Passport · Kids · Schools · i18n sweep · a11y · POPIA review | 9 Sep – 15 Sep | ✅ done (early) |
+
+### Hackathon (complete)
 
 | Phase | What | Target window | Status |
 |-------|------|---------------|--------|
@@ -118,6 +194,229 @@ _Last updated: 2026-07-08 — by Tumo (via Claude)_
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-27 (later)** — **V2-15, V2-07 and V2-11 done. Architecture v2 is 30 of 31.**
+  **V2-15 `WatchItemScreen` — the reason this was the load-bearing one.** `/watch` used to hand
+  straight off to the `CinematicReader`. The Reader is a fine player but it is a *book*: a scene's
+  sourcing lives in the margin of one paper page, visible only while you are on that page. The plan
+  asked the watch page for a standing **Sources & provenance** block, and that is now what it has —
+  what the film is adapted from (`module.source`), the passage behind **every** scene (each
+  `scene.sourceNote`, tappable to jump there), the AI-imagery label, the full `references[]`, and the
+  project's one rule in the reader's own language. **Not one word of it is authored**; it is all read
+  off content that has been in `src/content/*.ts` since the modules were written. The data was always
+  there — nothing had ever put it in front of a viewer.
+  Also on the page: the scene player with a chapter-tick strip, the Child⇄Adult toggle, the language
+  picker, Listen, "Continue the journey", "Open the full reader" (the Reader is unchanged and one tap
+  away) and "Ask Ubuntu about this story".
+  **Two things fell out of building it.** `progress.setWatched` existed, was unit-tested, and was
+  **never called by anything** — so the "% watched" pill on the Watch cards was always 0. The watch
+  page now reports its position and those pills mean something. And the chatbot had no way to be
+  asked a question by a screen, so `services/chatbot/askBus.ts` is a one-listener bridge: the widget
+  registers on mount, a page calls `askUbuntu(question)`. Deliberately a no-op when no widget is
+  mounted rather than a crash.
+  **V2-07 Home rebuilt to the planned order** — Hero → Continue → Watch rail → Journey preview →
+  Countries → Atlas → Kids/Schools → Archive. The bookshelf **is** the watch rail (the four pillars
+  are what the library leads with) and gained "Browse the whole library →". The Journey preview and
+  the continent band read from `history-trail.ts` and `anthems.ts`, so the years, the milestone count
+  and the 54 flags on the front page cannot drift from the data. **What changed for the worse and why
+  it is still right:** Provinces, Presidents, Heroes, Totems and National Days each lost their own
+  full-width band. They are rooms *inside* the Atlas hub, and six Atlas bands on one page was the old
+  architecture arguing with the new one. They keep a labelled chip row under the single Atlas section,
+  so nothing lost its shortcut from Home — but it is a real reduction and Tumo should look at it.
+  **V2-11 Archive's Trust sub-nav** — the Heritage Ledger and Sources & provenance now sit at the top
+  of the Archive itself, not only in the footer. A room that asks a person for their voice should show
+  its own receipts in the same room.
+  **V2-12 partly advanced, deliberately NOT ticked.** Added `src/routes.test.ts`: it parses the
+  `Route` union, `renderRoute` and `nav.ts` and fails if a route loses its case, if a nav item or
+  mobile tab points at a room that does not exist, or if the chatbot's orchestrator cannot open one.
+  That closes the "dead nav item" class of regression. It does **not** close the gate — no test here
+  can see a layout, and the browser re-walk still needs a human.
+  Verified: typecheck clean · **117/117 tests** · web bundle green.
+
+- **2026-08-27** — **Architecture v2: 27 of 31 tasks done — every room in the D1 nav is live and real.**
+  **V2-20** the resume bar — and it renders **nothing** until a stage is actually finished. A bar
+  reading "Chapter 1 · 0%" on a first visit makes an empty app look like a chore list.
+  **V2-28 i18n as a test, not a sweep.** `i18n/ui-coverage.test.ts` walks every `const UI` block in
+  every component and fails the build if a string is missing any of the 11 languages, or is an empty
+  placeholder in one. It inspects **331 strings across 28 files** and all pass. I negative-tested it
+  by deleting one `nr` string: it failed and named the exact file, key and language. Content is
+  deliberately **out of scope** — a scene carries English plus what has actually been reviewed, and
+  forcing 11 languages onto it would invite the fabrication the project forbids.
+  **V2-29 a11y.** Every `Pressable` in every v2 room now carries a label and a role; 13 were missing.
+  **Known gap, stated plainly:** 25 `Pressable`s in **pre-existing** screens (ArchiveScreen,
+  CinematicReader, ConsentSheet, LanguagePicker, ProvincesScreens, SideIndexScroll, ArticleReader,
+  HeritageLedgerScreen, ChatbotWidget, CountryPicker) still lack labels. Retrofitting them is real
+  work on working code and was **not** in the v2 scope — it should be its own task, not smuggled in.
+  **V2-30 POPIA** — reviewed and written up in
+  [docs/05-popia-compliance.md](docs/05-popia-compliance.md). No v2 surface collects personal
+  information; verified mechanically that no `fetch`, Supabase call or upload path exists anywhere in
+  the new rooms or the progress store. The only text inputs are two search boxes, which are local
+  filter state.
+  Verified: typecheck clean · **112/112 tests** · web bundle green.
+
+- **2026-08-26 (late night)** — **Week 3 rooms built: Passport, Kids, Schools (V2-22 → V2-27).**
+  `PassportScreen` — level, stars, streak, journey progress, the 27-totem card grid with locked slots,
+  country stamps, and a two-step **"Forget everything"** erasure. It deliberately holds no name, no
+  photo and no account: a passport is normally the most identifying thing a person carries, and this
+  one carries none of it, which is why it can be shown to a child with no consent flow.
+  `KidsScreen` + `KidsStageScreen` — real greetings per language, an animal of the day, and a picture
+  quiz that asks for the **real totem term** in the reader's own language family (Tau, Nkwe, Kwena),
+  so a child learning "Tau is the lion" has learnt something true and sourced. No penalty, no timer.
+  The grown-ups gate is a 3-second hold — friction, not security, and the comment says so rather than
+  implying a lock that isn't there.
+  `SchoolsScreen` — a working dashboard over **seeded demo data**, with the demo banner on screen at
+  all times rather than in a footnote. Under D5 the app holds no learner records, so there is nothing
+  real to show; a plausible-looking dashboard that didn't say so would be a lie told in UI.
+  CAPS alignment is claimed only at **topic level** against the DBE Senior Phase document — no outcome
+  codes are invented, and `schools.ts` says outright that any specific code must be read from CAPS itself.
+  Deleted `ComingSoon.tsx` — every room is now real, which is what its own comment said to do.
+
+- **2026-08-26 (late)** — **D2 reversed at Tumo's request, and the second sound credit got its face.**
+  The hero walk is now confirmed as the **free trailer**: "Start the journey" opens the SA road in
+  place, exactly as it always did, no lock and no sign-in. The deeper staged `/journey` page is reached
+  from the nav and is where future chapters will be locked. `onStartJourney` stays in `useHomeJourney`
+  as a documented escape hatch but is **deliberately unwired** — the comment now says that instead of
+  claiming the opposite. Plan §2, §3 and V2-06 updated so the doc no longer contradicts the code.
+  Footer: pulled the real **Baobab Roots Collective** channel avatar (the baobab-and-roots mark) and
+  bundled it at 160×160 webp to match African Tribe Echoes exactly; the Lucide placeholder is gone.
+
+- **2026-08-26 (late)** — **The core loop is closed: Journey + stages + quiz (V2-16 → V2-19).**
+  `JourneyScreen` walks all **25 real milestones** from `history-trail.ts` rather than the source
+  design's twelve invented chapters — sourced history costs nothing extra and is better history.
+  A stage opens when the one before it is done; finished stages stay open, so progress is never taken
+  away. `StageScreen` runs wireframe 2e: **WATCH → QUIZ → REWARD**, with a heritage card from
+  `totems.ts` assigned in order so a stage always yields the same card.
+  **Grounding (V2-17):** 17 questions across 13 milestones in `content/quiz.ts`, each answerable from
+  the milestone's own cited note. Two rules hold: a distractor is normally a *real* fact from another
+  milestone, so a half-remembered wrong answer is still true; and every question carries an
+  explanation shown either way. The one deliberate exception is the "the land was empty" option at
+  1652 — the terra nullius myth, offered **only** so choosing it is corrected on the spot. A test pins
+  that it can never become the correct answer.
+  **D2 is now live:** the hero's "Start the journey" hands off to `/journey` instead of opening its
+  in-place overlay; the seam added in V2-06 is wired through `HomeGallery`.
+  Verified: typecheck clean · **109/109 tests** · web bundle green.
+  **Note on the toolchain:** the typecheck ran >7 min twice today and once reported an error against a
+  file version that no longer existed on disk. Treat a single tsc result as suspect if files changed
+  under it — re-run before believing it.
+
+- **2026-08-27** — **The Journey is live: V2-16, V2-17, V2-18, V2-19 done. D2 closed.**
+  **Quiz (V2-17)** `content/quiz.ts` — 14 questions across 14 milestones, each answerable from that
+  milestone's own sourced note. The integrity rule is now **structural, not just intent**: 10 tests in
+  `quiz.test.ts` enforce one correct answer, a real milestone link, an explanation, no duplicate
+  options — and one test pins the 1652 question so the colonial "empty land" myth can never become the
+  correct answer. Wrong options are mostly **real facts from other milestones**, so a wrong guess never
+  teaches fiction.
+  **Journey (V2-16)** All **25** grounded milestones as stages, not the source design's 12 invented
+  chapters — more history, same effort. A stage unlocks when the one before it is done; finished
+  stages stay open. Progress bar, stars, cards, level, and the trail's citation at the foot.
+  **Stage (V2-18/19)** WATCH → QUIZ → REWARD. Honest about gaps: no film shows the picture and the
+  record instead of faking one; no quiz goes straight to the reward instead of inventing a question.
+  The reward is a real totem from `content/totems.ts` with its clans, its terms in three language
+  groups, and its source shown.
+  **D2 closed:** the hero's "Start the journey" now hands off to `/journey` via the `onStartJourney`
+  seam left in Week 1. The in-place overlay path is retired.
+  **Watch out — typecheck cost is trending badly.** Inlining the stage case in App's route switch made
+  tsc walk the now 24-member route union per narrowing and **stop finishing at all** (two 5-minute
+  timeouts). Extracting it to a top-level `StageRoute` component fixed it, but the full typecheck is
+  now **157s, up from ~7s**. Week 3 adds three more routes. See "Open decisions" — this needs a real
+  fix, not another extraction.
+  Still open in Week 2: **V2-15** (the WatchItemScreen player page) and **V2-20** (the resume bar).
+  Watch cards currently open the existing CinematicReader, which is a real player — the dedicated
+  watch page with its provenance panel is still to come.
+  Verified: typecheck clean · **109/109 tests** · web bundle green.
+
+- **2026-08-26 (night)** — **Week 2 started: progress store + Watch library. Footer credits changed.**
+  **V2-13** `services/progress/` — pure reducers in `progress.ts` (14 unit tests) plus the platform
+  split the Archive uses: web persists to localStorage, native is session-only with `persists:false`
+  so the Passport can say so honestly rather than implying a guarantee (no AsyncStorage dependency in
+  this project yet). Holds **no personal data** — no name, no account, nothing identifying; a test
+  asserts the shape's key list so nobody can quietly add an identifying field. Reducers are
+  idempotent and never regress: a card cannot be collected twice, a re-watch cannot rewind progress,
+  a retaken quiz cannot lower a score, and `normalise()` survives a corrupt stored blob.
+  **V2-14** `WatchScreen` — the browsable library, built only from existing modules. The source
+  design's Totems / National Days / Nine Provinces chips are **not** offered: in this codebase those
+  are Atlas screens, not modules with scenes, so those chips would promise films that do not exist.
+  Chips are All / The 4 Great Books / Cultural Atlas, plus search and real "% watched" from the store.
+  **Bug I introduced and fixed:** the WatchScreen render first landed in `navigateTo` (the chatbot's
+  orchestrator) instead of `renderRoute` — both switches open with the same `case "watch":` line. It
+  typechecked cleanly because the orchestrator's return type is loose, so tsc would never have caught
+  it; only reading the switch did. Worth remembering when scripting edits against this file.
+  **Footer (Tumo's request):** UNISA and Botlhale AI partner plates removed; **tumoolo.tech** added as
+  "Built by"; **Baobab Roots Collective** joins African Tribe Echoes under sound credits. Tumo's name
+  stays. No avatar is bundled for the new channel, so a Lucide mark stands in — drop a webp into
+  `assets/brand/` to swap it.
+  Verified: typecheck clean · **99/99 tests** · web bundle green.
+
+- **2026-08-26 (evening)** — **Countries + Atlas hub done (V2-08 → V2-10); branch pushed.**
+  `CountriesScreen` carries all 54 nations, searchable, with the national anthems moved out of the
+  hero dropdown (D3). `AtlasRooms` gathers Provinces · Presidents · Heroes · Totems · Days under the
+  Atlas, which D1 left without a top-level slot; those five screens are untouched.
+  **Grounding call:** the source design's per-country "atmosphere" copy (Ghana's kente, Mali's griots,
+  Ethiopia's Adwa…) is **not** reproduced — it traces to nothing in this repo. Only South Africa has
+  researched content, so only South Africa gets a journey; the other 53 carry an honest
+  "not yet researched" note.
+  Tumo asked whether the styling followed the source design — it did not, in three ways: the palette
+  (D4, deliberate), the invented copy (integrity rule, deliberate), and the cinematic layout, which
+  I had dropped **everywhere** including for South Africa. That third one was over-caution, not a
+  principle: South Africa has real cached art, a real 12-chapter trail, real provinces. Fixed — the
+  live country now gets the full treatment (Ken Burns backdrop from existing art, display name, and a
+  "journey ahead" rail built from the **sourced** `history-trail` milestones with the citation shown);
+  the other 53 keep the quiet panel. The design is earned by content rather than faked.
+  Verified: typecheck clean · 85/85 tests · web bundle green.
+  **Repo hygiene fix:** several files had been flipped LF → CRLF by scripted edits, which inflated the
+  diff from ~2.2k real changed lines to ~6.2k and would have made the commit unreviewable. Normalised
+  back to LF (this repo is LF) before committing. Worth remembering: write files with an explicit
+  `newline=''` when scripting edits on Windows.
+  Pushed as `feat/architecture-v2` (2 commits).
+
+- **2026-08-26 (later still)** — **The shell is live: V2-01 → V2-04 done.** Tumo picked header
+  **direction C, two-tier** from three mockups
+  ([artifact](https://claude.ai/code/artifact/5259ecef-c9b6-46b4-bd46-e424feceb344)): tier 1 carries the
+  wordmark + country ▾ + language ▾ + Passport chip, tier 2 carries the six D1 nav items, and the
+  signature 8px sa-blue rule caps it. Built `shell/nav.ts` (one source of truth for the header, the tab
+  bar **and** the chatbot's `navigate_to`, so the three can't drift), `SiteHeader`, `MobileTabBar`
+  (4 tabs — Journey · Watch · Atlas · Me), `AppShell` (three modes: page / own-scroll / immersive) and
+  `ComingSoon`. Extended the `Route` union with the nine v2 rooms; the country picker moved out of the
+  hero into the header and its state is now app-wide (D3 groundwork). Added 7 Lucide icons.
+  Unbuilt rooms serve an honest "being built · Week N" placeholder rather than a dead link — the Week 1
+  gate says every nav item lands on a real page, and a page pretending to be finished fails it too.
+  **Performance trap worth remembering:** writing the shell's route groupings as `Route["name"][]` and
+  calling `.includes(route.name)` made tsc walk the whole (now much larger) union on every call — the
+  typecheck went from seconds to not finishing in 7 minutes. Rewritten as module-level `Set<string>`
+  with the route name widened to `string`; back to seconds. The union-recursion warning already in
+  App.tsx now applies to lookups too, and there is a comment there saying so.
+  Verified: typecheck clean · **85/85 tests** · `expo export --platform web` green.
+  **Needs Tumo's eye:** the nav labels in `shell/nav.ts` are machine-quality across the 10 non-English
+  languages — the Setswana especially should be checked (Leeto / Lebelela / Polokelo / Bana / Dikolo).
+
+- **2026-08-26 (later)** — **V2-05 + V2-06 done: hero and footer extracted verbatim.** On branch
+  `feat/architecture-v2`. The footer moved to `components/shell/SiteFooter.tsx` and the hero to
+  `components/home/HomeHero.tsx`, both **byte-for-byte** — same markup, same styles, same strings (D6).
+  One structural note: `JourneyStory` renders `position:absolute` and must stay a **sibling** of the
+  ScrollView (inside it, "absolute" would resolve against the scroll *content*, so the full-screen film
+  would sit at the top of the page instead of over the viewport). So the hero ships as a hook plus two
+  pieces — `useHomeJourney` (shared state) + `HomeHero` (in-scroll) + `HomeJourneyStory` (sibling
+  overlay) — which keeps behaviour identical and makes the Week 2 move to `/journey` a contained lift.
+  Added the D2 seam: `onStartJourney` is optional and currently unwired, so "Start the journey" still
+  opens the in-place overlay exactly as before. Pruned what the move orphaned: 4 imports, 13 UI strings,
+  37 styles, 2 constants. `HomeGallery` is **1155 → 772 lines**. Verified: `npm run typecheck` clean ·
+  **85/85 tests** · `expo export --platform web` green. **Pre-existing issue found (not caused by this
+  work):** bare `npx tsc --noEmit` crashes with a stack overflow on this codebase — confirmed by
+  stashing the changes and reproducing on clean `main`. `npm run typecheck` already carries the
+  workaround (`node --stack-size=8000`); use that, not bare `tsc`.
+
+- **2026-08-26** — **Architecture v2 planned and started.** Unpacked the three new standalone design
+  bundles (Website, Countries, Wireframes 2a–2h) and read them against the live app. Found three
+  conflicting navs across the source designs, and that the existing Atlas/Provinces/Presidents/Heroes/
+  Totems/Days/Archive/Ledger screens had **no home** in any of them — resolved as **D1**. Confirmed Kids,
+  Schools, quizzes, stars/streaks, heritage cards and the Passport are **entirely net-new** (zero code
+  today), which is the bulk of the programme. Locked six decisions with Tumo (D1–D6): keep the hero
+  SA-road trail and the footer byte-for-byte, move country selection **and the national anthems** to a
+  new `/countries` page, keep the black + sa-blue palette rather than the designs' gold/brown, and keep
+  all progress **local-only** so no minor's data ever leaves the device. Wrote the 3-week plan
+  ([docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md)): 31 tasks, three week gates, a
+  fixed de-scope order, and a definition of done. Backlog added as **Phase 5** in
+  [specs/tasks.md](specs/tasks.md). Now starting Week 1 (the shell and the split).
 
 - **2026-07-08** — **Journey walk-control fix + phone-mode pass.** Fixed the reported bug: on the guided
   walk, the floating "Keep walking" button sat *under* the caption card and its taps landed on "Play the

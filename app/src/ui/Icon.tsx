@@ -46,4 +46,17 @@ export const Icon = {
   MessageCircle: L.MessageCircle,
   Send: L.Send,
   Sparkles: L.Sparkles,
+  // ── Architecture v2 shell (D1 nav + mobile tab bar) ──
+  Route: L.Route, // Journey
+  Compass: L.Compass, // Atlas
+  User: L.User, // Me / Passport
+  Stamp: L.Stamp, // Passport chip
+  GraduationCap: L.GraduationCap, // Schools
+  Smile: L.Smile, // Kids
+  Menu: L.Menu,
+  // ── Atlas hub rooms ──
+  Map: L.Map, // Provinces
+  Crown: L.Crown, // Presidents
+  Award: L.Award, // Heroes
+  PawPrint: L.PawPrint, // Totems & clans
 };

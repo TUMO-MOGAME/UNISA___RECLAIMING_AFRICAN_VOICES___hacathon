@@ -36,6 +36,21 @@ import { ChatbotWidget } from "./src/components/ChatbotWidget";
 import { moduleById } from "./src/content";
 import { DEFAULT_LANG } from "./src/i18n";
 import { Lang } from "./src/content/types";
+import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
+import { CountriesScreen } from "./src/components/CountriesScreen";
+import { WatchScreen } from "./src/components/WatchScreen";
+import { WatchItemScreen } from "./src/components/WatchItemScreen";
+import { JourneyScreen } from "./src/components/JourneyScreen";
+import { StageScreen } from "./src/components/StageScreen";
+import { PassportScreen } from "./src/components/PassportScreen";
+import { KidsScreen } from "./src/components/KidsScreen";
+import { KidsStageScreen } from "./src/components/KidsStageScreen";
+import { SchoolsScreen } from "./src/components/SchoolsScreen";
+import { historyTrail } from "./src/content/history-trail";
+import { stageId } from "./src/services/progress/progress";
+import type { NavId } from "./src/components/shell/nav";
+import { DEFAULT_COUNTRY } from "./src/content/anthems";
+import { useProgress } from "./src/services/progress/useProgress";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
 
@@ -65,12 +80,73 @@ type Route =
   | { name: "days" }
   | { name: "totems" }
   | { name: "heroes" }
-  | { name: "hero"; id: string };
+  | { name: "hero"; id: string }
+  // ── Architecture v2 rooms (docs/13-architecture-v2-plan.md §4) ──
+  | { name: "countries" }
+  | { name: "watch" }
+  | { name: "watchItem"; id: string }
+  | { name: "journey" }
+  | { name: "stage"; id: string }
+  | { name: "kids" }
+  | { name: "kidsStage"; id: string }
+  | { name: "schools" }
+  | { name: "passport" };
+
+// Route-name groupings for the shell. Deliberately `Set<string>` (see the note in App below).
+const OWN_SCROLL = new Set(["home", "atlas", "provinces", "presidents", "president", "days", "totems", "heroes", "hero"]);
+const ATLAS_ROOMS = new Set(["atlas", "provinces", "province", "city", "presidents", "president", "days", "totems", "heroes", "hero", "reader"]);
+const ARCHIVE_ROOMS = new Set(["archive", "heritage", "about"]);
+const WATCH_ROOMS = new Set(["watch", "watchItem"]);
+const ROOT_ROOMS = new Set(["home", "journey", "watch", "kids", "schools", "passport", "countries"]);
+// Routes whose React key must include the id, so moving between two of them remounts (and re-fades)
+// rather than reusing the previous item's mounted state.
+const KEYED_ROUTES = new Set(["reader", "province", "city", "president", "hero", "watchItem"]);
+
+// One Journey stage. Lives out here on purpose: inlining it in App's route switch made the
+// type-checker recurse over the (now 24-member) route union until it stopped finishing.
+function StageRoute({
+  milestoneId,
+  lang,
+  country,
+  progress,
+  onBack,
+}: {
+  milestoneId: string;
+  lang: Lang;
+  country: string;
+  progress: ReturnType<typeof useProgress>;
+  onBack: () => void;
+}) {
+  // Stages are numbered from 1 along the trail, so a stage id stays stable as the trail grows.
+  const idx = historyTrail.findIndex((m) => m.id === milestoneId);
+  if (idx < 0) return null;
+  const n = idx + 1;
+  const sid = stageId(country, n);
+  return (
+    <StageScreen
+      milestoneId={milestoneId}
+      lang={lang}
+      stageNumber={n}
+      alreadyDone={progress.progress.stagesDone.includes(sid)}
+      onComplete={(cardId) => {
+        progress.completeStage(sid);
+        if (cardId) progress.awardCard(cardId);
+        progress.touchToday();
+      }}
+      onBack={onBack}
+    />
+  );
+}
 
 export default function App() {
   // Default language is always English (the guaranteed base for every string); the picker switches it
   // app-wide, and any language without reviewed copy honestly falls back to English (see i18n/localize).
   const [lang, setLang] = useState<Lang>(DEFAULT_LANG);
+  // Selected country — moved out of the hero into the shell header (v2 D3), so it is shared app-wide
+  // and the forthcoming /countries page can drive it too.
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  // Device-local progress (D5) — no account, no PII, never leaves the device.
+  const progress = useProgress();
   // Route HISTORY (not a single route): push to navigate, pop to go back — so Back always returns
   // to where the user actually came from (e.g. Reader→Atlas, City→Province, Archive→President).
   const [stack, setStack] = useState<Route[]>([{ name: "home" }]);
@@ -104,6 +180,12 @@ export default function App() {
       case "archive":
       case "heritage":
       case "about":
+      case "countries":
+      case "watch":
+      case "journey":
+      case "kids":
+      case "schools":
+      case "passport":
         push({ name: pageId } as Route);
         break;
       default:
@@ -142,10 +224,12 @@ export default function App() {
   // Don't let a font-loading failure (e.g. offline) block rendering.
   const ready = fontsLoaded || !!fontError;
 
-  const routeKey =
-    route.name === "reader" || route.name === "province" || route.name === "city" || route.name === "president" || route.name === "hero"
-      ? `${route.name}:${route.id}`
-      : route.name;
+  // Widened to `string` and matched against a plain Set for the same reason as the shell groupings
+  // below: a chain of `route.name === ...` comparisons makes tsc walk the whole route union per
+  // narrowing and stop finishing.
+  const routeName: string = route.name;
+  const routeId = (route as { id?: string }).id;
+  const routeKey = routeId && KEYED_ROUTES.has(routeName) ? `${routeName}:${routeId}` : routeName;
 
   // Flat switch (not a nested ternary) — keeps each screen at the same shallow depth, which also
   // keeps the type-checker from recursing too deeply over the route union.
@@ -158,11 +242,29 @@ export default function App() {
         ) : null;
       }
       case "atlas":
-        return <AtlasScreen lang={lang} onBack={back} onOpen={(id) => push({ name: "reader", id })} />;
+        return (
+          <AtlasScreen
+            lang={lang}
+            onBack={back}
+            onOpen={(id) => push({ name: "reader", id })}
+            onProvinces={() => push({ name: "provinces" })}
+            onPresidents={() => push({ name: "presidents" })}
+            onHeroes={() => push({ name: "heroes" })}
+            onTotems={() => push({ name: "totems" })}
+            onDays={() => push({ name: "days" })}
+          />
+        );
       case "about":
         return <AboutSourcesScreen lang={lang} onBack={back} />;
       case "archive":
-        return <ArchiveScreen lang={lang} onBack={back} />;
+        return (
+          <ArchiveScreen
+            lang={lang}
+            onBack={back}
+            onHeritage={() => push({ name: "heritage" })}
+            onAbout={() => push({ name: "about" })}
+          />
+        );
       case "heritage":
         return <HeritageLedgerScreen lang={lang} onBack={back} />;
       case "provinces":
@@ -191,6 +293,98 @@ export default function App() {
         const h = heroById(route.id);
         return h ? <HeroScreen hero={h} onBack={back} lang={lang} /> : null;
       }
+      // ── The v2 rooms ──
+      case "watch":
+        return (
+          <WatchScreen
+            lang={lang}
+            progress={progress.progress}
+            onOpen={(id) => push({ name: "watchItem", id })}
+          />
+        );
+      case "watchItem": {
+        // The watch page — the player plus the Sources & provenance block the Reader has no room
+        // for. The Reader itself is still reachable from it and is unchanged.
+        const w = moduleById(route.id);
+        return w ? (
+          <WatchItemScreen
+            module={w}
+            lang={lang}
+            onLangChange={setLang}
+            onBack={back}
+            onJourney={() => push({ name: "journey" })}
+            onReader={() => push({ name: "reader", id: w.id })}
+            onAbout={() => push({ name: "about" })}
+            onWatched={progress.setWatched}
+          />
+        ) : null;
+      }
+      case "journey":
+        return (
+          <JourneyScreen
+            lang={lang}
+            country={country}
+            progress={progress.progress}
+            onOpenStage={(milestoneId) => push({ name: "stage", id: milestoneId })}
+          />
+        );
+      case "stage":
+        // Rendered by a top-level component, not inline. Inlining this block made tsc walk the whole
+        // route union per narrowing and stop finishing — the same trap the shell groupings hit.
+        return (
+          <StageRoute
+            milestoneId={route.id}
+            lang={lang}
+            country={country}
+            progress={progress}
+            onBack={back}
+          />
+        );
+      case "passport":
+        return (
+          <PassportScreen
+            lang={lang}
+            country={country}
+            progress={progress.progress}
+            persists={progress.persists}
+            onReset={progress.reset}
+            onJourney={() => push({ name: "journey" })}
+          />
+        );
+      case "kids":
+        return (
+          <KidsScreen
+            lang={lang}
+            progress={progress.progress}
+            onPlay={(totemId) => push({ name: "kidsStage", id: totemId })}
+            onCards={() => push({ name: "passport" })}
+            onExit={() => setStack([{ name: "home" }])}
+          />
+        );
+      case "kidsStage":
+        return (
+          <KidsStageScreen
+            lang={lang}
+            totemId={route.id}
+            onNext={(nextId) => setStack((st) => [...st.slice(0, -1), { name: "kidsStage", id: nextId }])}
+            onBack={back}
+            onEarn={(totemId) => {
+              progress.awardCard(totemId);
+              progress.touchToday();
+            }}
+          />
+        );
+      case "schools":
+        return <SchoolsScreen lang={lang} onOpenStage={(id) => push({ name: "stage", id })} />;
+      case "countries":
+        return (
+          <CountriesScreen
+            lang={lang}
+            country={country}
+            onChange={setCountry}
+            onEnter={() => push({ name: "journey" })}
+          />
+        );
       default:
         return (
           <HomeGallery
@@ -207,47 +401,78 @@ export default function App() {
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
             onStoryActiveChange={setStoryActive}
+            onWatch={() => push({ name: "watch" })}
+            onJourneyRoom={() => push({ name: "journey" })}
+            onCountries={() => push({ name: "countries" })}
+            onKids={() => push({ name: "kids" })}
+            onSchools={() => push({ name: "schools" })}
+            country={country}
+            progress={progress.progress}
+            onResumeStage={(id) => push({ name: "stage", id })}
           />
         );
     }
   }
 
-  // Home + Reader are full-bleed (hero image / immersive reader); every other screen is a content
-  // page that reads better as a centred column on wide screens instead of stretching edge-to-edge.
-  // These pages use the full-width two-pane "index" layout (SideIndexScroll); the rest stay centred.
-  const fullBleed =
-    route.name === "home" ||
-    route.name === "reader" ||
-    route.name === "atlas" ||
-    route.name === "provinces" ||
-    route.name === "presidents" ||
-    route.name === "president" || // wide layout: important-dates sidebar + content
-    route.name === "days" ||
-    route.name === "totems" || // wide layout: totems sidebar + content
-    route.name === "heroes" ||
-    route.name === "hero"; // wide layout: heroes sidebar + content
+  // ── Shell configuration (v2 §5) ────────────────────────────────────────
+  // NOTE: these lists are plain `string[]`, and the route name is widened to `string` before any
+  // lookup. Matching them against the Route union instead makes tsc walk the whole union per call
+  // and blows its stack (the same recursion this file already guards elsewhere). Keep it as strings.
+  //
+  // "own"       — the route scrolls itself (its own ScrollView or SideIndexScroll two-pane layout).
+  // "immersive" — no chrome: the Reader, a film, a dot-story fill the viewport.
+  // "page"      — the shell scrolls it and appends the footer. Everything else.
+  const name = routeName;
+  const shellMode: ShellMode =
+    name === "reader" ? "immersive" : OWN_SCROLL.has(name) ? "own" : "page";
+
+  // Which nav item to mark. The Atlas rooms all belong to Atlas; the Trust screens to Archive;
+  // a single film's page belongs to Watch.
+  const activeNav: NavId | null = ATLAS_ROOMS.has(name)
+    ? "atlas"
+    : ARCHIVE_ROOMS.has(name)
+      ? "archive"
+      : WATCH_ROOMS.has(name)
+        ? "watch"
+        : ROOT_ROOMS.has(name)
+          ? (name as NavId)
+          : null;
+
+  // Home's hero is full-bleed, so the header sits transparently on top of it rather than above it.
+  const overHero = name === "home";
+
+  const goto = (id: NavId) => {
+    if (id === "home") setStack([{ name: "home" }]);
+    else push({ name: id } as Route);
+  };
 
   return (
     <SafeAreaProvider>
       <View style={styles.app}>
         <StatusBar style="light" />
-        {/* Full-bleed on web — the app fills the whole viewport like a website. Content screens are
-            centred to a readable max-width; the hero/reader fill the screen. */}
         <View style={styles.frame}>
           {ready && (
-            <Fade key={routeKey} style={{ flex: 1 }}>
-              {fullBleed ? (
-                renderRoute()
-              ) : (
-                <View style={styles.centerWrap}>
-                  <View style={styles.centerInner}>{renderRoute()}</View>
-                </View>
-              )}
-            </Fade>
+            <AppShell
+              mode={storyActive ? "immersive" : shellMode}
+              lang={lang}
+              onLangChange={setLang}
+              country={country}
+              onCountryChange={setCountry}
+              active={activeNav}
+              onNavigate={goto}
+              overHero={overHero}
+              cards={progress.progress.cards.length}
+              onAbout={() => push({ name: "about" })}
+              onHeritage={() => push({ name: "heritage" })}
+            >
+              <Fade key={routeKey} style={{ flex: 1 }}>
+                {renderRoute()}
+              </Fade>
+            </AppShell>
           )}
         </View>
         {/* The conversational guide floats above every screen (answers only from site content; can
-            navigate). Rendered outside the route Fade so it persists across navigation. */}
+            navigate). Rendered outside the shell so it persists across navigation. */}
         {ready && !storyActive && <ChatbotWidget lang={lang} onNavigate={navigateTo} />}
       </View>
     </SafeAreaProvider>
