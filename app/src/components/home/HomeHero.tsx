@@ -25,6 +25,11 @@ import { Icon } from "../../ui";
 // on; it is the escape hatch if the hero is ever meant to hand off instead.
 //
 // The deeper, staged /journey page is reached from the nav, and is where future chapters get locked.
+//
+// ADDITIVE, NOT A REVERSAL (27 Aug): the trailer now also OFFERS a way into the deep version —
+// "Go deeper" on any dot opens that milestone's stage, and finishing the walk offers the whole
+// /journey room. The walk itself still opens in place and still never hands off on its own. The
+// difference matters: D2 is about what "Start the journey" does, and it still does the same thing.
 
 const PHOTO = "warm documentary photography, golden natural light, photorealistic, dignified African subjects, rich colour";
 const SLATE = "#000000"; // ground → pure black
@@ -42,6 +47,14 @@ const UI = {
   },
   keepWalking: { en: "Keep walking", tn: "Tswelela pele", af: "Stap verder", zu: "Qhubeka uhambe", xh: "Qhubeka uhambe", nso: "Tšwela pele", st: "Tsoela pele", ss: "Chubeka uhambe", ts: "Famba emahlweni", nr: "Ragela phambili", ve: "Bvelani phanḓa" },
   journeyDone: { en: "Restart the journey", tn: "Simolola leeto gape", af: "Herbegin die reis", zu: "Qalisa kabusha uhambo", xh: "Qalisa kwakhona uhambo", nso: "Thoma leeto gape", st: "Qala leeto hape", ss: "Cala kabusha luhambo", ts: "Sungula nakambe riendzo", nr: "Thoma godu ikhambo", ve: "Thoma hafhu lwendo" },
+  deeper: {
+    en: "Go deeper", tn: "Tsena boteng", af: "Gaan dieper", zu: "Ngena ujule", xh: "Ngena nzulu",
+    nso: "Tsena ka botebo", st: "Kena botebong", ss: "Ngena ujule", ts: "Nghena endzeni", nr: "Ngena ujule", ve: "Dzhenani nga vhukuma",
+  },
+  openJourney: {
+    en: "Explore the full Journey", tn: "Batlisisa Leeto ka botlalo", af: "Verken die volle Reis", zu: "Hlola uHambo olugcwele", xh: "Phonononga uHambo olupheleleyo",
+    nso: "Utolla Leeto ka botlalo", st: "Hlahloba Leeto ka botlalo", ss: "Hlola Luhambo loluphelele", ts: "Kambisisa Riendzo hinkwaro", nr: "Hlola iKhambo elizeleko", ve: "Ṱoḓisisani Lwendo lwoṱhe",
+  },
   playStory: { en: "Play the story", tn: "Bapala kanegelo", af: "Speel die storie", zu: "Dlala indaba", xh: "Dlala ibali", nso: "Bapala kanegelo", st: "Bapala pale", ss: "Dlala indzaba", ts: "Tlanga ntsheketo", nr: "Dlala indaba", ve: "Tambani tshiitwa" },
   storySkip: { en: "Skip", tn: "Tlola", af: "Slaan oor", zu: "Yeqa", xh: "Tsiba", nso: "Fetiša", st: "Tlōla", ss: "Yeca", ts: "Tlula", nr: "Yeqa", ve: "Fhirisa" },
   storyBack: { en: "Back", tn: "Morago", af: "Terug", zu: "Emuva", xh: "Emva", nso: "Morago", st: "Morao", ss: "Emuva", ts: "Endzhaku", nr: "Emuva", ve: "Murahu" },
@@ -116,7 +129,19 @@ export function useHomeJourney({
 
 export type HomeJourney = ReturnType<typeof useHomeJourney>;
 
-export function HomeHero({ lang, journey }: { lang: Lang; journey: HomeJourney }) {
+export function HomeHero({
+  lang,
+  journey,
+  onOpenStage,
+  onOpenJourney,
+}: {
+  lang: Lang;
+  journey: HomeJourney;
+  /** "Go deeper" on a dot — opens that milestone's stage (watch → solve → collect). */
+  onOpenStage: (milestoneId: string) => void;
+  /** Offered when the walk reaches the end — the whole /journey room. */
+  onOpenJourney: () => void;
+}) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
@@ -215,7 +240,32 @@ export function HomeHero({ lang, journey }: { lang: Lang; journey: HomeJourney }
                       <Text style={styles.storyBtnText}>{t(UI.playStory, lang)}</Text>
                     </PressScale>
                   ) : null}
+
+                  {/* The way out of the trailer and into the deep version, on ANY dot. The trailer
+                      stays a trailer — a year, a line and a picture — and this is where someone who
+                      wants the sourced detail, the question and the card goes to get it. */}
+                  <PressScale
+                    style={styles.deeperBtn}
+                    onPress={() => onOpenStage(milestone.id)}
+                    accessibilityLabel={`${t(UI.deeper, lang)} — ${milestone.year} ${milestone.title}`}
+                  >
+                    <Icon.ArrowUpRight size={13} color="#FFFFFF" />
+                    <Text style={styles.deeperBtnText}>{t(UI.deeper, lang)}</Text>
+                  </PressScale>
                 </View>
+
+                {/* Reaching the last dot is the end of the trailer, so that is where the whole
+                    Journey room is offered rather than only "walk it again". */}
+                {walkState.atLast ? (
+                  <PressScale
+                    style={styles.endCta}
+                    onPress={onOpenJourney}
+                    accessibilityLabel={t(UI.openJourney, lang)}
+                  >
+                    <Text style={styles.endCtaText}>{t(UI.openJourney, lang)}</Text>
+                    <Icon.ArrowRight size={15} color="#FFFFFF" />
+                  </PressScale>
+                ) : null}
               </View>
             ) : (
               <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
@@ -298,6 +348,31 @@ const styles = StyleSheet.create({
   walkCtaDisabled: { opacity: 0.45 },
   // Secondary: outlined gold — opens this year's story (distinct from Keep walking so they're not confused).
   storyBtn: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(232,180,90,0.14)", borderWidth: 1, borderColor: "#E8B45A", borderRadius: radius.pill, paddingVertical: 8, paddingHorizontal: 14 },
+  deeperBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
+    borderRadius: radius.pill,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+  },
+  deeperBtnText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 13 },
+  endCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.dsBlue,
+    backgroundColor: "rgba(26,133,167,0.18)",
+    borderRadius: radius.pill,
+    paddingVertical: 11,
+    paddingHorizontal: 20,
+  },
+  endCtaText: { color: "#FFFFFF", fontFamily: fonts.bodyBold, fontSize: 14, letterSpacing: 0.2 },
   storyBtnText: { color: "#E8B45A", fontFamily: fonts.bodyBold, fontSize: 12.5, letterSpacing: 0.3 },
   mapSource: { alignSelf: "center", maxWidth: 560, color: "rgba(255,255,255,0.5)", fontFamily: fonts.serifItalic, fontSize: 12, lineHeight: 18, textAlign: "center" },
 });

@@ -131,6 +131,21 @@ format.
 **Parked, needs a decision not a task:** networked duels, anonymous handles, leaderboards. See
 [docs/14 §6](../docs/14-game-architecture.md).
 
+### Alongside — the hero trailer hands off to the deep version (27 Aug)
+
+D2 is unchanged: the hero's walk is the free trailer and still opens **in place**. What changed is
+that the trailer now offers a way *out* of itself, which it never did.
+
+- [x] HERO-01 "Go deeper" on any dot → that milestone's stage (watch → solve → collect)
+- [x] HERO-02 Reaching the last dot offers the whole `/journey` room, not only "walk it again"
+- [ ] HERO-03 **The trailer is South Africa only.** It walks `history-trail.ts` — 25 sourced SA
+      milestones — no matter which country is selected. Making it the pan-African trailer Tumo wants
+      needs per-country milestones, and those do not exist: `countries/` has one researched nation
+      (Botswana, 27 Aug) and 53 scaffolds. **No content, no trailer** — this unblocks per country as
+      each `countries/*.md` gets a sourced Milestones table, not before
+- [ ] HERO-04 Until then, make the trailer say *which* country's road it is walking, and say honestly
+      when the selected country has no trail yet rather than silently showing South Africa's
+
 ### Alongside — the language picker follows the country (27 Aug)
 
 - [x] LANG-01 `content/country-languages.ts` — a **sourced** country → language map, plus tests that pin the claims
