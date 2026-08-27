@@ -32,13 +32,14 @@ notarises the public-domain canon on a public blockchain. Humanities first; tech
 
 ## 3. Implemented — ✅ live now (no key required)
 
-> **Architecture v2 (26–27 Aug 2026) — 27 of 31 tasks.** The app moved from one long scrolling page to
+> **Architecture v2 (26–27 Aug 2026) — 30 of 31 tasks.** The app moved from one long scrolling page to
 > a site with rooms: a persistent two-tier header + footer on every route, `/countries` (54 nations +
-> anthems), `/watch`, `/journey` with 25 sourced stages, the watch → quiz → collect loop, `/passport`,
-> Kids mode, and a Schools dashboard over labelled demo data. Progress is device-local with no
-> accounts and no PII. Full plan and decisions D1–D6:
-> [13-architecture-v2-plan.md](13-architecture-v2-plan.md). Four tasks remain open — see
-> [STATUS.md](../STATUS.md).
+> anthems), `/watch` and a per-film watch page carrying its **Sources & provenance** block,
+> `/journey` with 25 sourced stages, the watch → quiz → collect loop, `/passport`, Kids mode, and a
+> Schools dashboard over labelled demo data. Home follows the planned section order. Progress is
+> device-local with no accounts and no PII. Full plan and decisions D1–D6:
+> [13-architecture-v2-plan.md](13-architecture-v2-plan.md). One task remains open — the V2-12 browser
+> re-walk, which needs a human. See [STATUS.md](../STATUS.md).
 
 **The shell & the rooms (v2)**
 - ✅ **Persistent shell** — two-tier header (wordmark · country ▾ · language ▾ · Passport chip, then
@@ -46,6 +47,9 @@ notarises the public-domain canon on a public blockchain. Humanities first; tech
 - ✅ **`/countries`** — all 54 African nations, searchable, with the national anthems re-homed here.
   Only South Africa is researched, and the other 53 say so honestly rather than inventing copy.
 - ✅ **`/watch`** — the browsable library over the existing modules, with real "% watched".
+- ✅ **`/watch/:id`** — the per-film watch page: scene player, Child⇄Adult, language ▾, Listen, and a
+  standing **Sources & provenance** block (adapted-from, the passage behind every scene, the
+  AI-imagery label, references). The Reader is one tap away and unchanged.
 - ✅ **`/journey` + stages** — 25 real milestones from the history trail; watch → quiz → heritage card.
 - ✅ **Grounded quiz** — 17 questions across 13 milestones, each answerable from that milestone's own
   cited note. Distractors are real facts from elsewhere on the trail, never invented falsehoods.
@@ -139,9 +143,9 @@ The app runs fully without these; each simply upgrades or swaps an already-worki
 - **Progress persistence is web-only.** Stars, cards and streaks survive a refresh on web
   (localStorage); on native they last the session and the Passport says so rather than implying a
   guarantee. Lands with WatermelonDB alongside the Archive's own native persistence.
-- **The Watch page reuses the Reader.** There is no dedicated watch page yet, which means the
-  **Sources & provenance panel** the v2 plan called for on each film does not exist (V2-15). Scene
-  provenance is still shown inside the Reader.
+- **No pre-v2 browser re-walk yet (V2-12).** Typecheck, the 117 tests and the web bundle are green,
+  and `app/src/routes.test.ts` pins the route/nav wiring, but no one has opened every pre-v2 screen in
+  a browser since the shell landed. No test here can see a layout.
 - **Quiz coverage is partial** — 13 of the 25 journey milestones have questions. The rest complete on
   the watch alone rather than inventing a question to fill the gap.
 - **25 controls in pre-v2 screens lack accessibility labels** (ArchiveScreen, CinematicReader,

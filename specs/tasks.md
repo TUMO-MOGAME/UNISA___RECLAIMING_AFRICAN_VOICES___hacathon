@@ -69,18 +69,18 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 - [x] V2-04 `components/shell/MobileTabBar.tsx` — `Journey · Watch · Atlas · Me` (<900px)
 - [x] V2-05 Extract the footer → `shell/SiteFooter.tsx` **verbatim** (D6), rendered on every route
 - [x] V2-06 Extract the hero → `home/HomeHero.tsx` **verbatim** (D6); `onStart` → `/journey` (D2)
-- [ ] V2-07 Rebuild Home to the new section order
+- [x] V2-07 Rebuild Home to the new section order — Hero → Continue → Watch rail → Journey preview → Countries → Atlas (+ room chips) → Kids/Schools → Archive
 - [x] V2-08 `CountriesScreen.tsx` — country rail + atmosphere panel + "the journey ahead"
 - [x] V2-09 Move the 54 flags + national anthems into `/countries` (D3); retire the floating hero picker
 - [x] V2-10 `AtlasHubScreen.tsx` — gathers Provinces · Presidents · Heroes · Totems · Days
-- [ ] V2-11 Archive gains its Trust sub-nav (Heritage Ledger, Sources & provenance)
-- [ ] V2-12 **Week gate** — tsc clean · web bundle green · every pre-v2 route re-walked · STATUS updated
+- [x] V2-11 Archive gains its Trust sub-nav (Heritage Ledger, Sources & provenance)
+- [ ] V2-12 **Week gate** — tsc clean ✅ · web bundle green ✅ · route wiring pinned by `src/routes.test.ts` ✅ · **every pre-v2 route re-walked in a browser — still outstanding, needs a human at the keyboard** · STATUS updated ✅
 
 ### Week 2 — Watch and Journey, the core loop (2–8 Sep)
 
 - [x] V2-13 `services/progress/` — types + local store (web + native) + hook (D5), unit-tested
 - [x] V2-14 `WatchScreen.tsx` — featured + rails + filter chips + search (existing content only)
-- [ ] V2-15 `WatchItemScreen.tsx` — player · Child⇄Adult · language ▾ · **Sources & provenance** · Ask Ubuntu
+- [x] V2-15 `WatchItemScreen.tsx` — player · Child⇄Adult · language ▾ · **Sources & provenance** · Ask Ubuntu
 - [x] V2-16 `JourneyScreen.tsx` — staged trail (done/current/locked) from `history-trail.ts`
 - [x] V2-17 `content/quiz.ts` + grounded questions for chapters 1–3 — every distractor must be defensible
 - [x] V2-18 `StageScreen.tsx` — WATCH → QUIZ → REWARD (wireframe 2e) + "Ask Ubuntu for a hint"

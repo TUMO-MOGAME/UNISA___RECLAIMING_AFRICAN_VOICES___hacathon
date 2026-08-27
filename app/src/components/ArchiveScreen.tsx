@@ -153,9 +153,35 @@ const UI = {
     en: "Refresh", tn: "Ntšhafatsa", af: "Verfris", zu: "Vuselela", xh: "Hlaziya",
     nso: "Mpshafatša", st: "Ntjhafatsa", ss: "Vuselela", ts: "Pfuxeta", nr: "Vuselela", ve: "Vusuludza",
   },
+
+  // ── Trust sub-nav (V2-11) — where an archive proves it can be trusted with a voice ──
+  trust: {
+    en: "Trust", tn: "Tshepo", af: "Vertroue", zu: "Ukwethemba", xh: "Ukuthemba",
+    nso: "Tshepo", st: "Tshepo", ss: "Kwetsemba", ts: "Ku tshemba", nr: "Ukuthemba", ve: "U fulufhela",
+  },
+  ledgerLink: {
+    en: "Heritage Ledger · on-chain", tn: "Rekoto ya Boswa · mo blockchain", af: "Erfenisregister · op-ketting", zu: "Irejista Yamagugu · ku-blockchain", xh: "Irejista Yelifa · kwi-blockchain",
+    nso: "Rejista ya Bohwa · go blockchain", st: "Rejista ya Lefa · ho blockchain", ss: "Irejista Yelifa · ku-blockchain", ts: "Rejista ya Ndzhaka · eka blockchain", nr: "Irejista Yelifa · ku-blockchain", ve: "Rejista ya Ifa · kha blockchain",
+  },
+  sourcesLink: {
+    en: "Sources & provenance", tn: "Metswedi le tshimologo", af: "Bronne en herkoms", zu: "Imithombo nemvelaphi", xh: "Imithombo nemvelaphi",
+    nso: "Methopo le tshimologo", st: "Mehlodi le tshimoloho", ss: "Imitfombo nemvelaphi", ts: "Tihlovo ni masungulo", nr: "Imithombo nemvelaphi", ve: "Zwiko na vhubvo",
+  },
 };
 
-export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void }) {
+export function ArchiveScreen({
+  lang,
+  onBack,
+  onHeritage,
+  onAbout,
+}: {
+  lang: Lang;
+  onBack: () => void;
+  /** The Heritage Ledger — on-chain provenance for the public canon. */
+  onHeritage: () => void;
+  /** "About the Sources" — the site-wide citation and AI-imagery statement. */
+  onAbout: () => void;
+}) {
   const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
   const player = useAudioPlayer();
 
@@ -330,6 +356,32 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
     <Screen tone="paper">
       <ScreenHeader kicker="Your voice, your history" title={t(UI.title, lang)} onBack={onBack} />
 
+      {/* Trust sub-nav (V2-11). An archive that asks for a person's voice has to show its own
+          receipts in the same room: what the canon is anchored to, and where every fact comes from. */}
+      <View style={styles.trustNav}>
+        <Text style={styles.trustLabel}>{t(UI.trust, lang).toUpperCase()}</Text>
+        <View style={styles.trustRow}>
+          <Pressable
+            style={styles.trustChip}
+            onPress={onHeritage}
+            accessibilityRole="link"
+            accessibilityLabel={t(UI.ledgerLink, lang)}
+          >
+            <Icon.Lock size={14} color={colors.dsBlue} />
+            <Text style={styles.trustChipText}>{t(UI.ledgerLink, lang)}</Text>
+          </Pressable>
+          <Pressable
+            style={styles.trustChip}
+            onPress={onAbout}
+            accessibilityRole="link"
+            accessibilityLabel={t(UI.sourcesLink, lang)}
+          >
+            <Icon.BookOpen size={14} color={colors.dsBlue} />
+            <Text style={styles.trustChipText}>{t(UI.sourcesLink, lang)}</Text>
+          </Pressable>
+        </View>
+      </View>
+
       <Body style={styles.intro}>{t(UI.intro, lang)}</Body>
 
       {isRecording ? (
@@ -457,6 +509,28 @@ export function ArchiveScreen({ lang, onBack }: { lang: Lang; onBack: () => void
 
 const styles = StyleSheet.create({
   intro: { marginBottom: spacing.lg },
+
+  // Trust sub-nav (V2-11)
+  trustNav: { marginBottom: spacing.lg },
+  trustLabel: {
+    color: colors.dsGray,
+    fontFamily: fonts.bodyBold,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginBottom: spacing.sm,
+  },
+  trustRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  trustChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    borderRadius: radius.pill,
+    paddingVertical: 9,
+    paddingHorizontal: 15,
+  },
+  trustChipText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 13 },
   recordBtn: {
     backgroundColor: "#FFFFFF",
     borderRadius: radius.pill,

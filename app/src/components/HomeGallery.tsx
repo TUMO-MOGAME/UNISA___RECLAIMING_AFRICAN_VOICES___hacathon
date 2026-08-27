@@ -15,6 +15,9 @@ import { SiteFooter } from "./shell/SiteFooter";
 import { HomeHero, HomeJourneyStory, useHomeJourney } from "./home/HomeHero";
 import { ResumeBar } from "./home/ResumeBar";
 import { literatureJourney } from "../content/journey";
+import { countries } from "../content/anthems";
+import { historyTrail } from "../content/history-trail";
+import { journeyMedia } from "../content/journey-media";
 
 // The front door — a scrolling "Modern South Africa" landing page: a full-bleed hero, then a stack of
 // alternating image/text sections divided by thick sa-blue rules. Each section maps to real app
@@ -86,6 +89,11 @@ const UI = {
     en: "Explore the atlas", tn: "Sekaseka atlase", af: "Verken die atlas", zu: "Hlola i-athrasi", xh: "Phonononga i-atlasi",
     nso: "Utolla athlase", st: "Hlahloba atlase", ss: "Hlola i-athlasi", ts: "Kambela atlasi", nr: "Hlola i-atlasi", ve: "Ṱolisisa athilasi",
   },
+  // NOTE (V2-07): the *Kicker / *Sub / *Cta strings for Totems, Provinces, Presidents, Heroes and
+  // National Days are no longer rendered — those five lost their own Home bands and are now chips
+  // under the single Atlas section, labelled with `totems` / `provinces` / `presidents` /
+  // `heroesTitle` / `days`. The copy is kept rather than deleted: it is reviewed-quality text in
+  // eleven languages, and if a band ever comes back it should come back with its own words.
   totemsKicker: {
     en: "The Living World", tn: "Lefatshe le le Tshelang", af: "Die Lewende Wêreld", zu: "Izwe Eliphilayo", xh: "Ilizwe Eliphilayo",
     nso: "Lefase le le Phelago", st: "Lefatshe le Phelang", ss: "Live Leliphilako", ts: "Misava leyi Hanyaka", nr: "Iphasi Eliphilako", ve: "Shango ḽi Tshilaho",
@@ -244,6 +252,116 @@ const UI = {
     en: "Back to top", tn: "Boela kwa godimo", af: "Terug na bo", zu: "Buyela phezulu", xh: "Buyela phezulu",
     nso: "Boela godimo", st: "Khutlela hodimo", ss: "Buyela etulu", ts: "Vuyela ehenhla", nr: "Buyela phezulu", ve: "Vhuyelela nṱha",
   },
+
+  // ── v2 Home order (V2-07): the rooms the front page now hands off to ──
+  libraryCta: {
+    en: "Browse the whole library", tn: "Bona laeborari yotlhe", af: "Blaai deur die hele biblioteek", zu: "Bheka wonke umtapo", xh: "Khangela lonke ithala leencwadi",
+    nso: "Lebelela laeborari ka moka", st: "Sheba laeborari kaofela", ss: "Buka wonkhe umtapo", ts: "Languta layiburari hinkwayo", nr: "Qala woke umtapo", ve: "Sedzani layiburari yoṱhe",
+  },
+  journeyKicker: {
+    en: "The Journey", tn: "Leeto", af: "Die Reis", zu: "Uhambo", xh: "Uhambo",
+    nso: "Leeto", st: "Leeto", ss: "Luhambo", ts: "Riendzo", nr: "Ikhambo", ve: "Lwendo",
+  },
+  journeyTitle: {
+    en: "Walk the timeline", tn: "Tsamaya mo nakong", af: "Stap deur die tydlyn", zu: "Hamba ngomlando", xh: "Hamba ngexesha",
+    nso: "Sepela ka nako", st: "Tsamaya ka nako", ss: "Hamba ngemlandvo", ts: "Famba hi nkarhi", nr: "Khamba ngomlando", ve: "Tshimbilani nga tshifhinga",
+  },
+  journeySub: {
+    en: "Every milestone on this road is sourced. Watch a moment, answer a grounded question, collect a heritage card.",
+    tn: "Kgato nngwe le nngwe mo tseleng e e na le motswedi. Lebelela nako, araba potso e e theilweng, o tseye karata ya boswa.",
+    af: "Elke mylpaal op hierdie pad het 'n bron. Kyk 'n oomblik, beantwoord 'n gegronde vraag, versamel 'n erfeniskaart.",
+    zu: "Sonke isigaba salo mgwaqo sinomthombo. Buka isikhathi, phendula umbuzo osekelwe, uthole ikhadi lamagugu.",
+    xh: "Lonke inqanaba lale ndlela linomthombo. Bukela umzuzu, phendula umbuzo osekelweyo, uqokelele ikhadi lelifa.",
+    nso: "Kgato ye nngwe le ye nngwe tseleng ye e na le mothopo. Lebelela nako, araba potšišo yeo e theilwego, o kgoboketše karata ya bohwa.",
+    st: "Mohato o mong le o mong tseleng ena o na le mohlodi. Sheba nako, araba potso e thehilweng, o bokelle karete ya lefa.",
+    ss: "Sonkhe sigaba salomgwaco sinemtfombo. Buka sikhatsi, phendvula umbuto losekelwe, utfole likhadi lelifa.",
+    ts: "Goza rin'wana na rin'wana ka gondzo leri ri na xihlovo. Languta nkarhi, hlamula xivutiso lexi seketeriweke, u hlengeleta khadi ra ndzhaka.",
+    nr: "Soke isigaba salomgwaqo sinomthombo. Buka isikhathi, phendula umbuzo osekelweko, uthole ikharada yelifa.",
+    ve: "Ḽiga ḽiṅwe na ḽiṅwe kha yeneyi nḓila ḽi na tshiko. Lavhelesa tshifhinga, fhindula mbudziso yo thewaho, kuvhanganya khadi ya ifa.",
+  },
+  journeyCta: {
+    en: "Open the journey", tn: "Bula leeto", af: "Open die reis", zu: "Vula uhambo", xh: "Vula uhambo",
+    nso: "Bula leeto", st: "Bula leeto", ss: "Vula luhambo", ts: "Pfula riendzo", nr: "Vula ikhambo", ve: "Vulani lwendo",
+  },
+  milestones: {
+    en: "milestones", tn: "dikgato", af: "mylpale", zu: "izigaba", xh: "amanqanaba",
+    nso: "dikgato", st: "mehato", ss: "tigaba", ts: "magoza", nr: "iingaba", ve: "maga",
+  },
+  countriesKicker: {
+    en: "The continent", tn: "Kontinente", af: "Die vasteland", zu: "Izwekazi", xh: "Ilizwekazi",
+    nso: "Kontinente", st: "Kontinente", ss: "Lizwekazi", ts: "Kontinente", nr: "Ikontinenti", ve: "Kontinente",
+  },
+  countriesTitle: {
+    en: "Africa's nations", tn: "Merafe ya Aforika", af: "Afrika se nasies", zu: "Izizwe zase-Afrika", xh: "Izizwe zase-Afrika",
+    nso: "Ditšhaba tša Afrika", st: "Dichaba tsa Afrika", ss: "Tive tase-Afrika", ts: "Matiko ya Afrika", nr: "Iintjhaba ze-Afrika", ve: "Dzitshaka dza Afrika",
+  },
+  countriesSub: {
+    en: "Every African nation has its flag here, and its anthem as the recordings arrive. South Africa is where this journey runs deepest today.",
+    tn: "Setšhaba sengwe le sengwe sa Aforika se na le folaga ya sona fa, le pina ya sona ya bosetšhaba fa direkoto di goroga. Aforika Borwa ke fa leeto le le tseneletseng thata gompieno.",
+    af: "Elke Afrika-nasie het sy vlag hier, en sy volkslied sodra die opnames beskikbaar is. Suid-Afrika is waar hierdie reis vandag die diepste loop.",
+    zu: "Sonke isizwe sase-Afrika sinefulegi laso lapha, neculo laso lesizwe njengoba amarekhodi efika. INingizimu Afrika yilapho lolu hambo lujule khona namuhla.",
+    xh: "Sonke isizwe sase-Afrika sinefulegi laso apha, nengoma yaso yesizwe njengoko iirekhodi zifika. UMzantsi Afrika kulapho olu hambo lunzulu khona namhlanje.",
+    nso: "Setšhaba se sengwe le se sengwe sa Afrika se na le folaga ya sona mo, le koša ya sona ya setšhaba ge direkoto di fihla. Afrika Borwa ke moo leeto le le tseneletšego kudu lehono.",
+    st: "Setjhaba se seng le se seng sa Afrika se na le folaga ya sona mona, le pina ya sona ya setjhaba ha direkoto di fihla. Afrika Borwa ke moo leeto lena le tebileng haholo kajeno.",
+    ss: "Sonkhe sive sase-Afrika sinelifulegi laso lapha, neliculo laso lesive njengoba emarekhodi efika. INingizimu Afrika kulapho loluhambo lujule khona lamuhla.",
+    ts: "Tiko rin'wana na rin'wana ra Afrika ri na ni mujeko wa rona laha, ni risimu ra rona ra tiko loko tirhekhodo ti fika. Afrika-Dzonga hi kona laha riendzo leri ri enteke swinene namuntlha.",
+    nr: "Soke isitjhaba se-Afrika sinefulege laso lapha, nengoma yaso yesitjhaba njengombana amarekhodo afika. ISewula Afrika kulapho ikhambo leli elitjhinga khona namhlanjesi.",
+    ve: "Tshaka iṅwe na iṅwe ya Afrika i na na fulaga yayo hafha, na luimbo lwayo lwa lushaka musi dzirekhodo dzi tshi swika. Afrika Tshipembe ndi hune lwendo ulu lwa dzika vhukuma ṋamusi.",
+  },
+  countriesCta: {
+    en: "Choose a country", tn: "Tlhopha naga", af: "Kies 'n land", zu: "Khetha izwe", xh: "Khetha ilizwe",
+    nso: "Kgetha naga", st: "Kgetha naha", ss: "Khetsa live", ts: "Hlawula tiko", nr: "Khetha inarha", ve: "Nangani shango",
+  },
+  roomsLabel: {
+    en: "Inside the Atlas", tn: "Mo teng ga Atlase", af: "Binne die Atlas", zu: "Ngaphakathi kwe-Athulasi", xh: "Ngaphakathi kwe-Atlasi",
+    nso: "Ka gare ga Atlase", st: "Ka hare ho Atlase", ss: "Ngekhatsi kwe-Athilasi", ts: "Endzeni ka Atlasi", nr: "Ngaphakathi kwe-Athulasi", ve: "Nga ngomu ha Atlasi",
+  },
+  familyKicker: {
+    en: "For families and classrooms", tn: "Go malapa le diphaposi tsa borutelo", af: "Vir gesinne en klaskamers", zu: "Kwemindeni namakilasi", xh: "Kwiintsapho neegumbi zokufundela",
+    nso: "Go malapa le diphapoši tša borutelo", st: "Bakeng sa malapa le diphaposi tsa borutelo", ss: "Kwemindeni nemakilasi", ts: "Eka mindyangu ni tiklasi", nr: "Kwemindeni namakilasi", ve: "Kha miṱa na kilasi",
+  },
+  kidsTitle: {
+    en: "Kids", tn: "Bana", af: "Kinders", zu: "Izingane", xh: "Abantwana",
+    nso: "Bana", st: "Bana", ss: "Bantfwana", ts: "Vana", nr: "Abantwana", ve: "Vhana",
+  },
+  kidsSub: {
+    en: "Audio-first stories with an animal guide, big picture answers, and cards to collect.",
+    tn: "Dikanegelo tsa go reediwa le mokaedi wa phologolo, dikarabo tse dikgolo tsa ditshwantsho, le dikarata tsa go kgobokanya.",
+    af: "Klankgedrewe stories met 'n dieregids, groot prentjie-antwoorde en kaarte om te versamel.",
+    zu: "Izindaba ezilalelwayo ezinomhlahlandlela oyisilwane, izimpendulo ezinezithombe ezinkulu, namakhadi okuqoqa.",
+    xh: "Amabali amamelwayo anesikhokelo esisilwanyana, iimpendulo ezinemifanekiso emikhulu, namakhadi okuqokelela.",
+    nso: "Dikanegelo tša go theeletšwa tšeo di nago le mohlahli wa phoofolo, dikarabo tše dikgolo tša diswantšho, le dikarata tša go kgoboketša.",
+    st: "Dipale tse mamelwang tse nang le motataisi wa phoofolo, dikarabo tse kgolo tsa ditshwantsho, le dikarete tsa ho bokella.",
+    ss: "Tindzaba letilalelwako letinemcondzisi lesilwane, timphendvulo letinetitfombe letinkhulu, nemakhadi ekucocelela.",
+    ts: "Mintsheketo yo yingiseriwa leyi nga ni murhetani wa xiharhi, tinhlamulo ta swifaniso leswikulu, ni tikhadi to hlengeleta.",
+    nr: "Iindaba ezilalelwako ezinomkhombandlela osilwana, iimpendulo ezineenthombe ezikhulu, namakharada wokubuthelela.",
+    ve: "Zwiitwa zwi thetshelesiwaho zwi re na mulangi wa phukha, phindulo dza zwifanyiso zwihulwane, na khadi dza u kuvhanganya.",
+  },
+  kidsCta: {
+    en: "Open Kids mode", tn: "Bula mokgwa wa bana", af: "Open Kinder-modus", zu: "Vula imodi yezingane", xh: "Vula imowudi yabantwana",
+    nso: "Bula mokgwa wa bana", st: "Bula mokgwa wa bana", ss: "Vula imodi yebantfwana", ts: "Pfula xiyimo xa vana", nr: "Vula imodi yabantwana", ve: "Vulani nḓila ya vhana",
+  },
+  schoolsTitle: {
+    en: "Schools", tn: "Dikolo", af: "Skole", zu: "Izikole", xh: "Izikolo",
+    nso: "Dikolo", st: "Dikolo", ss: "Tikolo", ts: "Swikolo", nr: "Iimtjhana", ve: "Zwikolo",
+  },
+  schoolsSub: {
+    en: "A teacher's dashboard over a demo class: assigned chapter, completion, average score — no learner data leaves the device.",
+    tn: "Boto ya morutabana mo phaposing ya sekao: kgaolo e e abilweng, tswelelopele, maduo a a magareng — ga go na tshedimosetso ya moithuti e e tswang mo sedirisiweng.",
+    af: "'n Onderwyser se paneel oor 'n demo-klas: toegewese hoofstuk, voltooiing, gemiddelde punt — geen leerderdata verlaat die toestel nie.",
+    zu: "Ideshibhodi kathisha ekilasini lesibonelo: isahluko esabelwe, ukuqedela, amaphuzu amaphakathi — awukho ulwazi lomfundi oluphuma kudivayisi.",
+    xh: "Ideshibhodi katitshala kwiklasi yomzekelo: isahluko esabelweyo, ukugqiba, amanqaku aphakathi — akukho lwazi lomfundi luphuma kwisixhobo.",
+    nso: "Deshiboto ya morutiši ka klaseng ya mohlala: kgaolo yeo e abilwego, phethagatšo, dintlha tša magareng — ga go na tshedimošo ya moithuti yeo e tšwago sedirišwaneng.",
+    st: "Deshiboto ya mosuwe sehlopheng sa mohlala: khaolo e abetsweng, ho phethwa, dintlha tse mahareng — ha ho tlhahisoleseding ya moithuti e tswang sesebedisweng.",
+    ss: "Ideshibhodi yathishela ekilasini lesibonelo: sehluko lesabelwe, kucedza, emaphuzu lasemkhatsini — akukho lwati lwemfundzi loluphuma kudivayisi.",
+    ts: "Dashiboto ya mudyondzisi eka klasi ya xikombiso: ndzima leyi averiweke, ku hetisisa, tinhlayo ta le xikarhi — a ku na vuxokoxoko bya mudyondzi lebyi humaka eka xitirhisiwa.",
+    nr: "Ideshibhodi kathitjhere eklasini yesibonelo: isahluko esabelweko, ukuqeda, amaphuzu asephakathi — akukho ilwazi lomfundi eliphuma kudivayisi.",
+    ve: "Dashiboto ya mudededzi kha kilasi ya tsumbo: ndima yo ṋekedzwaho, u fhedza, mbuelo ya vhukati — a hu na mafhungo a mugudi ane a bva kha tshishumiswa.",
+  },
+  schoolsCta: {
+    en: "Open the classroom", tn: "Bula phaposi ya borutelo", af: "Open die klaskamer", zu: "Vula ikilasi", xh: "Vula igumbi lokufundela",
+    nso: "Bula phapoši ya borutelo", st: "Bula phaposi ya borutelo", ss: "Vula likilasi", ts: "Pfula klasi", nr: "Vula ikilasi", ve: "Vulani kilasi",
+  },
 };
 
 // Feeds the page scroll position + viewport height to each Section for scroll-in reveals + parallax.
@@ -270,6 +388,11 @@ export function HomeGallery({
   onHeroes,
   onStoryActiveChange,
   onJourney,
+  onWatch,
+  onJourneyRoom,
+  onCountries,
+  onKids,
+  onSchools,
   country,
   progress,
   onResumeStage,
@@ -290,6 +413,16 @@ export function HomeGallery({
   onStoryActiveChange?: (active: boolean) => void;
   /** Escape hatch only — the hero's walk is the free trailer and opens in place (D2 revised). */
   onJourney?: () => void;
+  /** The Watch room — the browsable library (v2 V2-07). */
+  onWatch: () => void;
+  /**
+   * The `/journey` ROOM, reached from the Journey-preview section. Deliberately not `onJourney`:
+   * that one is the hero's unwired escape hatch, and the hero's walk still opens in place (D2).
+   */
+  onJourneyRoom: () => void;
+  onCountries: () => void;
+  onKids: () => void;
+  onSchools: () => void;
   /** For the resume bar: which country's journey, and how far along it is. */
   country: string;
   progress: Progress;
@@ -356,10 +489,20 @@ export function HomeGallery({
         {/* Resume bar — renders nothing until a stage has actually been finished (V2-20). */}
         <ResumeBar lang={lang} country={country} progress={progress} onResume={onResumeStage} />
 
-        {/* ── THE LITERATURE — illustrated bookshelf (slate) ─────────────────── */}
-        <LiteratureShelf lang={lang} onOpen={onOpen} />
+        {/* ── WATCH — the library rail (V2-07 §3) ────────────────────────────── */}
+        {/* The four pillars are the films the Watch room leads with, so the bookshelf IS the rail;
+            "Browse the whole library" opens /watch, where the rest of the catalogue lives. */}
+        <LiteratureShelf lang={lang} onOpen={onOpen} onWatch={onWatch} />
 
-        {/* ── CULTURAL ATLAS (black) ─────────────────────────────────────────── */}
+        {/* ── JOURNEY PREVIEW (V2-07 §4) ─────────────────────────────────────── */}
+        <JourneyPreview lang={lang} country={country} progress={progress} onOpen={onJourneyRoom} />
+
+        {/* ── THE CONTINENT — 54 countries (V2-07 §5) ────────────────────────── */}
+        <CountriesStrip lang={lang} country={country} onOpen={onCountries} />
+
+        {/* ── CULTURAL ATLAS (V2-07 §6) ──────────────────────────────────────── */}
+        {/* One Atlas section now, not six: Provinces, Presidents, Heroes, Totems and Days are rooms
+            INSIDE the Atlas hub (V2-10), so they keep a shortcut here rather than a band each. */}
         <Section
           tone="slate"
           reverse
@@ -369,64 +512,18 @@ export function HomeGallery({
           intro={t(UI.atlasSub, lang)}
         >
           <CtaButton label={t(UI.atlasCta, lang)} onPress={onAtlas} />
+          <Text style={styles.roomsLabel}>{t(UI.roomsLabel, lang).toUpperCase()}</Text>
+          <View style={styles.roomsRow}>
+            <RoomChip icon={<Icon.Map size={15} color={colors.dsBlue} />} label={t(UI.provinces, lang)} onPress={onProvinces} />
+            <RoomChip icon={<Icon.Crown size={15} color={colors.dsBlue} />} label={t(UI.presidents, lang)} onPress={onPresidents} />
+            <RoomChip icon={<Icon.Award size={15} color={colors.dsBlue} />} label={t(UI.heroesTitle, lang)} onPress={onHeroes} />
+            <RoomChip icon={<Icon.PawPrint size={15} color={colors.dsBlue} />} label={t(UI.totems, lang)} onPress={onTotems} />
+            <RoomChip icon={<Icon.CalendarDays size={15} color={colors.dsBlue} />} label={t(UI.days, lang)} onPress={onDays} />
+          </View>
         </Section>
 
-        {/* ── TOTEMS & CLANS (slate) ─────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={require("../../assets/animals/lion.webp")}
-          kicker={t(UI.totemsKicker, lang)}
-          title={t(UI.totems, lang)}
-          intro={t(UI.totemsSub, lang)}
-        >
-          <CtaButton label={t(UI.totemsCta, lang)} onPress={onTotems} />
-        </Section>
-
-        {/* ── THE NINE PROVINCES (slate) ─────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={heroSource(atlasModules[2])}
-          kicker={t(UI.provKicker, lang)}
-          title={t(UI.provinces, lang)}
-          intro={t(UI.provSub, lang)}
-        >
-          <CtaButton label={t(UI.provCta, lang)} onPress={onProvinces} />
-        </Section>
-
-        {/* ── THE PRESIDENTS (black) ─────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          reverse
-          image={heroSource(modules[2])}
-          kicker={t(UI.presKicker, lang)}
-          title={t(UI.presidents, lang)}
-          intro={t(UI.presSub, lang)}
-        >
-          <CtaButton label={t(UI.presCta, lang)} onPress={onPresidents} />
-        </Section>
-
-        {/* ── HEROES OF THE NATION (slate) ───────────────────────────────────── */}
-        <Section
-          tone="slate"
-          image={require("../../assets/generated/heroes-heroines-card.webp")}
-          kicker={t(UI.heroesKicker, lang)}
-          title={t(UI.heroesTitle, lang)}
-          intro={t(UI.heroesSub, lang)}
-        >
-          <CtaButton label={t(UI.heroesCta, lang)} onPress={onHeroes} />
-        </Section>
-
-        {/* ── NATIONAL DAYS (slate) ──────────────────────────────────────────── */}
-        <Section
-          tone="slate"
-          reverse
-          image={heroSource(atlasModules[1])}
-          kicker={t(UI.daysKicker, lang)}
-          title={t(UI.days, lang)}
-          intro={t(UI.daysSub, lang)}
-        >
-          <CtaButton label={t(UI.daysCta, lang)} onPress={onDays} />
-        </Section>
+        {/* ── KIDS & SCHOOLS (V2-07 §7) ──────────────────────────────────────── */}
+        <KidsAndSchools lang={lang} onKids={onKids} onSchools={onSchools} />
 
         {/* ── COMMUNITY ARCHIVE (slate) ──────────────────────────────────────── */}
         <Section
@@ -555,7 +652,16 @@ function Section({
 // ── THE LITERATURE — a full-width "bookshelf": each of the four pillars is a book on the shelf, with
 // its own cover art, title, author·year, back-cover blurb and a "Begin reading" invitation. Unlike the
 // alternating Section, this band is full-width so the covers themselves carry the imagery. ────────────
-function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) => void }) {
+function LiteratureShelf({
+  lang,
+  onOpen,
+  onWatch,
+}: {
+  lang: Lang;
+  onOpen: (id: string) => void;
+  /** Into the Watch room, where the Atlas films sit alongside these four. */
+  onWatch: () => void;
+}) {
   const { width } = useWindowDimensions();
   const wide = width >= 768;
   const [journeyOpen, setJourneyOpen] = useState(false);
@@ -587,10 +693,22 @@ function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) =>
           <Text style={[styles.sectionIntro, wide && styles.sectionIntroWide, { color: colors.dsGray, maxWidth: 620 }]}>
             {t(UI.pillarsSub, lang)}
           </Text>
-          <Pressable style={styles.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
-            <Icon.Play size={17} color="#000000" fill="#000000" />
-            <Text style={styles.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
-          </Pressable>
+          <View style={styles.shelfActions}>
+            <Pressable style={styles.journeyBtn} onPress={() => setJourneyOpen(true)} accessibilityLabel={t(UI.playJourney, lang)}>
+              <Icon.Play size={17} color="#000000" fill="#000000" />
+              <Text style={styles.journeyBtnText}>{t(UI.playJourney, lang)}</Text>
+            </Pressable>
+            <Pressable
+              style={styles.libraryBtn}
+              onPress={onWatch}
+              accessibilityRole="link"
+              accessibilityLabel={t(UI.libraryCta, lang)}
+            >
+              <Icon.Film size={16} color={colors.dsBlue} />
+              <Text style={styles.libraryBtnText}>{t(UI.libraryCta, lang)}</Text>
+              <Icon.ArrowRight size={15} color={colors.dsBlue} />
+            </Pressable>
+          </View>
         </View>
         <View style={styles.shelf}>
           {modules.map((m, i) => (
@@ -602,6 +720,170 @@ function LiteratureShelf({ lang, onOpen }: { lang: Lang; onOpen: (id: string) =>
         <Journey slides={literatureJourney} lang={lang} onClose={() => setJourneyOpen(false)} />
       </Modal>
     </Animated.View>
+  );
+}
+
+// ── JOURNEY PREVIEW — a teaser for the /journey room (V2-07) ──────────────────────────────────────
+// Reads the SAME `history-trail.ts` the Journey and the hero walk read, so the years and the count on
+// the front page can never drift from the trail itself. The progress line only appears once there is
+// real progress to show — an empty "0 of 25" would be noise, not a promise.
+function JourneyPreview({
+  lang,
+  country,
+  progress,
+  onOpen,
+}: {
+  lang: Lang;
+  country: string;
+  progress: Progress;
+  onOpen: () => void;
+}) {
+  const total = historyTrail.length;
+  const done = progress.stagesDone.filter((s) => s.startsWith(`${country}:`)).length;
+  const first = historyTrail[0];
+  const last = historyTrail[total - 1];
+  // The next three milestones from where the walker actually is.
+  const upcoming = historyTrail.slice(Math.min(done, Math.max(0, total - 3)), Math.min(done + 3, total));
+
+  // The trail's own opening picture, so the preview and the walk show the same thing.
+  const image = journeyMedia[first.id]?.image ?? heroSource(atlasModules[2]);
+
+  return (
+    <Section
+      tone="slate"
+      image={image}
+      kicker={t(UI.journeyKicker, lang)}
+      title={t(UI.journeyTitle, lang)}
+      intro={t(UI.journeySub, lang)}
+    >
+      <Text style={styles.roomsLabel}>
+        {first.year} – {last.year} · {done > 0 ? `${done} / ${total}` : total} {t(UI.milestones, lang)}
+      </Text>
+      <View style={styles.trailPeek}>
+        {upcoming.map((m) => (
+          <View key={m.id} style={styles.trailPeekItem}>
+            <Text style={styles.trailPeekYear}>{m.year}</Text>
+            <Text style={styles.trailPeekTitle} numberOfLines={1}>
+              {m.title}
+            </Text>
+          </View>
+        ))}
+      </View>
+      <CtaButton label={t(UI.journeyCta, lang)} onPress={onOpen} />
+    </Section>
+  );
+}
+
+// ── THE CONTINENT — the /countries room (V2-07) ───────────────────────────────────────────────────
+// A band of real flags rather than a claim about them. The selected country leads; the count is read
+// off the data so it stays true as anthems and nations are added.
+function CountriesStrip({ lang, country, onOpen }: { lang: Lang; country: string; onOpen: () => void }) {
+  const { width } = useWindowDimensions();
+  const shown = Math.max(8, Math.min(18, Math.floor(width / 46)));
+  const selected = countries.find((c) => c.code === country);
+  // The selected country first, then the rest in their listed order.
+  const rail = [
+    ...(selected ? [selected] : []),
+    ...countries.filter((c) => c.code !== country),
+  ].slice(0, shown);
+
+  return (
+    <View style={styles.countriesBand}>
+      <View style={styles.countriesInner}>
+        <View style={styles.accentBar} />
+        <Text style={[styles.sectionKicker, { color: colors.dsBlue }]}>{t(UI.countriesKicker, lang).toUpperCase()}</Text>
+        <Text style={[styles.sectionTitle, { color: "#FFFFFF" }]}>{t(UI.countriesTitle, lang)}</Text>
+        <Text style={[styles.sectionIntro, { color: colors.dsGray, maxWidth: 640 }]}>{t(UI.countriesSub, lang)}</Text>
+
+        <Pressable
+          style={styles.flagRail}
+          onPress={onOpen}
+          accessibilityRole="link"
+          accessibilityLabel={`${t(UI.countriesCta, lang)} — ${countries.length}`}
+        >
+          {rail.map((c) => (
+            <Image
+              key={c.code}
+              source={c.flag}
+              style={[styles.railFlag, c.code === country && styles.railFlagOn]}
+              resizeMode="cover"
+            />
+          ))}
+          <View style={styles.railMore}>
+            <Text style={styles.railMoreText}>+{countries.length - rail.length}</Text>
+          </View>
+        </Pressable>
+
+        <CtaButton label={t(UI.countriesCta, lang)} onPress={onOpen} />
+      </View>
+    </View>
+  );
+}
+
+// ── KIDS & SCHOOLS — the two rooms built for the people who use this in a home or a classroom ─────
+function KidsAndSchools({ lang, onKids, onSchools }: { lang: Lang; onKids: () => void; onSchools: () => void }) {
+  const { width } = useWindowDimensions();
+  const wide = width >= 768;
+  return (
+    <View style={styles.familyBand}>
+      <View style={styles.countriesInner}>
+        <View style={styles.accentBar} />
+        <Text style={[styles.sectionKicker, { color: colors.dsBlue }]}>{t(UI.familyKicker, lang).toUpperCase()}</Text>
+        <View style={[styles.familyRow, wide && styles.familyRowWide]}>
+          <FamilyCard
+            icon={<Icon.Smile size={22} color={colors.dsBlue} />}
+            title={t(UI.kidsTitle, lang)}
+            sub={t(UI.kidsSub, lang)}
+            cta={t(UI.kidsCta, lang)}
+            onPress={onKids}
+          />
+          <FamilyCard
+            icon={<Icon.GraduationCap size={22} color={colors.dsBlue} />}
+            title={t(UI.schoolsTitle, lang)}
+            sub={t(UI.schoolsSub, lang)}
+            cta={t(UI.schoolsCta, lang)}
+            onPress={onSchools}
+          />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function FamilyCard({
+  icon,
+  title,
+  sub,
+  cta,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  sub: string;
+  cta: string;
+  onPress: () => void;
+}) {
+  return (
+    <PressScale style={styles.familyCard} onPress={onPress} accessibilityLabel={`${title} — ${cta}`}>
+      {icon}
+      <Text style={styles.familyTitle}>{title}</Text>
+      <Text style={styles.familySub}>{sub}</Text>
+      <View style={styles.familyCtaRow}>
+        <Text style={styles.familyCtaText}>{cta.toUpperCase()}</Text>
+        <Icon.ArrowRight size={15} color={colors.dsBlue} />
+      </View>
+    </PressScale>
+  );
+}
+
+// A shortcut into one Atlas room, sitting under the single Atlas section (V2-07 folds the five
+// former room bands into these chips so nothing lost its entry point from Home).
+function RoomChip({ icon, label, onPress }: { icon: React.ReactNode; label: string; onPress: () => void }) {
+  return (
+    <PressScale style={styles.roomChip} onPress={onPress} accessibilityLabel={label}>
+      {icon}
+      <Text style={styles.roomChipText}>{label}</Text>
+    </PressScale>
   );
 }
 
@@ -726,6 +1008,106 @@ const styles = StyleSheet.create({
   journeyBtn: { flexDirection: "row", alignItems: "center", gap: spacing.sm, alignSelf: "flex-start", backgroundColor: "#FFFFFF", borderRadius: radius.pill, paddingVertical: 12, paddingHorizontal: 20, marginTop: spacing.lg },
   journeyBtnText: { color: "#000000", fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3 },
   shelf: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.lg },
+
+  // ── v2 Home sections (V2-07) ──
+  shelfActions: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: spacing.md },
+  libraryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    alignSelf: "flex-start",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.22)",
+    borderRadius: radius.pill,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: spacing.lg,
+  },
+  libraryBtnText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 14.5 },
+
+  // Small label above a row of chips / a stat line inside a Section.
+  roomsLabel: {
+    color: colors.dsGray,
+    fontFamily: fonts.bodyBold,
+    fontSize: 11,
+    letterSpacing: 2,
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
+  roomsRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  roomChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    borderRadius: radius.pill,
+    paddingVertical: 9,
+    paddingHorizontal: 15,
+  },
+  roomChipText: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 13.5 },
+
+  // Journey preview: the next few milestones, straight off the trail.
+  trailPeek: { gap: spacing.sm, marginBottom: spacing.md },
+  trailPeekItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    borderLeftWidth: 2,
+    borderLeftColor: BLUE,
+    paddingLeft: spacing.md,
+  },
+  trailPeekYear: { color: BLUE, fontFamily: fonts.bodyBold, fontSize: 13, width: 44 },
+  trailPeekTitle: { color: "rgba(255,255,255,0.82)", fontFamily: fonts.body, fontSize: 14, flexShrink: 1 },
+
+  // The continent band.
+  countriesBand: {
+    width: "100%",
+    backgroundColor: SLATE,
+    borderTopWidth: 8,
+    borderTopColor: BLUE,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  countriesInner: { maxWidth: 1200, alignSelf: "center", width: "100%" },
+  flagRail: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginTop: spacing.lg },
+  railFlag: { width: 34, height: 23, borderRadius: 3, backgroundColor: "#222", opacity: 0.65 },
+  railFlagOn: { opacity: 1, borderWidth: 1.5, borderColor: BLUE },
+  railMore: {
+    height: 23,
+    paddingHorizontal: 9,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  railMoreText: { color: colors.dsGray, fontFamily: fonts.bodyBold, fontSize: 12 },
+
+  // Kids + Schools.
+  familyBand: {
+    width: "100%",
+    backgroundColor: SLATE,
+    borderTopWidth: 8,
+    borderTopColor: BLUE,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
+  familyRow: { gap: spacing.md, marginTop: spacing.md },
+  familyRowWide: { flexDirection: "row" },
+  familyCard: {
+    flex: 1,
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    backgroundColor: "#141414",
+  },
+  familyTitle: { color: "#FFFFFF", fontFamily: fonts.displaySemi, fontSize: 26, letterSpacing: -0.4 },
+  familySub: { color: colors.dsGray, fontFamily: fonts.body, fontSize: 14.5, lineHeight: 23 },
+  familyCtaRow: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: spacing.xs },
+  familyCtaText: { color: BLUE, fontFamily: fonts.bodyBold, fontSize: 12, letterSpacing: 1.6 },
   bookCol: { width: "23.5%" }, // 4-up shelf row on wide
   bookColNarrow: { width: "100%" },
   bookCard: {

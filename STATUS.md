@@ -27,7 +27,7 @@ _Last updated: 2026-08-27 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
-| **🏗️ Architecture v2 — multi-page transformation** | 🟢 **27 of 31 tasks done (26–27 Aug)** — every room is live; 4 tasks genuinely open, listed under Next action · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
+| **🏗️ Architecture v2 — multi-page transformation** | 🟢 **30 of 31 tasks done (26–27 Aug)** — every room is live and the Watch page carries its provenance block; the one open task is the **V2-12 browser re-walk** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
 
 ---
 
@@ -61,25 +61,30 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## ⏭️ Next action
 
-Architecture v2 is **27 of 31**. Every room in the nav is live and verified. Four tasks are
-genuinely still open and are **not** ticked:
+Architecture v2 is **30 of 31**. V2-07, V2-11 and V2-15 all landed on 27 Aug. **One task is still
+open, and it is the one a machine cannot finish:**
 
-- **V2-07** Rebuild Home to the new section order. The resume bar landed, but Home still runs the
-  old section sequence rather than Hero → Continue → Watch rail → Journey preview → Countries →
-  Atlas → Kids/Schools → Archive.
-- **V2-11** Archive's Trust sub-nav (Heritage Ledger, Sources & provenance). Both screens exist and
-  are reachable from the footer; they just have no sub-nav inside Archive.
-- **V2-12** The Week 1 gate. Typecheck, tests and bundle are green, but I never explicitly re-walked
-  every pre-v2 route in a browser to prove nothing regressed.
-- **V2-15** `WatchItemScreen`. Watch opens the existing `CinematicReader` instead, which was a
-  deliberate reuse — but it means the **Sources & provenance** panel the plan called for on the watch
-  page does not exist yet. Given the integrity rule, this is the most load-bearing of the four.
+- **V2-12 — the Week 1 gate.** Three of its four conditions are met and re-verified: typecheck
+  clean, web bundle green, and route wiring now pinned by a test
+  ([app/src/routes.test.ts](app/src/routes.test.ts)) that fails the build if a route loses its
+  `case`, if the nav points at a room that does not exist, or if the chatbot cannot open one.
+  **What is still not done is the part that matters: nobody has re-walked every pre-v2 route in a
+  browser and looked at it.** No test in this repo can see a layout. This needs Tumo at the keyboard
+  (`npm run web`), walking Home → Reader → Atlas → Provinces → Province → City → Presidents →
+  President → Heroes → Hero → Totems → Days → Archive → Ledger → About, plus the new rooms, and
+  confirming the **hero and the footer look exactly as they did** (D6). Until that happens V2-12
+  stays unticked.
 
 Then:
 
 1. **Tumo's language review.** The v2 UI strings are machine-quality across the 10 non-English
    languages. The **Setswana** especially wants your eye — the nav (`shell/nav.ts`), the Kids
-   greetings (`KidsScreen.tsx`), and the Passport privacy copy.
+   greetings (`KidsScreen.tsx`), and the Passport privacy copy. **New on 27 Aug and unreviewed:**
+   the Watch page's provenance labels (`WatchItemScreen.tsx` — "Sources & provenance", "Adapted
+   from", "The passage behind each scene"), the new Home sections (`HomeGallery.tsx` — the Journey
+   preview, the continent band, Kids/Schools) and the Archive's Trust chips (`ArchiveScreen.tsx`).
+   These sit on the most integrity-sensitive surface in the app, so a wrong word costs more here
+   than elsewhere.
 2. **Accessibility retrofit on the pre-v2 screens** — 25 unlabelled controls, listed in the
    2026-08-27 log entry. Its own task, deliberately not folded into v2.
 3. **Native persistence for progress** — web persists; native is session-only and says so. Lands with
@@ -189,6 +194,44 @@ Then:
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-27 (later)** — **V2-15, V2-07 and V2-11 done. Architecture v2 is 30 of 31.**
+  **V2-15 `WatchItemScreen` — the reason this was the load-bearing one.** `/watch` used to hand
+  straight off to the `CinematicReader`. The Reader is a fine player but it is a *book*: a scene's
+  sourcing lives in the margin of one paper page, visible only while you are on that page. The plan
+  asked the watch page for a standing **Sources & provenance** block, and that is now what it has —
+  what the film is adapted from (`module.source`), the passage behind **every** scene (each
+  `scene.sourceNote`, tappable to jump there), the AI-imagery label, the full `references[]`, and the
+  project's one rule in the reader's own language. **Not one word of it is authored**; it is all read
+  off content that has been in `src/content/*.ts` since the modules were written. The data was always
+  there — nothing had ever put it in front of a viewer.
+  Also on the page: the scene player with a chapter-tick strip, the Child⇄Adult toggle, the language
+  picker, Listen, "Continue the journey", "Open the full reader" (the Reader is unchanged and one tap
+  away) and "Ask Ubuntu about this story".
+  **Two things fell out of building it.** `progress.setWatched` existed, was unit-tested, and was
+  **never called by anything** — so the "% watched" pill on the Watch cards was always 0. The watch
+  page now reports its position and those pills mean something. And the chatbot had no way to be
+  asked a question by a screen, so `services/chatbot/askBus.ts` is a one-listener bridge: the widget
+  registers on mount, a page calls `askUbuntu(question)`. Deliberately a no-op when no widget is
+  mounted rather than a crash.
+  **V2-07 Home rebuilt to the planned order** — Hero → Continue → Watch rail → Journey preview →
+  Countries → Atlas → Kids/Schools → Archive. The bookshelf **is** the watch rail (the four pillars
+  are what the library leads with) and gained "Browse the whole library →". The Journey preview and
+  the continent band read from `history-trail.ts` and `anthems.ts`, so the years, the milestone count
+  and the 54 flags on the front page cannot drift from the data. **What changed for the worse and why
+  it is still right:** Provinces, Presidents, Heroes, Totems and National Days each lost their own
+  full-width band. They are rooms *inside* the Atlas hub, and six Atlas bands on one page was the old
+  architecture arguing with the new one. They keep a labelled chip row under the single Atlas section,
+  so nothing lost its shortcut from Home — but it is a real reduction and Tumo should look at it.
+  **V2-11 Archive's Trust sub-nav** — the Heritage Ledger and Sources & provenance now sit at the top
+  of the Archive itself, not only in the footer. A room that asks a person for their voice should show
+  its own receipts in the same room.
+  **V2-12 partly advanced, deliberately NOT ticked.** Added `src/routes.test.ts`: it parses the
+  `Route` union, `renderRoute` and `nav.ts` and fails if a route loses its case, if a nav item or
+  mobile tab points at a room that does not exist, or if the chatbot's orchestrator cannot open one.
+  That closes the "dead nav item" class of regression. It does **not** close the gate — no test here
+  can see a layout, and the browser re-walk still needs a human.
+  Verified: typecheck clean · **117/117 tests** · web bundle green.
 
 - **2026-08-27** — **Architecture v2: 27 of 31 tasks done — every room in the D1 nav is live and real.**
   **V2-20** the resume bar — and it renders **nothing** until a stage is actually finished. A bar

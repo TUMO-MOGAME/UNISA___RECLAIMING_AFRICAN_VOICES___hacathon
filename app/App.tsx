@@ -39,6 +39,7 @@ import { Lang } from "./src/content/types";
 import { AppShell, type ShellMode } from "./src/components/shell/AppShell";
 import { CountriesScreen } from "./src/components/CountriesScreen";
 import { WatchScreen } from "./src/components/WatchScreen";
+import { WatchItemScreen } from "./src/components/WatchItemScreen";
 import { JourneyScreen } from "./src/components/JourneyScreen";
 import { StageScreen } from "./src/components/StageScreen";
 import { PassportScreen } from "./src/components/PassportScreen";
@@ -95,7 +96,11 @@ type Route =
 const OWN_SCROLL = new Set(["home", "atlas", "provinces", "presidents", "president", "days", "totems", "heroes", "hero"]);
 const ATLAS_ROOMS = new Set(["atlas", "provinces", "province", "city", "presidents", "president", "days", "totems", "heroes", "hero", "reader"]);
 const ARCHIVE_ROOMS = new Set(["archive", "heritage", "about"]);
+const WATCH_ROOMS = new Set(["watch", "watchItem"]);
 const ROOT_ROOMS = new Set(["home", "journey", "watch", "kids", "schools", "passport", "countries"]);
+// Routes whose React key must include the id, so moving between two of them remounts (and re-fades)
+// rather than reusing the previous item's mounted state.
+const KEYED_ROUTES = new Set(["reader", "province", "city", "president", "hero", "watchItem"]);
 
 // One Journey stage. Lives out here on purpose: inlining it in App's route switch made the
 // type-checker recurse over the (now 24-member) route union until it stopped finishing.
@@ -219,10 +224,12 @@ export default function App() {
   // Don't let a font-loading failure (e.g. offline) block rendering.
   const ready = fontsLoaded || !!fontError;
 
-  const routeKey =
-    route.name === "reader" || route.name === "province" || route.name === "city" || route.name === "president" || route.name === "hero"
-      ? `${route.name}:${route.id}`
-      : route.name;
+  // Widened to `string` and matched against a plain Set for the same reason as the shell groupings
+  // below: a chain of `route.name === ...` comparisons makes tsc walk the whole route union per
+  // narrowing and stop finishing.
+  const routeName: string = route.name;
+  const routeId = (route as { id?: string }).id;
+  const routeKey = routeId && KEYED_ROUTES.has(routeName) ? `${routeName}:${routeId}` : routeName;
 
   // Flat switch (not a nested ternary) — keeps each screen at the same shallow depth, which also
   // keeps the type-checker from recursing too deeply over the route union.
@@ -250,7 +257,14 @@ export default function App() {
       case "about":
         return <AboutSourcesScreen lang={lang} onBack={back} />;
       case "archive":
-        return <ArchiveScreen lang={lang} onBack={back} />;
+        return (
+          <ArchiveScreen
+            lang={lang}
+            onBack={back}
+            onHeritage={() => push({ name: "heritage" })}
+            onAbout={() => push({ name: "about" })}
+          />
+        );
       case "heritage":
         return <HeritageLedgerScreen lang={lang} onBack={back} />;
       case "provinces":
@@ -279,16 +293,32 @@ export default function App() {
         const h = heroById(route.id);
         return h ? <HeroScreen hero={h} onBack={back} lang={lang} /> : null;
       }
-      // The v2 rooms. Each is an honest placeholder naming what lands there and when, until its
-      // real screen arrives in Weeks 2–3 — a live nav item must never be a dead link.
+      // ── The v2 rooms ──
       case "watch":
         return (
           <WatchScreen
             lang={lang}
             progress={progress.progress}
-            onOpen={(id) => push({ name: "reader", id })}
+            onOpen={(id) => push({ name: "watchItem", id })}
           />
         );
+      case "watchItem": {
+        // The watch page — the player plus the Sources & provenance block the Reader has no room
+        // for. The Reader itself is still reachable from it and is unchanged.
+        const w = moduleById(route.id);
+        return w ? (
+          <WatchItemScreen
+            module={w}
+            lang={lang}
+            onLangChange={setLang}
+            onBack={back}
+            onJourney={() => push({ name: "journey" })}
+            onReader={() => push({ name: "reader", id: w.id })}
+            onAbout={() => push({ name: "about" })}
+            onWatched={progress.setWatched}
+          />
+        ) : null;
+      }
       case "journey":
         return (
           <JourneyScreen
@@ -371,6 +401,11 @@ export default function App() {
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
             onStoryActiveChange={setStoryActive}
+            onWatch={() => push({ name: "watch" })}
+            onJourneyRoom={() => push({ name: "journey" })}
+            onCountries={() => push({ name: "countries" })}
+            onKids={() => push({ name: "kids" })}
+            onSchools={() => push({ name: "schools" })}
             country={country}
             progress={progress.progress}
             onResumeStage={(id) => push({ name: "stage", id })}
@@ -387,18 +422,21 @@ export default function App() {
   // "own"       — the route scrolls itself (its own ScrollView or SideIndexScroll two-pane layout).
   // "immersive" — no chrome: the Reader, a film, a dot-story fill the viewport.
   // "page"      — the shell scrolls it and appends the footer. Everything else.
-  const name: string = route.name;
+  const name = routeName;
   const shellMode: ShellMode =
     name === "reader" ? "immersive" : OWN_SCROLL.has(name) ? "own" : "page";
 
-  // Which nav item to mark. The Atlas rooms all belong to Atlas; the Trust screens to Archive.
+  // Which nav item to mark. The Atlas rooms all belong to Atlas; the Trust screens to Archive;
+  // a single film's page belongs to Watch.
   const activeNav: NavId | null = ATLAS_ROOMS.has(name)
     ? "atlas"
     : ARCHIVE_ROOMS.has(name)
       ? "archive"
-      : ROOT_ROOMS.has(name)
-        ? (name as NavId)
-        : null;
+      : WATCH_ROOMS.has(name)
+        ? "watch"
+        : ROOT_ROOMS.has(name)
+          ? (name as NavId)
+          : null;
 
   // Home's hero is full-bleed, so the header sits transparently on top of it rather than above it.
   const overHero = name === "home";
