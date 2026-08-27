@@ -32,6 +32,28 @@ notarises the public-domain canon on a public blockchain. Humanities first; tech
 
 ## 3. Implemented — ✅ live now (no key required)
 
+> **Architecture v2 (26–27 Aug 2026) — 27 of 31 tasks.** The app moved from one long scrolling page to
+> a site with rooms: a persistent two-tier header + footer on every route, `/countries` (54 nations +
+> anthems), `/watch`, `/journey` with 25 sourced stages, the watch → quiz → collect loop, `/passport`,
+> Kids mode, and a Schools dashboard over labelled demo data. Progress is device-local with no
+> accounts and no PII. Full plan and decisions D1–D6:
+> [13-architecture-v2-plan.md](13-architecture-v2-plan.md). Four tasks remain open — see
+> [STATUS.md](../STATUS.md).
+
+**The shell & the rooms (v2)**
+- ✅ **Persistent shell** — two-tier header (wordmark · country ▾ · language ▾ · Passport chip, then
+  the six nav items) and the footer, on every route. Mobile drops to a 4-tab bar.
+- ✅ **`/countries`** — all 54 African nations, searchable, with the national anthems re-homed here.
+  Only South Africa is researched, and the other 53 say so honestly rather than inventing copy.
+- ✅ **`/watch`** — the browsable library over the existing modules, with real "% watched".
+- ✅ **`/journey` + stages** — 25 real milestones from the history trail; watch → quiz → heritage card.
+- ✅ **Grounded quiz** — 17 questions across 13 milestones, each answerable from that milestone's own
+  cited note. Distractors are real facts from elsewhere on the trail, never invented falsehoods.
+- ✅ **`/passport`** — level, stars, streak, 27-card totem grid, country stamps, real erasure.
+- ✅ **Kids mode** — animal of the day, picture quiz on real totem terms, 3-second grown-ups gate.
+- ✅ **Schools** — teacher dashboard over **seeded demo data**, labelled as such on screen at all times.
+- ✅ **i18n enforced by test** — 331 UI strings across 28 files, all 11 languages, checked in CI.
+
 **Reading & literature**
 - ✅ Cinematic **Reader** for all four pillars — full-bleed AI image + scrim + overlaid text, a real
   page-turn book, ambient soundtrack, **Child/Adult** toggle, scene navigation.
@@ -114,6 +136,17 @@ The app runs fully without these; each simply upgrades or swaps an already-worki
   Botlhale key lands.
 - On a **native** build, the Journey walker and films degrade to placeholders/stills (web is the demo
   target and is fully featured).
+- **Progress persistence is web-only.** Stars, cards and streaks survive a refresh on web
+  (localStorage); on native they last the session and the Passport says so rather than implying a
+  guarantee. Lands with WatermelonDB alongside the Archive's own native persistence.
+- **The Watch page reuses the Reader.** There is no dedicated watch page yet, which means the
+  **Sources & provenance panel** the v2 plan called for on each film does not exist (V2-15). Scene
+  provenance is still shown inside the Reader.
+- **Quiz coverage is partial** — 13 of the 25 journey milestones have questions. The rest complete on
+  the watch alone rather than inventing a question to fill the gap.
+- **25 controls in pre-v2 screens lack accessibility labels** (ArchiveScreen, CinematicReader,
+  ConsentSheet, LanguagePicker, ProvincesScreens, SideIndexScroll and others). Every v2 room is
+  labelled; the retrofit is its own task.
 
 ---
 
@@ -121,7 +154,7 @@ The app runs fully without these; each simply upgrades or swaps an already-worki
 
 1. Turn on the African-AI loop (Botlhale voice + Lelapa transcription + Supabase sharing) so Community
    Impact is *demonstrated*, not conceptual.
-2. Native parity (WatermelonDB persistence + `expo-video`).
+2. Native parity (WatermelonDB persistence for both the Archive and progress + `expo-video`).
 3. Depth pass on the four pillars; native-speaker review of translations.
 4. Ship Mantswe a Batho + the Ingestion Library so the archive grows itself.
 5. Heritage Ledger Phase B (named certificate NFTs).

@@ -4,7 +4,7 @@
 > of "done." For the structured **implemented vs. planned** view, see
 > [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-08-26 — by Tumo (via Claude)_
+_Last updated: 2026-08-27 — by Tumo (via Claude)_
 
 ---
 
