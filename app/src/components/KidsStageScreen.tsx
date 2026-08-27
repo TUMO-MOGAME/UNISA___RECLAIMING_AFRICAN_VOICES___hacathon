@@ -106,7 +106,7 @@ export function KidsStageScreen({
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
-      <Pressable onPress={onBack} style={styles.back} accessibilityRole="link">
+      <Pressable onPress={onBack} style={styles.back} accessibilityRole="link" accessibilityLabel={t(UI.back, lang)}>
         <Icon.ChevronLeft size={20} color="rgba(255,255,255,0.7)" />
         <Text style={styles.backText}>{t(UI.back, lang)}</Text>
       </Pressable>
@@ -155,7 +155,7 @@ export function KidsStageScreen({
               <Icon.Sparkles key={i} size={26} color={colors.dsBlue} />
             ))}
           </View>
-          <Pressable onPress={next} style={styles.nextBtn} accessibilityRole="button">
+          <Pressable onPress={next} style={styles.nextBtn} accessibilityRole="button" accessibilityLabel={t(UI.again, lang)}>
             <Text style={styles.nextText}>{t(UI.again, lang)}</Text>
             <Icon.ArrowRight size={20} color={colors.night} />
           </Pressable>

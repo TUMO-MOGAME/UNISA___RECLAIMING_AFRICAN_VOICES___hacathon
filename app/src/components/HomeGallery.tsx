@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, Text, Pressable, Animated, Image, Modal, StyleSheet, useWindowDimensions, Linking } from "react-native";
 import { Module, Lang } from "../content/types";
+import type { Progress } from "../services/progress/progress";
 import { modules, atlasModules } from "../content";
 import { sceneImageSource } from "../content/images";
 import { t } from "../i18n";
@@ -12,6 +13,7 @@ import { Icon } from "../ui";
 import { Journey } from "./Journey";
 import { SiteFooter } from "./shell/SiteFooter";
 import { HomeHero, HomeJourneyStory, useHomeJourney } from "./home/HomeHero";
+import { ResumeBar } from "./home/ResumeBar";
 import { literatureJourney } from "../content/journey";
 
 // The front door — a scrolling "Modern South Africa" landing page: a full-bleed hero, then a stack of
@@ -268,6 +270,9 @@ export function HomeGallery({
   onHeroes,
   onStoryActiveChange,
   onJourney,
+  country,
+  progress,
+  onResumeStage,
 }: {
   lang: Lang;
   onLangChange: (l: Lang) => void;
@@ -283,8 +288,12 @@ export function HomeGallery({
   onHeroes: () => void;
   /** Notifies the app when a full-screen dot-story opens/closes (to hide the floating chatbot). */
   onStoryActiveChange?: (active: boolean) => void;
-  /** D2 — the hero's "Start the journey" now opens the dedicated /journey page. */
+  /** Escape hatch only — the hero's walk is the free trailer and opens in place (D2 revised). */
   onJourney?: () => void;
+  /** For the resume bar: which country's journey, and how far along it is. */
+  country: string;
+  progress: Progress;
+  onResumeStage: (milestoneId: string) => void;
 }) {
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
@@ -343,6 +352,9 @@ export function HomeGallery({
         {/* Extracted verbatim to home/HomeHero (v2 D6). The SA road, the guided walk and the
             dot-stories are unchanged; only their file moved. */}
         <HomeHero lang={lang} journey={journey} />
+
+        {/* Resume bar — renders nothing until a stage has actually been finished (V2-20). */}
+        <ResumeBar lang={lang} country={country} progress={progress} onResume={onResumeStage} />
 
         {/* ── THE LITERATURE — illustrated bookshelf (slate) ─────────────────── */}
         <LiteratureShelf lang={lang} onOpen={onOpen} />

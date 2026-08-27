@@ -371,6 +371,9 @@ export default function App() {
             onTotems={() => push({ name: "totems" })}
             onHeroes={() => push({ name: "heroes" })}
             onStoryActiveChange={setStoryActive}
+            country={country}
+            progress={progress.progress}
+            onResumeStage={(id) => push({ name: "stage", id })}
           />
         );
     }

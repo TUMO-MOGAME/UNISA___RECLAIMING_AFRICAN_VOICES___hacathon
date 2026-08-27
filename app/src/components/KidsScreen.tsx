@@ -113,7 +113,12 @@ export function KidsScreen({
         <Text style={styles.bigPlayText}>{t(UI.play, lang)}</Text>
       </Pressable>
 
-      <Pressable onPress={onCards} style={styles.bigSecondary} accessibilityRole="link">
+      <Pressable
+        onPress={onCards}
+        style={styles.bigSecondary}
+        accessibilityRole="link"
+        accessibilityLabel={`${t(UI.myCards, lang)} — ${progress.cards.length}`}
+      >
         <Icon.PawPrint size={22} color={colors.dsBlue} />
         <Text style={styles.bigSecondaryText}>{t(UI.myCards, lang)}</Text>
         <Text style={styles.cardCount}>

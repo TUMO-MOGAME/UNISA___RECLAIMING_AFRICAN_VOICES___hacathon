@@ -134,11 +134,11 @@ export function SiteFooter({
           </View>
           {/* Right: links + built-with (grouped here so the partners column stays compact) */}
           <View style={[styles.footerLinks, wide && styles.footerLinksWide]}>
-            <Pressable style={styles.footerLink} onPress={onAbout}>
+            <Pressable style={styles.footerLink} onPress={onAbout} accessibilityRole="link" accessibilityLabel={t(UI.about, lang)}>
               <Text style={styles.footerLinkText}>{t(UI.about, lang)}</Text>
               <Icon.ArrowRight size={16} color={colors.dsBlue} />
             </Pressable>
-            <Pressable style={styles.footerLink} onPress={onHeritage}>
+            <Pressable style={styles.footerLink} onPress={onHeritage} accessibilityRole="link" accessibilityLabel={t(UI.heritage, lang)}>
               <View style={styles.liveDot} />
               <Text style={styles.footerLinkText}>{t(UI.heritage, lang)}</Text>
             </Pressable>

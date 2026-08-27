@@ -153,7 +153,12 @@ export function PassportScreen({
       </View>
 
       {/* ── Journey progress ── */}
-      <Pressable onPress={onJourney} style={styles.journeyPanel} accessibilityRole="link">
+      <Pressable
+        onPress={onJourney}
+        style={styles.journeyPanel}
+        accessibilityRole="link"
+        accessibilityLabel={`${t(UI.journey, lang)} — ${nation.name}, ${pct}%`}
+      >
         <View style={styles.journeyTop}>
           <Image source={nation.flag} style={styles.flag} resizeMode="cover" />
           <View style={styles.journeyText}>
@@ -234,7 +239,12 @@ export function PassportScreen({
         {!persists ? <Text style={styles.privacyWarn}>{t(UI.sessionOnly, lang)}</Text> : null}
 
         {!confirming ? (
-          <Pressable onPress={() => setConfirming(true)} style={styles.forget} accessibilityRole="button">
+          <Pressable
+            onPress={() => setConfirming(true)}
+            style={styles.forget}
+            accessibilityRole="button"
+            accessibilityLabel={t(UI.forget, lang)}
+          >
             <Icon.Trash2 size={14} color="rgba(255,255,255,0.75)" />
             <Text style={styles.forgetText}>{t(UI.forget, lang)}</Text>
           </Pressable>
@@ -242,7 +252,12 @@ export function PassportScreen({
           <View style={styles.confirmBox}>
             <Text style={styles.confirmText}>{t(UI.forgetSure, lang)}</Text>
             <View style={styles.confirmRow}>
-              <Pressable onPress={() => setConfirming(false)} style={styles.cancel} accessibilityRole="button">
+              <Pressable
+                onPress={() => setConfirming(false)}
+                style={styles.cancel}
+                accessibilityRole="button"
+                accessibilityLabel={t(UI.cancel, lang)}
+              >
                 <Text style={styles.cancelText}>{t(UI.cancel, lang)}</Text>
               </Pressable>
               <Pressable
@@ -252,6 +267,7 @@ export function PassportScreen({
                 }}
                 style={styles.destructive}
                 accessibilityRole="button"
+                accessibilityLabel={t(UI.confirm, lang)}
               >
                 <Text style={styles.destructiveText}>{t(UI.confirm, lang)}</Text>
               </Pressable>

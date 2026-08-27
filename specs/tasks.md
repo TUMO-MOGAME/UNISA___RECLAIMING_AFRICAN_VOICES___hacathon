@@ -85,8 +85,8 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 - [x] V2-17 `content/quiz.ts` + grounded questions for chapters 1–3 — every distractor must be defensible
 - [x] V2-18 `StageScreen.tsx` — WATCH → QUIZ → REWARD (wireframe 2e) + "Ask Ubuntu for a hint"
 - [x] V2-19 Heritage cards — award on stage completion, 22 totems from `totems.ts`
-- [ ] V2-20 "Continue your journey" resume bar on Home, wired to real progress
-- [ ] V2-21 **Week gate** — tests + tsc + bundle green · STATUS updated
+- [x] V2-20 "Continue your journey" resume bar on Home, wired to real progress
+- [x] V2-21 **Week gate** — tests + tsc + bundle green · STATUS updated
 
 ### Week 3 — Kids, Schools, Passport, polish (9–15 Sep)
 
@@ -96,7 +96,7 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 - [x] V2-25 Grown-ups corner — hold-3-seconds gate out of Kids mode
 - [x] V2-26 `SchoolsScreen.tsx` — teacher dashboard over **seeded demo class data** (D5), labelled as demo
 - [x] V2-27 CAPS-alignment + lesson plans for chapters 1–3 (cite the CAPS document)
-- [ ] V2-28 **i18n sweep** — every new string in all 11 languages, honest EN fallback
-- [ ] V2-29 Accessibility + responsive pass — labels · contrast · touch targets · web keyboard nav
-- [ ] V2-30 POPIA review of every new surface
-- [ ] V2-31 **Programme gate** — final polish · docs updated · STATUS + tasks.md reconciled
+- [x] V2-28 **i18n sweep** — every new string in all 11 languages, honest EN fallback
+- [x] V2-29 Accessibility + responsive pass — labels · contrast · touch targets · web keyboard nav
+- [x] V2-30 POPIA review of every new surface
+- [x] V2-31 **Programme gate** — final polish · docs updated · STATUS + tasks.md reconciled

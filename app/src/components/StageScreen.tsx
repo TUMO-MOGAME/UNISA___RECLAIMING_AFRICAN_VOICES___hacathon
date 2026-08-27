@@ -26,6 +26,10 @@ import { STARS_PER_STAGE } from "../services/progress/progress";
 type Step = "watch" | "quiz" | "reward";
 
 const UI = {
+  back: {
+    en: "Back to the journey", tn: "Boela kwa leetong", af: "Terug na die reis", zu: "Buyela ohambweni", xh: "Buyela kuhambo",
+    nso: "Boela leetong", st: "Kgutlela leetong", ss: "Buyela eluhambweni", ts: "Tlhelela eriendzweni", nr: "Buyela ekhambweni", ve: "Vhuyelelani lwendoni",
+  },
   step: { en: "Step", tn: "Kgato", af: "Stap", zu: "Isinyathelo", xh: "Inyathelo", nso: "Kgato", st: "Mohato", ss: "Sinyatselo", ts: "Goza", nr: "Igadango", ve: "Ḽiga" },
   of: { en: "of", tn: "ya", af: "van", zu: "kwa", xh: "kwa", nso: "ya", st: "ya", ss: "kwa", ts: "ya", nr: "kwa", ve: "ya" },
   watch: { en: "Watch", tn: "Lebelela", af: "Kyk", zu: "Buka", xh: "Bukela", nso: "Lebelela", st: "Sheba", ss: "Buka", ts: "Languta", nr: "Buka", ve: "Lavhelesa" },
@@ -150,7 +154,12 @@ export function StageScreen({
   return (
     <>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.page}>
-        <Pressable onPress={onBack} style={styles.back} accessibilityRole="button">
+        <Pressable
+          onPress={onBack}
+          style={styles.back}
+          accessibilityRole="button"
+          accessibilityLabel={`${t(UI.back, lang)} — ${milestone.year} ${milestone.title}`}
+        >
           <Icon.ChevronLeft size={16} color="rgba(255,255,255,0.7)" />
           <Text style={styles.backText}>{milestone.year} · {milestone.title}</Text>
         </Pressable>
@@ -198,7 +207,12 @@ export function StageScreen({
               </View>
             ) : null}
 
-            <Pressable onPress={() => (questions.length ? setStep("quiz") : finish())} style={styles.cta}>
+            <Pressable
+              onPress={() => (questions.length ? setStep("quiz") : finish())}
+              style={styles.cta}
+              accessibilityRole="button"
+              accessibilityLabel={t(UI.toQuiz, lang)}
+            >
               <Text style={styles.ctaText}>{t(UI.toQuiz, lang)}</Text>
               <Icon.ArrowRight size={16} color={colors.night} />
             </Pressable>
@@ -227,7 +241,8 @@ export function StageScreen({
                     onPress={() => !checked && setPicked(i)}
                     disabled={checked}
                     accessibilityRole="radio"
-                    accessibilityState={{ selected: isPicked }}
+                    accessibilityState={{ selected: isPicked, disabled: checked }}
+                    accessibilityLabel={t(o.text, lang)}
                     style={[
                       styles.option,
                       isPicked && !checked && styles.optionPicked,
@@ -261,6 +276,11 @@ export function StageScreen({
               onPress={checked ? onNext : onCheck}
               disabled={picked === null}
               style={[styles.cta, picked === null && styles.ctaDisabled]}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: picked === null }}
+              accessibilityLabel={
+                checked ? (qIdx + 1 < questions.length ? t(UI.next, lang) : t(UI.continue, lang)) : t(UI.check, lang)
+              }
             >
               <Text style={styles.ctaText}>
                 {checked ? (qIdx + 1 < questions.length ? t(UI.next, lang) : t(UI.continue, lang)) : t(UI.check, lang)}
@@ -302,7 +322,12 @@ export function StageScreen({
 
             {!questions.length ? <Text style={styles.quiet}>{t(UI.noQuiz, lang)}</Text> : null}
 
-            <Pressable onPress={onBack} style={styles.cta}>
+            <Pressable
+              onPress={onBack}
+              style={styles.cta}
+              accessibilityRole="button"
+              accessibilityLabel={t(UI.continue, lang)}
+            >
               <Text style={styles.ctaText}>{t(UI.continue, lang)}</Text>
               <Icon.ArrowRight size={16} color={colors.night} />
             </Pressable>

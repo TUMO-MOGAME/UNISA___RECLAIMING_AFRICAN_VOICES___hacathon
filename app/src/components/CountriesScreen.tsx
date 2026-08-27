@@ -198,7 +198,7 @@ export function CountriesScreen({
             <Fact icon={<Icon.Map size={14} color={colors.dsBlue} />} text="9 provinces · totems · national days" />
           </View>
 
-          <Pressable onPress={onEnter} style={styles.cta} accessibilityRole="link">
+          <Pressable onPress={onEnter} style={styles.cta} accessibilityRole="link" accessibilityLabel={t(UI.enter, lang)}>
             <Text style={styles.ctaText}>{t(UI.enter, lang)}</Text>
             <Icon.ArrowRight size={16} color={colors.night} />
           </Pressable>

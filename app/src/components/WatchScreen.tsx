@@ -170,6 +170,7 @@ export function WatchScreen({
               onPress={() => setChip(c.key)}
               accessibilityRole="button"
               accessibilityState={{ selected: chip === c.key }}
+              accessibilityLabel={`${t(c.label as any, lang)} — ${c.n}`}
               style={[styles.chip, chip === c.key && styles.chipOn]}
             >
               <Text style={[styles.chipText, chip === c.key && styles.chipTextOn]}>

@@ -106,7 +106,12 @@ export function SchoolsScreen({ lang, onOpenStage }: { lang: Lang; onOpenStage: 
           <Text style={styles.assignedDue}>
             {t(UI.due, lang)} {DEMO_CLASS.dueLabel}
           </Text>
-          <Pressable onPress={() => onOpenStage(milestone.id)} style={styles.openBtn} accessibilityRole="link">
+          <Pressable
+            onPress={() => onOpenStage(milestone.id)}
+            style={styles.openBtn}
+            accessibilityRole="link"
+            accessibilityLabel={`${t(UI.openStage, lang)} — ${milestone.year} ${milestone.title}`}
+          >
             <Text style={styles.openBtnText}>{t(UI.openStage, lang)}</Text>
             <Icon.ArrowRight size={14} color={colors.night} />
           </Pressable>

@@ -27,7 +27,7 @@ _Last updated: 2026-08-26 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
-| **🏗️ Architecture v2 — multi-page transformation** (3 weeks, 26 Aug → 15 Sep) | 🟡 **in progress — Week 1** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
+| **🏗️ Architecture v2 — multi-page transformation** | 🟢 **27 of 31 tasks done (26–27 Aug)** — every room is live; 4 tasks genuinely open, listed under Next action · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
 
 ---
 
@@ -61,18 +61,33 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## ⏭️ Next action
 
-**Architecture v2, Week 1 — the shell and the split** (see [the plan](docs/13-architecture-v2-plan.md) §7):
+Architecture v2 is **27 of 31**. Every room in the nav is live and verified. Four tasks are
+genuinely still open and are **not** ticked:
 
-1. **V2-01** Extend the `Route` union in [App.tsx](app/App.tsx) with the nine new routes.
-2. **V2-05 / V2-06** Extract the **footer** and the **hero** out of `HomeGallery` **verbatim** into
-   `shell/SiteFooter.tsx` and `home/HomeHero.tsx`. Extract first, commit, verify, *then* re-wire — never
-   refactor and restyle in the same step (D6: if it looks different, it's wrong).
-3. **V2-02 / V2-03 / V2-04** Build `AppShell` + `SiteHeader` (D1 nav) + `MobileTabBar`, and render the
-   kept footer on every route.
-4. **V2-08 / V2-09** Build `/countries` and move the 54 flags + national anthems into it (D3).
-5. **V2-10** Build the Atlas hub so Provinces · Presidents · Heroes · Totems · Days keep a home under D1.
-6. **V2-12 (week gate)** `npx tsc --noEmit` clean, web bundle green, and **every pre-v2 route re-walked**
-   to prove nothing broke.
+- **V2-07** Rebuild Home to the new section order. The resume bar landed, but Home still runs the
+  old section sequence rather than Hero → Continue → Watch rail → Journey preview → Countries →
+  Atlas → Kids/Schools → Archive.
+- **V2-11** Archive's Trust sub-nav (Heritage Ledger, Sources & provenance). Both screens exist and
+  are reachable from the footer; they just have no sub-nav inside Archive.
+- **V2-12** The Week 1 gate. Typecheck, tests and bundle are green, but I never explicitly re-walked
+  every pre-v2 route in a browser to prove nothing regressed.
+- **V2-15** `WatchItemScreen`. Watch opens the existing `CinematicReader` instead, which was a
+  deliberate reuse — but it means the **Sources & provenance** panel the plan called for on the watch
+  page does not exist yet. Given the integrity rule, this is the most load-bearing of the four.
+
+Then:
+
+1. **Tumo's language review.** The v2 UI strings are machine-quality across the 10 non-English
+   languages. The **Setswana** especially wants your eye — the nav (`shell/nav.ts`), the Kids
+   greetings (`KidsScreen.tsx`), and the Passport privacy copy.
+2. **Accessibility retrofit on the pre-v2 screens** — 25 unlabelled controls, listed in the
+   2026-08-27 log entry. Its own task, deliberately not folded into v2.
+3. **Native persistence for progress** — web persists; native is session-only and says so. Lands with
+   WatermelonDB alongside the Archive's own native persistence (T024).
+4. **Quiz coverage** — 17 questions across 13 of the 25 milestones. The remaining 12 need sourced
+   questions before those stages feel finished.
+5. **Locked chapters on `/journey`** — the free/paid split Tumo described. The hero trailer is free
+   and stays free; the gating mechanism itself is not built.
 
 ### Parked (pre-v2, still open)
 
@@ -98,9 +113,9 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 | Phase | What | Target window | Status |
 |-------|------|---------------|--------|
-| **5.1 Shell** | Persistent header/footer · route split · `/countries` + anthems · Atlas hub | 26 Aug – 1 Sep | 🟡 in progress |
-| **5.2 Core loop** | `/watch` + player · `/journey` stages · quiz · heritage cards · progress store | 2 Sep – 8 Sep | ⬜ |
-| **5.3 Rooms + polish** | Passport · Kids · Schools · i18n sweep · a11y · POPIA review | 9 Sep – 15 Sep | ⬜ |
+| **5.1 Shell** | Persistent header/footer · route split · `/countries` + anthems · Atlas hub | 26 Aug – 1 Sep | ✅ done |
+| **5.2 Core loop** | `/watch` + player · `/journey` stages · quiz · heritage cards · progress store | 2 Sep – 8 Sep | ✅ done (early) |
+| **5.3 Rooms + polish** | Passport · Kids · Schools · i18n sweep · a11y · POPIA review | 9 Sep – 15 Sep | ✅ done (early) |
 
 ### Hackathon (complete)
 
@@ -174,6 +189,27 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-27** — **Architecture v2: 27 of 31 tasks done — every room in the D1 nav is live and real.**
+  **V2-20** the resume bar — and it renders **nothing** until a stage is actually finished. A bar
+  reading "Chapter 1 · 0%" on a first visit makes an empty app look like a chore list.
+  **V2-28 i18n as a test, not a sweep.** `i18n/ui-coverage.test.ts` walks every `const UI` block in
+  every component and fails the build if a string is missing any of the 11 languages, or is an empty
+  placeholder in one. It inspects **331 strings across 28 files** and all pass. I negative-tested it
+  by deleting one `nr` string: it failed and named the exact file, key and language. Content is
+  deliberately **out of scope** — a scene carries English plus what has actually been reviewed, and
+  forcing 11 languages onto it would invite the fabrication the project forbids.
+  **V2-29 a11y.** Every `Pressable` in every v2 room now carries a label and a role; 13 were missing.
+  **Known gap, stated plainly:** 25 `Pressable`s in **pre-existing** screens (ArchiveScreen,
+  CinematicReader, ConsentSheet, LanguagePicker, ProvincesScreens, SideIndexScroll, ArticleReader,
+  HeritageLedgerScreen, ChatbotWidget, CountryPicker) still lack labels. Retrofitting them is real
+  work on working code and was **not** in the v2 scope — it should be its own task, not smuggled in.
+  **V2-30 POPIA** — reviewed and written up in
+  [docs/05-popia-compliance.md](docs/05-popia-compliance.md). No v2 surface collects personal
+  information; verified mechanically that no `fetch`, Supabase call or upload path exists anywhere in
+  the new rooms or the progress store. The only text inputs are two search boxes, which are local
+  filter state.
+  Verified: typecheck clean · **112/112 tests** · web bundle green.
 
 - **2026-08-26 (late night)** — **Week 3 rooms built: Passport, Kids, Schools (V2-22 → V2-27).**
   `PassportScreen` — level, stars, streak, journey progress, the 27-totem card grid with locked slots,
