@@ -67,7 +67,7 @@ export function SiteHeader({
 
         <View style={styles.util}>
           <CountryPicker country={country} onChange={onCountryChange} lang={lang} />
-          <LanguagePicker lang={lang} onChange={onLangChange} compact={!wide} />
+          <LanguagePicker lang={lang} onChange={onLangChange} compact={!wide} country={country} />
           {cards > 0 ? (
             <Pressable
               onPress={() => onNavigate("passport")}

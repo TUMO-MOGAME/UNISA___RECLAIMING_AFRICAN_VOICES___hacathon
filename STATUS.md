@@ -27,6 +27,7 @@ _Last updated: 2026-08-27 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
+| **🎮 Know the Road — the game layer (Phase 6)** | 🟡 **planned, 0 of 10** — solving becomes the thing that moves you; decisions D7–D9 locked 27 Aug · plan: [docs/14-game-architecture.md](docs/14-game-architecture.md) |
 | **🏗️ Architecture v2 — multi-page transformation** | 🟢 **30 of 31 tasks done (26–27 Aug)** — every room is live and the Watch page carries its provenance block; the one open task is the **V2-12 browser re-walk** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
 
 ---
@@ -75,6 +76,18 @@ open, and it is the one a machine cannot finish:**
   confirming the **hero and the footer look exactly as they did** (D6). Until that happens V2-12
   stays unticked.
 
+### Now building — Phase 6, Know the Road
+
+The v2 loop looks like a game and is not one: `StageScreen.finish()` awards the card and all 50 stars
+**whether or not a single answer was right**, and `recordQuiz` / `stampCountry` are tested code that
+nothing calls. Decisions D7–D9 and the build order are in
+[docs/14-game-architecture.md](docs/14-game-architecture.md).
+
+- ~~**KTR-01 — solve-gated stage completion.**~~ ✅ done 27 Aug.
+- **KTR-02 — the first-try bonus, the streak, and the `solve` progress slice.** The score now exists
+  and is recorded; next it should be worth something. Updates the `progress.test.ts` allow-list
+  deliberately — every field a counter, nothing that identifies a person.
+
 Then:
 
 1. **Tumo's language review.** The v2 UI strings are machine-quality across the 10 non-English
@@ -89,7 +102,7 @@ Then:
    2026-08-27 log entry. Its own task, deliberately not folded into v2.
 3. **Native persistence for progress** — web persists; native is session-only and says so. Lands with
    WatermelonDB alongside the Archive's own native persistence (T024).
-4. **Quiz coverage** — 17 questions across 13 of the 25 milestones. The remaining 12 need sourced
+4. **Quiz coverage** — 14 questions across 13 of the 25 milestones. The remaining 12 need sourced
    questions before those stages feel finished.
 5. **Locked chapters on `/journey`** — the free/paid split Tumo described. The hero trailer is free
    and stays free; the gating mechanism itself is not built.
@@ -195,6 +208,82 @@ Then:
 
 ## 🗒️ Log
 
+- **2026-08-27 (evening, later)** — **KTR-01 done: solving is now what moves you. Plus the language
+  picker follows the country, and `countries/` opens for research.**
+  **KTR-01.** A wrong answer no longer walks past you. It shows the sourced correction and hands the
+  same question back with its options **reshuffled**, so answering again is a re-read rather than
+  tapping a remembered position. You still cannot fail out — there is no penalty and no lost
+  progress; what a wrong answer costs is the **first-try credit**. The reward card's score changed
+  meaning accordingly: it now counts questions solved **without** a correction, which is the only
+  version of that number that says anything. `recordQuiz` is finally called after being written and
+  unit-tested since v2 — and it is called on re-visits too, because every reducer behind it is
+  idempotent and `recordQuiz` keeps the best attempt, so returning to solve a stage cleanly can raise
+  a score and never lower it.
+  The shuffle lives in `content/quiz.ts`, not in the screen, specifically so it can be tested: three
+  new tests pin that reordering keeps every option exactly once, never moves which one is correct,
+  and actually permutes. A presentation trick that could silently change an answer is exactly the
+  kind of thing that must fail a build rather than a reader.
+  **The language picker now follows the country.** Choosing Botswana leads with **Setswana**, Lesotho
+  with **Sesotho**, Eswatini with **siSwati** — because those genuinely are those countries' national
+  languages, not because we mapped them by resemblance. It **groups, never filters**: a language you
+  can read never disappears because of where you said you were.
+  New sourced data in `content/country-languages.ts`, deliberately **only six countries** — `za` `bw`
+  `ls` `sz` `na` `zw` — each citing the constitution or government source that makes the claim. Every
+  other country falls back to the flat eleven-language list, which is the honest default. Filling in
+  54 from memory would have been fabrication at scale.
+  It also **names what we do not have**: pick Namibia and the picker says Oshiwambo, Otjiherero,
+  Khoekhoegowab and German are spoken there and are not in Ubuntu Heritage. A picker showing only
+  what we happen to support would quietly imply a country speaks only that.
+  **The trap that shaped the data:** Zimbabwe's *Ndebele* is **Northern** Ndebele, a different
+  language from South Africa's isiNdebele (`nr`). Mapping one to the other would have been a
+  plausible-looking falsehood, so Zimbabwe's Ndebele is listed among the languages we lack — and a
+  test now fails the build if anyone ever "fixes" that.
+  **`countries/`** — a folder for Tumo's per-country research, one `.md` per nation, named by the same
+  ISO code the flags use. Its README says which sections already feed code (Languages → the picker;
+  Anthem → `/countries`) so the research lands somewhere instead of sitting in a drawer, and
+  `za-south-africa.md` is filled in as a worked example from material already in the repo.
+  **LANG-04, decided by Tumo the same evening: switch, but only while untouched.** Choosing a country
+  now also switches the UI to that country's leading language — pick Botswana and the app comes up in
+  Setswana. The moment the reader picks a language by hand, nothing overrides it again. Silently
+  changing a language someone deliberately chose is worse than not being clever.
+  Which language "leads" is itself a claim, so it is a `lead` field with its own justification rather
+  than "whatever happened to be first in the array": South Africa leads with isiZulu (Census 2022
+  home-language share — the Constitution lists the eleven **without** ranking, so the list and the
+  order have different sources, and the note says so). Zimbabwe leads with English on an honest
+  technicality, spelled out in the file: its two largest languages are Shona and Ndebele and we have
+  neither, so English leads only among the languages we actually speak there.
+  Verified: typecheck clean · **131/131 tests** · web bundle green.
+
+- **2026-08-27 (evening)** — **Game layer decided: Know the Road v3, D7–D9.**
+  Compared the "Know the Road v2" proposal against what the code actually does, and the proposal was
+  right about the thing that matters. **The v2 loop looks like a game and is not one:**
+  `StageScreen.finish()` awards the heritage card and all 50 stars **whether or not a single answer
+  was right**; the score is rendered once and thrown away; and `recordQuiz` and `stampCountry` are
+  written, unit-tested and **called by nothing** — the same dead-reducer pattern `setWatched` had
+  until this morning. A reader can guess their way to a full Passport and the app congratulates them.
+  On a project scored 30% on Humanities Depth that is the most expensive gap we have.
+  **D7 — solving replaces landing.** Wrong answers are corrected and retried, never penalised.
+  **D8 — no server, no accounts, no network play; competition is pass-and-play on one device.** The
+  proposal's networked Arena would store a persistent per-device handle plus timestamps on a server:
+  personal information by linkage, on a product used by children, where POPIA §35 applies. Its
+  mitigation — "default off for under-13 Kids-mode devices" — **cannot be built**, because the app has
+  no age signal and by design never will. Parked behind an explicit decision with Tumo, not rejected.
+  **D9 — no timers outside pass-and-play.** Depth is the difficulty. A timer excludes the elders and
+  children this is for.
+  **Dropped from the proposal: the anti-AI hardening.** Canvas-rendered question text and answer-time
+  forensics are cost with no return, and the proposal contradicts itself — F2 and F8 are plain text,
+  pasteable inside a 15-second round, and are the two it schedules first. The real defence is that
+  **winning buys nothing**: no wagering, no public losses, no rank.
+  **Kept: the format catalogue**, which is the treasure and needs no competition to be worth building
+  — F1 alone is free, since 22 totem calls are already bundled in `assets/animals/sounds/` and used
+  only by Kids mode today. **F4 stays blocked**: its choices must be spoken in the language, and the
+  only voices we could synthesise are the drafts already labelled unreviewed. No content, no format.
+  **Corrected the record.** The proposal misdescribed the repo in four places, and two of the errors
+  were ours: the quiz bank is **14 questions, not 17** (STATUS and docs/10 both said 17 — fixed);
+  there are **27 totems, 22 with calls**; Supabase **Realtime is used nowhere**; and
+  `roll-the-road-architecture.md`, which the proposal claims to supersede, **is not in this repo**.
+  Plan: [docs/14-game-architecture.md](docs/14-game-architecture.md) · backlog: Phase 6, KTR-01…10.
+
 - **2026-08-27 (later)** — **V2-15, V2-07 and V2-11 done. Architecture v2 is 30 of 31.**
   **V2-15 `WatchItemScreen` — the reason this was the load-bearing one.** `/watch` used to hand
   straight off to the `CinematicReader`. The Reader is a fine player but it is a *book*: a scene's
@@ -286,7 +375,7 @@ Then:
   A stage opens when the one before it is done; finished stages stay open, so progress is never taken
   away. `StageScreen` runs wireframe 2e: **WATCH → QUIZ → REWARD**, with a heritage card from
   `totems.ts` assigned in order so a stage always yields the same card.
-  **Grounding (V2-17):** 17 questions across 13 milestones in `content/quiz.ts`, each answerable from
+  **Grounding (V2-17):** 14 questions across 13 milestones in `content/quiz.ts`, each answerable from
   the milestone's own cited note. Two rules hold: a distractor is normally a *real* fact from another
   milestone, so a half-remembered wrong answer is still true; and every question carries an
   explanation shown either way. The one deliberate exception is the "the land was empty" option at

@@ -243,3 +243,21 @@ export const hasQuiz = (milestoneId: string): boolean =>
 
 /** The one correct option, or undefined if a question is malformed. */
 export const answerOf = (q: QuizQuestion): QuizOption | undefined => q.options.find((o) => o.correct);
+
+/**
+ * Option indices in a shuffled order, for re-asking a question after a correction (KTR-01, D7).
+ *
+ * When a wrong answer hands the question back, the options are reordered so that answering again is
+ * a deliberate re-read rather than tapping a remembered position. Reordering is presentation only:
+ * it can never add, drop or change a correct answer, and `quiz.test.ts` pins that.
+ *
+ * `rand` is injectable so the invariant can be tested against every permutation rather than hoped at.
+ */
+export function shuffledOptionOrder(q: QuizQuestion, rand: () => number = Math.random): number[] {
+  const order = q.options.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}

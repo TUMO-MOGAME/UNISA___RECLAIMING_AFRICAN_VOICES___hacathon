@@ -51,7 +51,7 @@ notarises the public-domain canon on a public blockchain. Humanities first; tech
   standing **Sources & provenance** block (adapted-from, the passage behind every scene, the
   AI-imagery label, references). The Reader is one tap away and unchanged.
 - ✅ **`/journey` + stages** — 25 real milestones from the history trail; watch → quiz → heritage card.
-- ✅ **Grounded quiz** — 17 questions across 13 milestones, each answerable from that milestone's own
+- ✅ **Grounded quiz** — 14 questions across 13 milestones, each answerable from that milestone's own
   cited note. Distractors are real facts from elsewhere on the trail, never invented falsehoods.
 - ✅ **`/passport`** — level, stars, streak, 27-card totem grid, country stamps, real erasure.
 - ✅ **Kids mode** — animal of the day, picture quiz on real totem terms, 3-second grown-ups gate.

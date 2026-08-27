@@ -197,6 +197,7 @@ export function WatchItemScreen({
   module,
   lang,
   onLangChange,
+  country,
   onBack,
   onJourney,
   onReader,
@@ -206,6 +207,8 @@ export function WatchItemScreen({
   module: Module;
   lang: Lang;
   onLangChange: (l: Lang) => void;
+  /** Selected country — orders the language picker to that country's languages. */
+  country: string;
   onBack: () => void;
   /** "Continue the journey" — the staged trail this film feeds into. */
   onJourney: () => void;
@@ -352,7 +355,7 @@ export function WatchItemScreen({
           ))}
         </View>
 
-        <LanguagePicker lang={lang} onChange={onLangChange} compact />
+        <LanguagePicker lang={lang} onChange={onLangChange} compact country={country} />
 
         <Pressable
           onPress={() => (tts.speaking ? tts.stop() : tts.speak(bodyRes.text, bodyRes.lang))}
