@@ -66,6 +66,7 @@ CLAUDE.md            <- you are here (entry point)
 AGENTS.md            <- the working rules (grounding, ethics, git)
 STATUS.md            <- LIVE board: done / in-progress / next (read first, update last)
 README.md            <- human overview + quick start
+countries/           <- Tumo's per-country research, one .md per African nation (see its README)
 docs/                <- plan, architecture, tech stack, AI pipeline, humanities, POPIA, judging
 specs/               <- concept-submission narrative + task backlog
 .claude/             <- settings + project-specific skills

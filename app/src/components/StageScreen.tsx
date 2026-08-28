@@ -9,11 +9,22 @@ import { SceneImage } from "./SceneImage";
 import { JourneyStory } from "./JourneyStory";
 import { historyTrail, historyTrailSource } from "../content/history-trail";
 import { journeyMedia, hasStory } from "../content/journey-media";
-import { quizFor, quizSource, type QuizQuestion } from "../content/quiz";
+import { quizFor, quizSource, shuffledOptionOrder, type QuizQuestion } from "../content/quiz";
 import { totems } from "../content/totems";
 import { STARS_PER_STAGE } from "../services/progress/progress";
 
-// One stage of the Journey (v2 V2-18, wireframe 2e): WATCH → QUIZ → REWARD.
+// One stage of the Journey (v2 V2-18, wireframe 2e): WATCH → SOLVE → REWARD.
+//
+// KTR-01 (docs/14-game-architecture.md, D7): SOLVING is what moves you. Until this change the stage
+// completed and paid out the card and all 50 stars whether or not a single answer was right — the
+// score was rendered once and thrown away, so a reader could guess their way to a full Passport and
+// be congratulated for it. Now a question must actually be answered correctly to pass.
+//
+// A wrong answer is NOT a penalty (D7). It shows the sourced correction and hands the same question
+// back with its options reshuffled, so re-answering is a deliberate choice rather than muscle memory.
+// You cannot fail out of a stage; you can only keep learning until you pass. What a wrong answer
+// costs is the first-try credit — the score on the reward card counts only questions solved without
+// a correction, which is the number that now means something.
 //
 // The three steps are honest about what exists. A milestone with no film shows its picture and its
 // sourced note instead of pretending to have one; a milestone with no quiz yet goes straight from
@@ -47,6 +58,14 @@ const UI = {
   next: { en: "Next question", tn: "Potso e e latelang", af: "Volgende vraag", zu: "Umbuzo olandelayo", xh: "Umbuzo olandelayo", nso: "Potšišo ye e latelago", st: "Potso e latelang", ss: "Umbuto lolandzelako", ts: "Xivutiso lexi landzelaka", nr: "Umbuzo olandelako", ve: "Mbudziso i tevhelaho" },
   right: { en: "That's right", tn: "Go siame", af: "Dis reg", zu: "Kulungile", xh: "Kulungile", nso: "Go lokile", st: "Ho lokile", ss: "Kulungile", ts: "Swi lulamile", nr: "Kulungile", ve: "Zwo luga" },
   wrong: { en: "Not quite", tn: "Ga se gone", af: "Nie heeltemal nie", zu: "Akulungile", xh: "Akulunganga", nso: "Ga se gona", st: "Hase hantle", ss: "Akulungile", ts: "A swi lulamanga", nr: "Akulungile", ve: "A zwo ngo luga" },
+  tryAgain: {
+    en: "Try again", tn: "Leka gape", af: "Probeer weer", zu: "Zama futhi", xh: "Zama kwakhona",
+    nso: "Leka gape", st: "Leka hape", ss: "Zama futsi", ts: "Ringeta nakambe", nr: "Linga godu", ve: "Lingedzani hafhu",
+  },
+  firstTry: {
+    en: "first try", tn: "maiteko a ntlha", af: "eerste probeerslag", zu: "ngomzamo wokuqala", xh: "ngolinge lokuqala",
+    nso: "maiteko a mathomo", st: "boiteko ba pele", ss: "ngemzamo wekucala", ts: "eka ku ringeta ko sungula", nr: "ngomzamo wokuthoma", ve: "kha u lingedza hu thomaho",
+  },
   earned: {
     en: "Stage complete", tn: "Kgato e fedile", af: "Fase voltooi", zu: "Isinyathelo siqediwe", xh: "Inyathelo ligqityiwe",
     nso: "Kgato e feditšwe", st: "Mohato o phethilwe", ss: "Sinyatselo sicedziwe", ts: "Goza ri hetiwile", nr: "Igadango liqediwe", ve: "Ḽiga ḽo fhela",
@@ -104,8 +123,13 @@ export function StageScreen({
   lang: Lang;
   stageNumber: number;
   alreadyDone: boolean;
-  /** Fired once the stage is finished: award stars + the card. */
-  onComplete: (cardId: string) => void;
+  /**
+   * Fired once the stage is finished: award stars + the card, and record the solve.
+   * `quiz` is null for a milestone that has no authored questions yet. Fired on a re-visit too —
+   * every progress reducer behind it is idempotent, and `recordQuiz` keeps the best attempt, so
+   * coming back and solving it cleanly is allowed to improve the score.
+   */
+  onComplete: (cardId: string, quiz: { correct: number; total: number } | null) => void;
   onBack: () => void;
 }) {
   const { width } = useWindowDimensions();
@@ -119,7 +143,12 @@ export function StageScreen({
   const [qIdx, setQIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
-  const [correctCount, setCorrectCount] = useState(0);
+  /** Questions solved WITHOUT needing a correction — the only score worth showing (D7). */
+  const [firstTryCount, setFirstTryCount] = useState(0);
+  /** Corrections taken on the CURRENT question. > 0 means this one no longer counts as first-try. */
+  const [retries, setRetries] = useState(0);
+  /** Option display order. null = authored order; set to a shuffle on each retry. */
+  const [order, setOrder] = useState<number[] | null>(null);
 
   if (!milestone) return null;
 
@@ -127,15 +156,29 @@ export function StageScreen({
   const q: QuizQuestion | undefined = questions[qIdx];
   const totalSteps = questions.length > 0 ? 3 : 2;
 
-  const finish = () => {
-    if (!alreadyDone) onComplete(card.id);
+  /** True once the reader has checked an answer and it was the right one. */
+  const solved = checked && picked !== null && !!q?.options[picked]?.correct;
+
+  const finish = (correct: number) => {
+    onComplete(card.id, questions.length ? { correct, total: questions.length } : null);
     setStep("reward");
   };
 
   const onCheck = () => {
     if (picked === null || !q) return;
     setChecked(true);
-    if (q.options[picked]?.correct) setCorrectCount((c) => c + 1);
+    // Credit only a clean solve. A question reached through a correction still passes — it just
+    // does not score, which is the whole difference between learning it and knowing it.
+    if (q.options[picked]?.correct && retries === 0) setFirstTryCount((c) => c + 1);
+  };
+
+  /** Wrong answer: no penalty, no lost progress — read the correction, then answer it again. */
+  const onRetry = () => {
+    if (!q) return;
+    setRetries((r) => r + 1);
+    setChecked(false);
+    setPicked(null);
+    setOrder(shuffledOptionOrder(q));
   };
 
   const onNext = () => {
@@ -143,10 +186,20 @@ export function StageScreen({
       setQIdx(qIdx + 1);
       setPicked(null);
       setChecked(false);
+      setRetries(0);
+      setOrder(null);
     } else {
-      finish();
+      finish(firstTryCount);
     }
   };
+
+  const ctaLabel = !checked
+    ? t(UI.check, lang)
+    : !solved
+      ? t(UI.tryAgain, lang)
+      : qIdx + 1 < questions.length
+        ? t(UI.next, lang)
+        : t(UI.continue, lang);
 
   const stepNo = step === "watch" ? 1 : step === "quiz" ? 2 : totalSteps;
   const stepLabel = step === "watch" ? t(UI.watch, lang) : step === "quiz" ? t(UI.quiz, lang) : t(UI.reward, lang);
@@ -208,7 +261,7 @@ export function StageScreen({
             ) : null}
 
             <Pressable
-              onPress={() => (questions.length ? setStep("quiz") : finish())}
+              onPress={() => (questions.length ? setStep("quiz") : finish(0))}
               style={styles.cta}
               accessibilityRole="button"
               accessibilityLabel={t(UI.toQuiz, lang)}
@@ -232,7 +285,8 @@ export function StageScreen({
             <Text style={styles.prompt}>{t(q.prompt, lang)}</Text>
 
             <View style={styles.options}>
-              {q.options.map((o, i) => {
+              {(order ?? q.options.map((_, i) => i)).map((i) => {
+                const o = q.options[i];
                 const isPicked = picked === i;
                 const reveal = checked && (o.correct || isPicked);
                 return (
@@ -265,27 +319,29 @@ export function StageScreen({
 
             {checked ? (
               <View style={styles.explain}>
-                <Text style={[styles.verdict, q.options[picked ?? -1]?.correct ? styles.verdictRight : styles.verdictWrong]}>
-                  {q.options[picked ?? -1]?.correct ? t(UI.right, lang) : t(UI.wrong, lang)}
+                <Text style={[styles.verdict, solved ? styles.verdictRight : styles.verdictWrong]}>
+                  {solved ? t(UI.right, lang) : t(UI.wrong, lang)}
                 </Text>
+                {/* The sourced correction shows either way — getting it wrong is how you learn it. */}
                 <Text style={styles.explainText}>{t(q.explain, lang)}</Text>
               </View>
             ) : null}
 
+            {/* The gate (D7): a wrong answer cannot advance. It offers the question back instead. */}
             <Pressable
-              onPress={checked ? onNext : onCheck}
+              onPress={!checked ? onCheck : solved ? onNext : onRetry}
               disabled={picked === null}
               style={[styles.cta, picked === null && styles.ctaDisabled]}
               accessibilityRole="button"
               accessibilityState={{ disabled: picked === null }}
-              accessibilityLabel={
-                checked ? (qIdx + 1 < questions.length ? t(UI.next, lang) : t(UI.continue, lang)) : t(UI.check, lang)
-              }
+              accessibilityLabel={ctaLabel}
             >
-              <Text style={styles.ctaText}>
-                {checked ? (qIdx + 1 < questions.length ? t(UI.next, lang) : t(UI.continue, lang)) : t(UI.check, lang)}
-              </Text>
-              <Icon.ArrowRight size={16} color={colors.night} />
+              <Text style={styles.ctaText}>{ctaLabel}</Text>
+              {!checked || solved ? (
+                <Icon.ArrowRight size={16} color={colors.night} />
+              ) : (
+                <Icon.RotateCcw size={16} color={colors.night} />
+              )}
             </Pressable>
             <Text style={styles.source}>{quizSource}</Text>
           </View>
@@ -299,7 +355,7 @@ export function StageScreen({
               {!alreadyDone ? <Text style={styles.rewardStars}>+{STARS_PER_STAGE} ★</Text> : null}
               {questions.length ? (
                 <Text style={styles.rewardScore}>
-                  {correctCount} / {questions.length}
+                  {firstTryCount} / {questions.length} {t(UI.firstTry, lang)}
                 </Text>
               ) : null}
             </View>

@@ -484,7 +484,12 @@ export function HomeGallery({
         {/* ── HERO ───────────────────────────────────────────────────────────── */}
         {/* Extracted verbatim to home/HomeHero (v2 D6). The SA road, the guided walk and the
             dot-stories are unchanged; only their file moved. */}
-        <HomeHero lang={lang} journey={journey} />
+        <HomeHero
+          lang={lang}
+          journey={journey}
+          onOpenStage={onResumeStage}
+          onOpenJourney={onJourneyRoom}
+        />
 
         {/* Resume bar — renders nothing until a stage has actually been finished (V2-20). */}
         <ResumeBar lang={lang} country={country} progress={progress} onResume={onResumeStage} />

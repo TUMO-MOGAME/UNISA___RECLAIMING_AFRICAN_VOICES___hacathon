@@ -100,3 +100,55 @@ Full plan, decisions D1–D6 and week gates: **[docs/13-architecture-v2-plan.md]
 - [x] V2-29 Accessibility + responsive pass — labels · contrast · touch targets · web keyboard nav
 - [x] V2-30 POPIA review of every new surface
 - [x] V2-31 **Programme gate** — final polish · docs updated · STATUS + tasks.md reconciled
+
+
+---
+
+## Phase 6 — Know the Road: the game layer (from 27 Aug)
+
+Decisions **D7–D9**, the format catalogue and what is parked:
+**[docs/14-game-architecture.md](../docs/14-game-architecture.md)**.
+
+The v2 loop looks like a game and is not one: the quiz decides nothing, and `recordQuiz` /
+`stampCountry` are tested code that nothing calls. Phase 6 makes solving the thing that moves you.
+
+- [x] KTR-01 Solve-gated stage completion — a wrong answer corrects and retries, never penalises; wire `recordQuiz`
+- [ ] KTR-02 First-try bonus + streak + the `solve` progress slice (allow-list updated deliberately)
+- [ ] KTR-03 `content/challenges.ts` — generator contract with a **non-optional `sourceRef`** + integrity tests; F0 (the existing quiz) as the first generator
+- [ ] KTR-04 **F8** true road / false road, then **F2** order the road — data only, no new assets
+- [ ] KTR-05 Forks at branch milestones on `/journey` (uses `milestone.branches`, already in the data)
+- [ ] KTR-06 **F1** listen & identify (22 totem calls already bundled) + **F5** whose clan?
+- [ ] KTR-07 **F6** picture flash
+- [ ] KTR-08 Pass-and-play on one device — competition with no server, no handle, no POPIA change
+- [ ] KTR-09 **F3** map tap (needs a province map asset)
+- [ ] KTR-10 Schools hook — a teacher starts a pass-and-play round from the dashboard (demo-data rules unchanged)
+
+**Blocked, deliberately:** F4 "finish the line" needs spoken indigenous-language choices we do not
+have. The only voices we could synthesise are the machine drafts already labelled unreviewed, and
+putting those in a child's ear as authoritative is exactly what AGENTS.md §4 forbids. No content, no
+format.
+
+**Parked, needs a decision not a task:** networked duels, anonymous handles, leaderboards. See
+[docs/14 §6](../docs/14-game-architecture.md).
+
+### Alongside — the hero trailer hands off to the deep version (27 Aug)
+
+D2 is unchanged: the hero's walk is the free trailer and still opens **in place**. What changed is
+that the trailer now offers a way *out* of itself, which it never did.
+
+- [x] HERO-01 "Go deeper" on any dot → that milestone's stage (watch → solve → collect)
+- [x] HERO-02 Reaching the last dot offers the whole `/journey` room, not only "walk it again"
+- [ ] HERO-03 **The trailer is South Africa only.** It walks `history-trail.ts` — 25 sourced SA
+      milestones — no matter which country is selected. Making it the pan-African trailer Tumo wants
+      needs per-country milestones, and those do not exist: `countries/` has one researched nation
+      (Botswana, 27 Aug) and 53 scaffolds. **No content, no trailer** — this unblocks per country as
+      each `countries/*.md` gets a sourced Milestones table, not before
+- [ ] HERO-04 Until then, make the trailer say *which* country's road it is walking, and say honestly
+      when the selected country has no trail yet rather than silently showing South Africa's
+
+### Alongside — the language picker follows the country (27 Aug)
+
+- [x] LANG-01 `content/country-languages.ts` — a **sourced** country → language map, plus tests that pin the claims
+- [x] LANG-02 `LanguagePicker` groups by the selected country, and names the languages we do **not** have rather than hiding them
+- [ ] LANG-03 Extend the map beyond Southern Africa — **each country needs its own citation**; an unmapped country falls back to the flat list, which is the honest default
+- [x] LANG-04 Choosing a country also **switches** the active language — but only while the reader has not picked one by hand. Once they choose a language themselves, nothing overrides it again

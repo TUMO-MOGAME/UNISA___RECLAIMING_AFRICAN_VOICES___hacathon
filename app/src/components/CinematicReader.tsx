@@ -89,12 +89,15 @@ export function CinematicReader({
   module,
   lang,
   onLangChange,
+  country,
   onBack,
   onArchive,
 }: {
   module: Module;
   lang: Lang;
   onLangChange: (l: Lang) => void;
+  /** Selected country — orders the language picker to that country's languages. */
+  country?: string;
   onBack?: () => void;
   onArchive?: () => void;
 }) {
@@ -204,7 +207,7 @@ export function CinematicReader({
             </View>
           </View>
           <View style={styles.toggles}>
-            <LanguagePicker lang={lang} onChange={onLangChange} compact />
+            <LanguagePicker lang={lang} onChange={onLangChange} compact country={country} />
             <Toggle
               options={[
                 { key: "adult", label: t(UI.adult, lang) },

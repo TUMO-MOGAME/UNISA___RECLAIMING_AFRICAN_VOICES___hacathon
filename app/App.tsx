@@ -50,6 +50,7 @@ import { historyTrail } from "./src/content/history-trail";
 import { stageId } from "./src/services/progress/progress";
 import type { NavId } from "./src/components/shell/nav";
 import { DEFAULT_COUNTRY } from "./src/content/anthems";
+import { languagesFor } from "./src/content/country-languages";
 import { useProgress } from "./src/services/progress/useProgress";
 
 // Lightweight in-app navigation (no router dependency). Language is shared app-wide.
@@ -128,9 +129,13 @@ function StageRoute({
       lang={lang}
       stageNumber={n}
       alreadyDone={progress.progress.stagesDone.includes(sid)}
-      onComplete={(cardId) => {
+      onComplete={(cardId, quiz) => {
         progress.completeStage(sid);
         if (cardId) progress.awardCard(cardId);
+        // KTR-01: the solve is finally recorded. Safe to call on a re-visit — completeStage and
+        // awardCard are idempotent, and recordQuiz keeps the best attempt, so coming back and
+        // solving a stage cleanly can raise the score but never lower it.
+        if (quiz) progress.recordQuiz(sid, quiz.correct, quiz.total);
         progress.touchToday();
       }}
       onBack={onBack}
@@ -145,6 +150,27 @@ export default function App() {
   // Selected country — moved out of the hero into the shell header (v2 D3), so it is shared app-wide
   // and the forthcoming /countries page can drive it too.
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  // Has the reader chosen a language for themselves yet? (LANG-04, decided with Tumo 27 Aug.)
+  // Until they have, choosing a country also switches the UI to that country's leading language —
+  // pick Botswana and the app comes up in Setswana. The moment they pick a language by hand we stop
+  // overriding it, because silently changing the language someone deliberately chose is worse than
+  // not being clever.
+  const [langChosen, setLangChosen] = useState(false);
+
+  /** Every language picker goes through this — picking a language is what marks it "chosen". */
+  const chooseLang = (l: Lang) => {
+    setLangChosen(true);
+    setLang(l);
+  };
+
+  /** Every country picker goes through this. */
+  const chooseCountry = (code: string) => {
+    setCountry(code);
+    if (langChosen) return;
+    const lead = languagesFor(code)?.lead;
+    // Countries we have not sourced a language map for change nothing — the honest default.
+    if (lead && lead !== lang) setLang(lead);
+  };
   // Device-local progress (D5) — no account, no PII, never leaves the device.
   const progress = useProgress();
   // Route HISTORY (not a single route): push to navigate, pop to go back — so Back always returns
@@ -238,7 +264,7 @@ export default function App() {
       case "reader": {
         const m = moduleById(route.id);
         return m ? (
-          <CinematicReader module={m} lang={lang} onLangChange={setLang} onBack={back} onArchive={() => push({ name: "archive" })} />
+          <CinematicReader module={m} lang={lang} onLangChange={chooseLang} country={country} onBack={back} onArchive={() => push({ name: "archive" })} />
         ) : null;
       }
       case "atlas":
@@ -310,7 +336,8 @@ export default function App() {
           <WatchItemScreen
             module={w}
             lang={lang}
-            onLangChange={setLang}
+            onLangChange={chooseLang}
+            country={country}
             onBack={back}
             onJourney={() => push({ name: "journey" })}
             onReader={() => push({ name: "reader", id: w.id })}
@@ -381,7 +408,7 @@ export default function App() {
           <CountriesScreen
             lang={lang}
             country={country}
-            onChange={setCountry}
+            onChange={chooseCountry}
             onEnter={() => push({ name: "journey" })}
           />
         );
@@ -389,7 +416,7 @@ export default function App() {
         return (
           <HomeGallery
             lang={lang}
-            onLangChange={setLang}
+            onLangChange={chooseLang}
             onOpen={(id) => push({ name: "reader", id })}
             onAbout={() => push({ name: "about" })}
             onArchive={() => push({ name: "archive" })}
@@ -455,9 +482,9 @@ export default function App() {
             <AppShell
               mode={storyActive ? "immersive" : shellMode}
               lang={lang}
-              onLangChange={setLang}
+              onLangChange={chooseLang}
               country={country}
-              onCountryChange={setCountry}
+              onCountryChange={chooseCountry}
               active={activeNav}
               onNavigate={goto}
               overHero={overHero}
