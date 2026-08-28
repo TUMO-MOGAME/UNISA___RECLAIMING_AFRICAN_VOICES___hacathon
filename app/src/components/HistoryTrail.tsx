@@ -134,6 +134,11 @@ export const HistoryTrail = forwardRef<
   HistoryTrailHandle,
   {
     active: boolean;
+    /**
+     * The road to walk. Defaults to South Africa's, which is what every existing caller wanted before
+     * the trail became country-aware (see content/trails.ts).
+     */
+    milestones?: HistoryMilestone[];
     onSelect: (m: HistoryMilestone) => void;
     selectedId?: string | null;
     /** Opacity for the trail (path + dots). The start flag ignores this and stays full-opacity. */
@@ -146,14 +151,16 @@ export const HistoryTrail = forwardRef<
     onWalkChange?: (s: { atLast: boolean; walking: boolean }) => void;
   }
 >(function HistoryTrail(
-  { active, onSelect, selectedId, dimOpacity, onStart, startLabel, onWalkChange },
+  { active, milestones, onSelect, selectedId, dimOpacity, onStart, startLabel, onWalkChange },
   ref
 ) {
+  // One name for the road, so every measurement, dot and walk step reads from the same list.
+  const trail = milestones ?? historyTrail;
   const { width } = useWindowDimensions();
   const rows = width >= 900 ? 3 : width >= 560 ? 4 : 5;
   const [size, setSize] = useState({ w: 0, h: 0 });
 
-  const pts = useMemo(() => computePoints(historyTrail.length, size.w, size.h, rows), [size.w, size.h, rows]);
+  const pts = useMemo(() => computePoints(trail.length, size.w, size.h, rows), [trail.length, size.w, size.h, rows]);
   const dPath = useMemo(() => smoothPath(pts), [pts]);
   const first = pts[0];
 
@@ -183,15 +190,17 @@ export const HistoryTrail = forwardRef<
     setFacing("right");
     wx.setValue(pts[0].x);
     wy.setValue(pts[0].y);
-    onSelectRef.current?.(historyTrail[0]); // show the first milestone's description
+    onSelectRef.current?.(trail[0]); // show the first milestone's description
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, ready, size.w, size.h, rows]);
+    // `trail` is in the deps on purpose: switching country swaps the road, and the walker must
+    // start again at its first dot rather than stand on a coordinate from the previous country.
+  }, [active, ready, trail, size.w, size.h, rows]);
 
   // Walk from the current big dot to the next one, following the real road curve.
   const walkNext = () => {
     if (phase === "walking") return;
     const i = idxRef.current;
-    if (i >= historyTrail.length - 1) return;
+    if (i >= trail.length - 1) return;
     const seg = i;
     const a = pts[seg];
     const b = pts[seg + 1];
@@ -213,7 +222,7 @@ export const HistoryTrail = forwardRef<
       wx.setValue(b.x);
       wy.setValue(b.y);
       setPhase("idle");
-      onSelectRef.current?.(historyTrail[i + 1]); // reveal the arrival milestone's description
+      onSelectRef.current?.(trail[i + 1]); // reveal the arrival milestone's description
     });
   };
 
@@ -224,10 +233,10 @@ export const HistoryTrail = forwardRef<
     setFacing("right");
     wx.setValue(pts[0].x);
     wy.setValue(pts[0].y);
-    onSelectRef.current?.(historyTrail[0]);
+    onSelectRef.current?.(trail[0]);
   };
 
-  const atLast = idx >= historyTrail.length - 1;
+  const atLast = idx >= trail.length - 1;
 
   // Expose the walk actions to the parent (the caption card drives them). Rebuilt when the values the
   // closures read change, so a tap always advances from the walker's current position.
@@ -241,7 +250,7 @@ export const HistoryTrail = forwardRef<
   // milestone dot and the next, "as we approach" it), perpendicular to the road there.
   const branchItems = useMemo(() => {
     const arr: { b: HistoryMilestone; from: { x: number; y: number }; to: { x: number; y: number } }[] = [];
-    historyTrail.forEach((m, i) => {
+    trail.forEach((m, i) => {
       if (!m.branches?.length || !pts[i]) return;
       const hasNext = i + 1 < pts.length;
       const seg = hasNext ? i : Math.max(0, i - 1);
@@ -302,7 +311,7 @@ export const HistoryTrail = forwardRef<
               <Path d={dPath} stroke={GOLD} strokeOpacity={0.9} strokeWidth={3} strokeDasharray="1 12" fill="none" strokeLinecap="round" />
             </Svg>
 
-            {historyTrail.map((m, i) => {
+            {trail.map((m, i) => {
               const p = pts[i];
               const sel = m.id === selectedId;
               return (

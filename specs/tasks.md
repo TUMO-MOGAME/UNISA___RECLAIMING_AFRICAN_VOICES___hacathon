@@ -138,13 +138,52 @@ that the trailer now offers a way *out* of itself, which it never did.
 
 - [x] HERO-01 "Go deeper" on any dot → that milestone's stage (watch → solve → collect)
 - [x] HERO-02 Reaching the last dot offers the whole `/journey` room, not only "walk it again"
-- [ ] HERO-03 **The trailer is South Africa only.** It walks `history-trail.ts` — 25 sourced SA
-      milestones — no matter which country is selected. Making it the pan-African trailer Tumo wants
-      needs per-country milestones, and those do not exist: `countries/` has one researched nation
-      (Botswana, 27 Aug) and 53 scaffolds. **No content, no trailer** — this unblocks per country as
-      each `countries/*.md` gets a sourced Milestones table, not before
-- [ ] HERO-04 Until then, make the trailer say *which* country's road it is walking, and say honestly
-      when the selected country has no trail yet rather than silently showing South Africa's
+- [x] HERO-05 **The bug: "Start the journey" felt like it navigated away.** It never did — `openMap()`
+      fired the 1652 dot-story the instant you tapped, throwing a full-screen picture-then-film over
+      the road before you saw it. The walk everyone came for was hidden behind a film you had to
+      dismiss. Now the road opens, the walker stands on the first dot, and the story plays only when
+      you ask for it at a dot. **Watching is offered, never forced**
+- [x] HERO-04 The trailer now says **whose road it is** — country name and year range in the top bar —
+      and when the selected country has no trail, says that country's road is coming instead of
+      silently passing South Africa's off as theirs
+- [x] HERO-06 `content/trails.ts` — the country → road registry, so a new country is a **data edit**.
+      `HistoryTrail` takes its milestones as a prop and resets the walker when the road changes
+- [ ] HERO-03 **Only South Africa has a road.** That is the content gap, not a code gap: `trails.ts`
+      holds `za` and nothing else, and a country is added the moment its `countries/*.md` Milestones
+      table is sourced per claim. Botswana has 19 dated events ready and is deliberately **not** wired
+      — its citation markers were lost in the paste it came from. **No sourced content, no road**
+
+### Alongside — Ubuntu Heritage installs as a PWA (29 Aug)
+
+Serves two things at once: the offline-first promise in [docs/07](../docs/07-accessibility.md) becomes
+real rather than aspirational, and if MoMo Mini Apps turn out to be PWAs, the hackathon build starts
+from a working one.
+
+- [x] PWA-01 `public/manifest.webmanifest` + 192/512/maskable icons generated from `assets/icon.png`
+- [x] PWA-02 `scripts/build-web.mjs` — injects the head tags into Expo's generated `index.html` and
+      writes a service worker with a real precache list; `npm run build:web`
+- [x] PWA-03 Service worker deliberately **conservative**: navigation is network-first so a deploy is
+      picked up immediately, only content-hashed `/_expo/static/` is cache-first, and
+      `skipWaiting` + `clients.claim` mean a bad worker is replaced by the next deploy rather than
+      pinning someone to an old build
+- [x] PWA-04 `vercel.json` build command runs the post-step, so the deployed site is the PWA
+- [ ] PWA-05 **Verify on a real device** — install prompt, add to home screen, then aeroplane mode.
+      No test here can do this and it is the only thing that proves it works
+- [ ] PWA-06 **Films are 12.8 MB each.** Gate them behind a "play on Wi-Fi?" prompt or transcode —
+      the low-data promise is not honest while one tap can cost a reader 13 MB
+
+### Measured payload (29 Aug) — the numbers behind the low-data claim
+
+| | Files | Total | Average |
+|---|---:|---:|---:|
+| App shell — **what a first open costs** | 10 | **4.1 MB** | — |
+| Scene images (webp) | 232 | 30.8 MB | 136 KB |
+| Audio (mp3) | 228 | 183.0 MB | 822 KB |
+| Films (mp4) | 3 | 37.6 MB | **12.8 MB** |
+| Fonts (ttf) | 36 | 11.7 MB | 333 KB |
+
+Read a story ≈ **0.3 MB** (two scenes). Read it again ≈ **0 MB**. Nothing but the shell is precached —
+media is cached only once actually viewed, which is the point on a metered connection.
 
 ### Alongside — the language picker follows the country (27 Aug)
 

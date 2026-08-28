@@ -463,7 +463,7 @@ export function HomeGallery({
 
   // The hero's journey state now lives in home/HomeHero (v2 D6); the page keeps a handle so the
   // hero and the full-screen dot-story stay in sync across the ScrollView boundary.
-  const journey = useHomeJourney({ onStoryActiveChange, onStartJourney: onJourney });
+  const journey = useHomeJourney({ country, onStoryActiveChange, onStartJourney: onJourney });
 
   return (
     <View style={styles.root}>
