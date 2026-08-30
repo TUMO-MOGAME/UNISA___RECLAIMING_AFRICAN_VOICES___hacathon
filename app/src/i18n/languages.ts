@@ -27,23 +27,37 @@ export type LanguageMeta = {
   endonym: string; // the language's own name for itself
   bcp47: string; // IETF tag for on-device speech / web
   botlhale: string; // Botlhale AI language_code
+  /**
+   * ElevenLabs language id, or `null` where ElevenLabs does not speak this language.
+   *
+   * VERIFIED AGAINST THE API, 30 Aug 2026: `GET /v1/models` was read and every model's `languages`
+   * list checked against our eleven. Of them ElevenLabs covers **English and Afrikaans only**
+   * (eleven_v3 and eleven_v3_conversational, 74 languages each; multilingual_v2 and flash/turbo v2.5
+   * carry English but not Afrikaans). NONE of the nine indigenous languages appears in any model.
+   *
+   * `null` is therefore a sourced claim, not a placeholder. It matters because the API does not
+   * refuse unsupported text — send it Setswana and it returns confident, fluent, wrong audio. That
+   * is the failure docs/14 blocks challenge format F4 over: unreviewed pronunciation in a child's
+   * ear, presented as authoritative. So the selector never routes those languages here.
+   */
+  elevenlabs: string | null;
   reviewedContent: boolean; // human-authored/-reviewed story text exists today
 };
 
 // Order: English first, then the indigenous languages. [NEEDS: confirm the exact Botlhale codes for
 // nr/ss/ve with the contact — their public table only fully listed en/zu/xh/st/nso/ts/af/tn.]
 export const LANGUAGES: LanguageMeta[] = [
-  { code: "en", english: "English", endonym: "English", bcp47: "en-ZA", botlhale: "en-ZA", reviewedContent: true },
-  { code: "tn", english: "Tswana", endonym: "Setswana", bcp47: "tn-ZA", botlhale: "tn-ZA", reviewedContent: true },
-  { code: "zu", english: "Zulu", endonym: "isiZulu", bcp47: "zu-ZA", botlhale: "zu-ZA", reviewedContent: false },
-  { code: "xh", english: "Xhosa", endonym: "isiXhosa", bcp47: "xh-ZA", botlhale: "xh-ZA", reviewedContent: false },
-  { code: "nso", english: "Northern Sotho (Sepedi)", endonym: "Sepedi", bcp47: "nso-ZA", botlhale: "nso-ZA", reviewedContent: false },
-  { code: "st", english: "Southern Sotho", endonym: "Sesotho", bcp47: "st-ZA", botlhale: "st-ZA", reviewedContent: false },
-  { code: "ts", english: "Tsonga", endonym: "Xitsonga", bcp47: "ts-ZA", botlhale: "ts-ZA", reviewedContent: false },
-  { code: "af", english: "Afrikaans", endonym: "Afrikaans", bcp47: "af-ZA", botlhale: "af-ZA", reviewedContent: false },
-  { code: "ss", english: "Swati", endonym: "siSwati", bcp47: "ss-ZA", botlhale: "ss-ZA", reviewedContent: false },
-  { code: "nr", english: "Southern Ndebele", endonym: "isiNdebele", bcp47: "nr-ZA", botlhale: "nr-ZA", reviewedContent: false },
-  { code: "ve", english: "Venda", endonym: "Tshivenḓa", bcp47: "ve-ZA", botlhale: "ve-ZA", reviewedContent: false },
+  { code: "en", english: "English", endonym: "English", bcp47: "en-ZA", botlhale: "en-ZA", elevenlabs: "en", reviewedContent: true },
+  { code: "tn", english: "Tswana", endonym: "Setswana", bcp47: "tn-ZA", botlhale: "tn-ZA", elevenlabs: null, reviewedContent: true },
+  { code: "zu", english: "Zulu", endonym: "isiZulu", bcp47: "zu-ZA", botlhale: "zu-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "xh", english: "Xhosa", endonym: "isiXhosa", bcp47: "xh-ZA", botlhale: "xh-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "nso", english: "Northern Sotho (Sepedi)", endonym: "Sepedi", bcp47: "nso-ZA", botlhale: "nso-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "st", english: "Southern Sotho", endonym: "Sesotho", bcp47: "st-ZA", botlhale: "st-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "ts", english: "Tsonga", endonym: "Xitsonga", bcp47: "ts-ZA", botlhale: "ts-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "af", english: "Afrikaans", endonym: "Afrikaans", bcp47: "af-ZA", botlhale: "af-ZA", elevenlabs: "af", reviewedContent: false },
+  { code: "ss", english: "Swati", endonym: "siSwati", bcp47: "ss-ZA", botlhale: "ss-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "nr", english: "Southern Ndebele", endonym: "isiNdebele", bcp47: "nr-ZA", botlhale: "nr-ZA", elevenlabs: null, reviewedContent: false },
+  { code: "ve", english: "Venda", endonym: "Tshivenḓa", bcp47: "ve-ZA", botlhale: "ve-ZA", elevenlabs: null, reviewedContent: false },
 ];
 
 export const DEFAULT_LANG: LangCode = "en";
@@ -63,6 +77,16 @@ export function toBcp47(code: LangCode): string {
 /** Botlhale AI language_code for TTS / translation. */
 export function toBotlhaleCode(code: LangCode): string {
   return languageByCode(code).botlhale;
+}
+
+/** ElevenLabs language id, or null where ElevenLabs does not speak the language at all. */
+export function toElevenLabsCode(code: LangCode): string | null {
+  return languageByCode(code).elevenlabs;
+}
+
+/** Whether ElevenLabs can actually voice this language — see `LanguageMeta.elevenlabs`. */
+export function elevenLabsSupports(code: LangCode): boolean {
+  return languageByCode(code).elevenlabs !== null;
 }
 
 /** Whether we trust on-device speech for this language. Conservative: only English is reliable

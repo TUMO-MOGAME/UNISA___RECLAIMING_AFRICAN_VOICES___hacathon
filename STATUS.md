@@ -4,7 +4,7 @@
 > of "done." For the structured **implemented vs. planned** view, see
 > [docs/10-status-and-roadmap.md](docs/10-status-and-roadmap.md).
 
-_Last updated: 2026-08-27 — by Tumo (via Claude)_
+_Last updated: 2026-08-30 — by Tumo (via Claude)_
 
 ---
 
@@ -27,7 +27,8 @@ _Last updated: 2026-08-27 — by Tumo (via Claude)_
 | **Cinematic hero art**: Gemini, cached local PNGs — all **7 modules** (4 literary + 3 Atlas) | ✅ done (idempotent gen; quota-safe) |
 | **Submission package**: written narrative (7 modules + Heritage Ledger) · demo script · review handoff | ✅ drafted (video + Emma's review pending) |
 | NativeWind wiring | ⬜ optional (T006) |
-| **🎮 Know the Road — the game layer (Phase 6)** | 🟡 **planned, 0 of 10** — solving becomes the thing that moves you; decisions D7–D9 locked 27 Aug · plan: [docs/14-game-architecture.md](docs/14-game-architecture.md) |
+| **Reader "Listen" — ElevenLabs** for the languages it actually speaks (EN/AF), Botlhale for the nine, device underneath | ✅ built 30 Aug + **live key tested** · cached so a passage is paid for once · **nobody has listened to a clip yet (EL-05)** |
+| **🎮 Know the Road — the game layer (Phase 6)** | 🟡 **2 of 10** — KTR-01 + KTR-02 done (27–30 Aug); solving now moves you *and* is worth something · plan: [docs/14-game-architecture.md](docs/14-game-architecture.md) |
 | **🏗️ Architecture v2 — multi-page transformation** | 🟢 **30 of 31 tasks done (26–27 Aug)** — every room is live and the Watch page carries its provenance block; the one open task is the **V2-12 browser re-walk** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
 
 ---
@@ -62,6 +63,12 @@ browsable cinematic library, and a watch → quiz → collect loop. Full plan, t
 
 ## ⏭️ Next action
 
+> **30 Aug:** KTR-02, PWA-06 and the ElevenLabs narration voice all landed — typecheck clean,
+> **179/179 tests** (up from 136), `npm run build:web` green. **V2-12 is unchanged and still the
+> highest-value open item: nobody has re-walked the routes in a browser.** Three of the four things
+> now waiting need a human — a pair of eyes on a layout (V2-12), a pair of ears on a narration clip
+> (EL-05), and a real phone in aeroplane mode (PWA-05).
+
 Architecture v2 is **30 of 31**. V2-07, V2-11 and V2-15 all landed on 27 Aug. **One task is still
 open, and it is the one a machine cannot finish:**
 
@@ -84,9 +91,17 @@ nothing calls. Decisions D7–D9 and the build order are in
 [docs/14-game-architecture.md](docs/14-game-architecture.md).
 
 - ~~**KTR-01 — solve-gated stage completion.**~~ ✅ done 27 Aug.
-- **KTR-02 — the first-try bonus, the streak, and the `solve` progress slice.** The score now exists
-  and is recorded; next it should be worth something. Updates the `progress.test.ts` allow-list
-  deliberately — every field a counter, nothing that identifies a person.
+- ~~**KTR-02 — the first-try bonus, the streak, and the `solve` progress slice.**~~ ✅ done 30 Aug.
+  `recordSolve` replaces the bare `recordQuiz` call. A question answered without a correction pays a
+  bonus star; a run of cleanly-solved stages is counted, and the best run ever reached is kept
+  forever. Four rules are pinned by tests: **nothing is ever taken away** · the bonus pays the
+  **improvement**, once (re-walking a stage you aced pays nothing) · the run advances on a stage's
+  **first** clean solve only, so re-opening one easy stage seven times cannot "earn" a streak of
+  seven · **a milestone with no authored question decides nothing** — neither a win nor a break,
+  which matters while 12 of the 25 have none. The `progress.test.ts` allow-list grew by exactly one
+  key, `solve`, three counters, as a reviewed line of the change.
+- **KTR-03 is next** — `content/challenges.ts` with the non-optional `sourceRef`, F0 (the existing
+  quiz) as the first generator so the abstraction is proved against working content.
 
 Then:
 
@@ -97,7 +112,12 @@ Then:
    from", "The passage behind each scene"), the new Home sections (`HomeGallery.tsx` — the Journey
    preview, the continent band, Kids/Schools) and the Archive's Trust chips (`ArchiveScreen.tsx`).
    These sit on the most integrity-sensitive surface in the app, so a wrong word costs more here
-   than elsewhere.
+   than elsewhere. **New on 30 Aug and unreviewed:** the reward card's first-try bonus
+   (`StageScreen.tsx` — `UI.bonus`), the Passport's two new counters (`PassportScreen.tsx` —
+   `UI.solvedClean`, `UI.bestRun`), and the whole of the data gate (`DataGate.tsx` — "Play on
+   Wi-Fi?", the size sentence, the data-saver note, "Don't ask again on this device"). The gate is
+   the one place in the app that talks to someone about **money**, so its Setswana wants your eye
+   more than most.
 2. **Accessibility retrofit on the pre-v2 screens** — 25 unlabelled controls, listed in the
    2026-08-27 log entry. Its own task, deliberately not folded into v2.
 3. **Native persistence for progress** — web persists; native is session-only and says so. Lands with
@@ -106,6 +126,42 @@ Then:
    questions before those stages feel finished.
 5. **Locked chapters on `/journey`** — the free/paid split Tumo described. The hero trailer is free
    and stays free; the gating mechanism itself is not built.
+
+### The narration voice — what ElevenLabs can and cannot do (30 Aug)
+
+Tumo's key was tested live. It works: **starter tier, 40 000 characters a month** (12 953 spent when
+checked), instant voice cloning available, and **four South African English voices** already on the
+account — Amara (Warm African-British), Declan (SA News), Andreas, Travis. **Amara is the chosen
+narration voice.**
+
+**The finding that shaped the wiring.** `GET /v1/models` was read and every model's language list
+checked against our eleven. ElevenLabs covers **English and Afrikaans**. It does **not** cover
+Setswana, isiZulu, isiXhosa, Sepedi, Sesotho, siSwati, Xitsonga, Tshivenḓa or isiNdebele — none of
+them appears in any model. And it does not *refuse* text in a language it does not know; it returns
+fluent, confident, wrong pronunciation. Putting that in a child's ear as the voice of Setswana
+literature is precisely what [AGENTS.md §4](AGENTS.md) forbids and why
+[docs/14](docs/14-game-architecture.md) blocks challenge format F4.
+
+So the engine is chosen **per language**, and a test asserts the rule rather than trusting it:
+
+| Language | Voice |
+|---|---|
+| English, Afrikaans | **ElevenLabs** (Amara) — the best voice we have, for the two it can actually speak |
+| the nine indigenous languages | **Botlhale**, still the only engine that truly voices Setswana — and ElevenLabs is not even on their fallback ladder |
+| anything, with no keys at all | **on-device** — free, offline, quota-free, and always the last rung so Listen never dead-ends |
+
+Every remote clip is cached (IndexedDB on web) on text + language + voice, so one passage is paid for
+once. That is not an optimisation: a passage is ~800 characters of a 40 000-character month, and
+without the cache the Listen button would stop working around the 12th.
+
+**Two things are still open, and both matter:**
+
+- **EL-05 — nobody has listened to a clip.** No test in this repo can hear anything. The pipeline is
+  verified end-to-end (real MP3 bytes, right size, right format); the *sound* is unjudged.
+- **EL-06 — rotate the key after the demo.** `EXPO_PUBLIC_ELEVENLABS_API_KEY` is compiled into the
+  web bundle and is readable by anyone who opens the deployed site, on a **paid** account. Same
+  exposure the Anthropic chatbot key already carries. Longer term this wants a small proxy behind
+  `EXPO_PUBLIC_ELEVENLABS_BASE_URL` rather than a shipped key.
 
 ### Parked (pre-v2, still open)
 
@@ -207,6 +263,60 @@ Then:
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-30** — **KTR-02: a clean solve is finally worth more than a corrected one. PWA-06: a
+  13 MB film asks before it spends someone's airtime. And ElevenLabs becomes the narration voice —
+  for the two languages it can actually speak.**
+
+  **KTR-02.** KTR-01 made a wrong answer *stop* you; it still left a stage solved perfectly worth
+  exactly as much as one solved on the fourth attempt. `recordSolve` replaces the bare `recordQuiz`
+  call: it keeps the best attempt, pays a bonus star per question answered without a correction, and
+  counts a run of cleanly-solved stages. Four rules, each pinned by a test rather than by intent —
+  **nothing is ever taken away** (stars, best run and the stored tally only rise); the bonus pays the
+  **improvement**, once, so re-walking a stage you aced pays nothing and a shaky first pass can still
+  be improved on later; the run advances on a stage's **first** clean solve and on nothing else,
+  because otherwise re-opening one easy stage seven times "earns" a streak of seven; and **a
+  milestone with no authored question decides nothing** — not a win, and emphatically not a break,
+  which matters a great deal while 12 of the 25 milestones have no question yet. A broken run is
+  never announced anywhere in the UI; `bestStreak` is stored separately precisely so the record of
+  the best one survives. The `progress.test.ts` allow-list grew by exactly one key — `solve`, three
+  counters, nothing time-stamped, nothing that identifies anyone — and it grew as a reviewed line of
+  this change, which is the entire point of having an allow-list.
+
+  **PWA-06.** The measured payload table said a story costs ~0.3 MB and a film costs 12.8 MB, and
+  1816 plays **two** back to back — so one tap on "Watch the film" could pull 24 MB down a prepaid
+  line with no warning at all. The low-data promise in [docs/07](docs/07-accessibility.md) was not
+  honest while that was true, and caching does not help a first view. Now the button carries the real
+  size and anything over 2 MB opens a gate **before the `<video>` element mounts**, because mounting
+  it *is* the download. The gate states the cost and leads with "Play it anyway" — it exists to
+  inform, not to talk anyone out of watching — and "don't ask again on this device" is remembered, so
+  a reader on uncapped fibre meets it once. The one thing that checkbox cannot silence is an active
+  **data saver**: that is a switch a person turned on in their browser or their phone, and a box
+  ticked in this app last month does not get to cancel it. The sizes are declared next to each
+  `require()` and `journey-media.test.ts` stats the real files, because a film re-cut without updating
+  its number would quote a reader the wrong price for their airtime. **The films were not
+  transcoded** — this change makes the cost honest, not smaller.
+
+  **ElevenLabs.** Tumo's key was tested against the live API: valid, starter tier, 40 000 characters a
+  month, instant voice cloning available, and four South African English voices already on the
+  account. Then `GET /v1/models` was read, and it changed the design. Of our eleven languages
+  ElevenLabs speaks **English and Afrikaans**; it does not speak Setswana, isiZulu, isiXhosa, Sepedi,
+  Sesotho, siSwati, Xitsonga, Tshivenḓa or isiNdebele — and, crucially, it does not *say* so. Send it
+  Setswana and it returns fluent, confident, wrong pronunciation. That is the exact harm
+  [AGENTS.md §4](AGENTS.md) exists to prevent and the same reason
+  [docs/14](docs/14-game-architecture.md) blocks challenge format F4. So the engine is chosen per
+  language: ElevenLabs (Amara — Warm African-British) for English and Afrikaans, Botlhale for the
+  nine, on-device underneath everything as the rung that always exists. `select.test.ts` asserts, for
+  all nine and under every key combination, that ElevenLabs never appears on their ladder at all —
+  the integrity rule as a test rather than a comment. Output is 32 kbps, not 128: PWA-06 had just
+  finished measuring what generosity costs, and the same line is 34 KB against 6 KB. Every clip is
+  cached on text + language + voice so a passage is paid for once, which is what lets the Listen
+  button survive a month on 40 000 characters. Two things stay open and are logged as tasks, not
+  hidden: **nobody has listened to a clip** (EL-05 — no test in this repo can hear), and the key is
+  **bundled to the client** and must be rotated after the demo (EL-06).
+
+  Verified: `npm run typecheck` clean · **179/179 tests** (136 before this session) ·
+  `npm run build:web` green.
 
 - **2026-08-27 (evening, later)** — **KTR-01 done: solving is now what moves you. Plus the language
   picker follows the country, and `countries/` opens for research.**

@@ -113,7 +113,14 @@ The v2 loop looks like a game and is not one: the quiz decides nothing, and `rec
 `stampCountry` are tested code that nothing calls. Phase 6 makes solving the thing that moves you.
 
 - [x] KTR-01 Solve-gated stage completion — a wrong answer corrects and retries, never penalises; wire `recordQuiz`
-- [ ] KTR-02 First-try bonus + streak + the `solve` progress slice (allow-list updated deliberately)
+- [x] KTR-02 First-try bonus + streak + the `solve` progress slice (allow-list updated deliberately).
+      `recordSolve` replaces the bare `recordQuiz` call: keeps the best attempt, pays
+      `BONUS_STARS_FIRST_TRY` per question solved without a correction, and moves a run of clean
+      stages. Four rules the tests pin — nothing is taken away · the bonus pays the **improvement**,
+      once · the run advances on a stage's **first** clean solve only (so re-walking one easy stage
+      cannot farm a streak) · **a milestone with no authored question decides nothing**, neither a win
+      nor a break, which matters while 12 of 25 have none. The `solve` slice is three counters and the
+      allow-list grew by exactly one reviewed key. Surfaced on the reward card and the Passport
 - [ ] KTR-03 `content/challenges.ts` — generator contract with a **non-optional `sourceRef`** + integrity tests; F0 (the existing quiz) as the first generator
 - [ ] KTR-04 **F8** true road / false road, then **F2** order the road — data only, no new assets
 - [ ] KTR-05 Forks at branch milestones on `/journey` (uses `milestone.branches`, already in the data)
@@ -169,8 +176,15 @@ from a working one.
 - [x] PWA-04 `vercel.json` build command runs the post-step, so the deployed site is the PWA
 - [ ] PWA-05 **Verify on a real device** — install prompt, add to home screen, then aeroplane mode.
       No test here can do this and it is the only thing that proves it works
-- [ ] PWA-06 **Films are 12.8 MB each.** Gate them behind a "play on Wi-Fi?" prompt or transcode —
-      the low-data promise is not honest while one tap can cost a reader 13 MB
+- [x] PWA-06 **Films are 12.8 MB each** — and 1816 plays two back to back, so one tap could cost
+      24 MB. Now the "Watch the film" button carries the real size and anything over 2 MB opens a
+      `DataGate` **before the `<video>` mounts** (mounting it *is* the download). It states the cost,
+      leads with "Play it anyway", and remembers "don't ask again on this device" — a warning, not a
+      toll gate. The one thing a checkbox cannot silence is an active **data saver**: that switch is
+      something a person turned on in their browser today. Sizes live next to each `require()` and
+      `journey-media.test.ts` stats the real files, because a stale number quotes a reader the wrong
+      price for their airtime. **Transcoding was not done** — the films are unchanged; this makes the
+      cost honest rather than smaller
 
 ### Measured payload (29 Aug) — the numbers behind the low-data claim
 
@@ -191,3 +205,33 @@ media is cached only once actually viewed, which is the point on a metered conne
 - [x] LANG-02 `LanguagePicker` groups by the selected country, and names the languages we do **not** have rather than hiding them
 - [ ] LANG-03 Extend the map beyond Southern Africa — **each country needs its own citation**; an unmapped country falls back to the flat list, which is the honest default
 - [x] LANG-04 Choosing a country also **switches** the active language — but only while the reader has not picked one by hand. Once they choose a language themselves, nothing overrides it again
+
+### Alongside — ElevenLabs becomes the narration voice, where it can be (30 Aug)
+
+Tumo's key was tested live: valid, **starter tier, 40 000 characters/month** (12 953 already spent
+when checked), instant voice cloning available, and **four South African English voices** on the
+account. Decisions taken with Tumo on 30 Aug: **per-language routing, cached**, voice = **Amara —
+Warm African-British**.
+
+- [x] EL-01 `services/tts/elevenlabs.ts` — pure request builder + `refuseReason` + the async edge.
+      `POST /v1/text-to-speech/{voice}` returning raw MP3 bytes, wrapped to a data URI.
+      Output is **`mp3_22050_32`**, not 128 kbps: the same line is 34 KB at 128 and 6 KB at 32, and
+      PWA-06 had just finished measuring what generosity costs on a metered line
+- [x] EL-02 `LanguageMeta.elevenlabs` — a **sourced** claim, verified against `GET /v1/models`:
+      ElevenLabs covers **English and Afrikaans** of our eleven and **none** of the nine indigenous
+      languages
+- [x] EL-03 `select.ts` — the provider **ladder**, chosen per language. ElevenLabs for en/af ·
+      Botlhale for the nine · device underneath everything, always last, always present.
+      **No indigenous language is ever routed to ElevenLabs**, not even as a last resort: it does not
+      reject unsupported text, it returns fluent, confident, wrong pronunciation. `select.test.ts`
+      asserts that for all nine, under every key combination
+- [x] EL-04 `cache.ts` + `cache-key.ts` + IndexedDB store — the same passage is synthesised **once**.
+      One passage is ~800 of the month's 40 000 characters; without this the Listen button stops
+      working partway through the month
+- [ ] EL-05 **Listen to a clip and judge it.** No test here can hear anything. Wanted: one English
+      passage through Amara, and confirmation that the Afrikaans `eleven_v3` path sounds right
+- [ ] EL-06 **Rotate the key after the demo.** `EXPO_PUBLIC_*` is compiled into the web bundle and is
+      readable by anyone who opens the deployed site — on a **paid** account. Longer term this wants a
+      proxy behind `EXPO_PUBLIC_ELEVENLABS_BASE_URL` rather than a shipped key
+- [ ] EL-07 Pre-render the fixed narration (T031's cinematic intro) at author time instead of live,
+      so the demo never depends on quota or a network at all
