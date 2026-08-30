@@ -21,6 +21,7 @@
 | | |
 |---|---|
 | Flag | ✅ `app/assets/flags/bw.png` |
+| Country entry | ✅ listed in [`anthems.ts`](../app/src/content/anthems.ts) as `bw` |
 | National anthem recording | ❌ none yet — `/countries` says so honestly |
 | Language map (drives the language picker) | ✅ sourced — choosing Botswana leads with **Setswana** |
 | Totems for the major polities | ✅ **Kwena** (crocodile), **Tshwene** (baboon) and **Phuti** (duiker) are all already heritage cards in [`totems.ts`](../app/src/content/totems.ts) |
@@ -162,8 +163,9 @@ canon; it is the same people on the other side of a line drawn along the Molopo.
 - [ ] **The anthem.** Not covered by the report at all, and it is what `/countries` needs first.
 - [ ] **Tie claims to individual sources.** The inline citation markers were lost in the paste. Nothing
       here should become app content until a specific claim points at a specific source.
-- [ ] **Upgrade the weakest sources.** Of the 66 below, 11 are Wikipedia and 6 are Scribd. Fine for
-      orientation; not enough for something the app asserts to a child.
+- [ ] **Upgrade the weakest sources.** Of the 66 below, 12 are Wikipedia (one of them the Afrikaans
+      edition), one is Wikibooks and 6 are Scribd. Fine for orientation; not enough for something the
+      app asserts to a child.
 - [ ] **Verify the Diturupa ↔ SS *Mendi* link.** The report states the festival is "deeply linked to"
       the sinking. That is a specific causal claim and it should rest on more than one source.
 - [ ] **Handle *botlhanka* / *bolata* with a Motswana's guidance.** Hereditary serfdom of the Basarwa

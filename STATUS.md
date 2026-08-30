@@ -30,6 +30,7 @@ _Last updated: 2026-08-30 — by Tumo (via Claude)_
 | **Reader "Listen" — ElevenLabs** for the languages it actually speaks (EN/AF), Botlhale for the nine, device underneath | ✅ built 30 Aug + **live key tested** · cached so a passage is paid for once · **nobody has listened to a clip yet (EL-05)** |
 | **🎮 Know the Road — the game layer (Phase 6)** | 🟡 **2 of 10** — KTR-01 + KTR-02 done (27–30 Aug); solving now moves you *and* is worth something · plan: [docs/14-game-architecture.md](docs/14-game-architecture.md) |
 | **🏗️ Architecture v2 — multi-page transformation** | 🟢 **30 of 31 tasks done (26–27 Aug)** — every room is live and the Watch page carries its provenance block; the one open task is the **V2-12 browser re-walk** · plan: [docs/13-architecture-v2-plan.md](docs/13-architecture-v2-plan.md) |
+| **📚 `countries/` research** | 🟢 **54 of 54 researched — no scaffolds left.** `bw` + `bf` carry long-form reports; the other 52 are built claim-by-claim from named sources, each with Open questions. Findings: **indigenous African scripts** (Ge'ez, Vai, N'Ko), **the first African-language novel is in Sesotho (1907)**, **Sontonga's melody in 4 countries**, **Swahili should be language 12**, and **3 fixes to live `country-languages.ts` data** · [countries/README.md](countries/README.md) |
 
 ---
 
@@ -263,6 +264,111 @@ without the cache the Listen button would stop working around the 12th.
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-30 (later still)** — **All 54 country files researched. No scaffolds left in `countries/`.**
+
+  The 51 remaining scaffolds were filled with sourced research: **languages and their legal status,
+  the national anthem, a milestone spine, peoples, literature and heritage — each claim naming the
+  numbered source it came from.** Sources were Wikipedia country pages, `nationalanthems.info`,
+  per-country UNESCO World Heritage lists, and targeted literature searches; every file says out loud
+  that these are **encyclopaedia-grade, not primary**, and ends with **Open questions** listing what it
+  still needs. Where a section is empty it states whether that is *a gap in the research* or *a fact
+  about the country* — the distinction matters and the files keep it.
+
+  **What this deliberately is not:** Botswana-depth narrative for all 54. That could not be produced
+  truthfully in one pass, and writing it from memory would have been the fabrication-at-scale this log
+  already refused once.
+
+  **Six findings that cut across files and are worth more than any single country entry.**
+
+  🔴 **1. Africans have been inventing writing systems for two thousand years.** **Ge'ez** in Ethiopia
+  and Eritrea, attested in a 3rd-century inscription and still the everyday script of Amharic and
+  Tigrinya. **Vai** in Liberia, c. 1833, said to have come to Momolu Duwalu Bukele in a dream, taught
+  in schools he built, used for letters, diaries, accounts and jewellery engraving — and the source
+  records that **"since the 1830s, at least 27 new scripts have been invented for West African
+  languages."** **N'Ko** in Guinea, built by Solomana Kanté in 1949 for the Manding languages and named
+  with the words *"I say."* **Osmanya** in Somalia. The premise that African heritage is oral and
+  therefore fragile is true of a great deal and **demonstrably false as a general claim** — and this is
+  the strongest single argument the research produced for the submission narrative.
+
+  🔴 **2. The first novel published in any African language was written in Sesotho** — Thomas Mofolo's
+  *Moeti oa Bochabela*, **1907**, Lesotho — and his *Chaka* (1925), a Sesotho novel about Shaka,
+  **predates the publication of *Mhudi* (1930)**. **The app already speaks Sesotho** and has
+  `reviewedContent: false` for it. Every other major literary find is in a language the app does not
+  have; this one is not. **This is the most actionable content proposal in the whole folder.**
+
+  🔴 **3. Enoch Sontonga's melody is continental infrastructure.** *Nkosi Sikelel' iAfrika* is the
+  national anthem of **Tanzania** (as *Mungu ibariki Afrika*, adopted 1961 — **before South Africa**)
+  and **Zambia** (*Lumbanyeni Zambia*, 1964), sits inside South Africa's own, and **Zimbabwe left it in
+  1994** by public competition, specifically because it wanted a song that was only its own. A Xhosa
+  schoolteacher's composition, four countries, and a live argument about shared versus national
+  heritage. **If one anthem recording is sourced for `/countries`, it should be this cluster.**
+
+  🔴 **4. "African rhythms inside a European form" is a continental method, not six coincidences.**
+  Kourouma bending French (Côte d'Ivoire), Craveirinha putting African rhythm in Portuguese verse
+  (Mozambique), Silá and Semedo subverting Portuguese with Crioulo (Guinea-Bissau), Tutuola carrying
+  Yoruba tales into English (Nigeria), Sutherland staging Ananse (Ghana) — and **Nuruddin Farah, whose
+  prose alliteration is inherited from his mother Aleeli, an oral poet** (Somalia). Beside Vilakazi
+  and European metre, that is the project's own thesis, evidenced in six countries.
+
+  🔴 **5. The creole league table.** Eleven creoles across nine countries — Krio reaches **97%** of
+  Sierra Leone, Kriol **94%** of Guinea-Bissau, Mauritian Creole **90%** of Mauritius — **and only two
+  hold full official status** (Sango in the CAR, Seselwa in Seychelles). Meanwhile Mauritius's de facto
+  official English is the home language of **0.6%**. The gap between what a country speaks and what its
+  law names is the folder's most repeated finding.
+
+  🔴 **6. Swahili should be the app's twelfth language.** Official or national in **five** researched
+  countries — Tanzania, Kenya, Uganda, Rwanda, the DRC. The app has none of it. Four separate files
+  reach the same recommendation independently.
+
+  **Three concrete corrections to data already shipping**, each needing its instrument verified first:
+  **Namibia** recognises **Setswana** nationally and it is missing from the `na` entry (the app has
+  `tn`); **Lesotho**'s source names **isiXhosa** as official and the `ls` entry has only `st`/`en` (the
+  app has `xh`); **Zimbabwe**'s constitution "embraces only two nationally, Shona and English", which
+  sharpens the honest-technicality comment already in the code. Plus one new entry worth adding —
+  **Mozambique**, whose Tsonga is the app's Xitsonga.
+
+  **And the blocker restated:** for most of the 54 the app speaks **none** of the country's languages,
+  and `country-languages.ts` still cannot say so, because `lead` is a required `LangCode`. **LANG-03
+  cannot move much past Southern Africa until that shape exists.**
+
+  **Handled with the care the integrity rule requires, not written up:** the Herero and Nama genocide
+  (Namibia), the Congo Free State, the 1994 genocide against the Tutsi and the colonial construction of
+  Hutu/Tutsi categories, Mauritania's three abolitions of slavery and the Haratin, Dahomey's role in
+  the slave trade, and the Mfecane read from four northern vantages. Each is flagged in its file with
+  what it needs before it can be shown to a reader. **Three live sovereignty disputes** — Western
+  Sahara, Mayotte, Chagos — are each marked as disputed with the parties named, and the app needs
+  **one** agreed wording rather than three ad-hoc sentences.
+
+  `countries/README.md` rewritten: the two file shapes documented, all 54 marked, and the cross-file
+  findings pointed at from the LANG-03 section. **No app code touched.**
+
+- **2026-08-30 (later)** — **`countries/`: Burkina Faso restructured, and the Botswana shape becomes
+  the house pattern for a researched country.**
+
+  Tumo's Burkina Faso research had landed in the file as a raw paste — the scaffold's empty template
+  sections still sitting above it, the demographic table flattened into tab-separated fragments, and
+  14 references stacked three lines to an entry with "Opens in a new window" between them. It now
+  follows [`bw-botswana.md`](countries/bw-botswana.md) exactly: **summary sections built only from
+  claims made in the narrative** (every row naming the § it came from), **the report carried
+  verbatim** — verified line by line against a backup of the original, not a word changed — and
+  **the sources reformatted** with an honest note on what they are worth.
+
+  **Two things the restructure surfaced that more research would not have.**
+  *One:* among the 14 sources is **`r/imaginarymaps`**, a Reddit community for **fictional**
+  alternate-history maps, sitting in a file whose single rule is that nothing is invented. Logged as
+  the top open question — not "a weak source" but a disqualifying one, and the job now is finding
+  what rested on it.
+  *Two:* **Burkina Faso cannot be added to `country-languages.ts` at all**, and not for want of
+  research. `lead` is a required `LangCode` — one of the eleven South African languages — and Ubuntu
+  Heritage speaks **none** of Mooré, Dioula, Fulani, Berber or French. The structure has no shape for
+  *"we speak none of what is spoken here"*, which will be the honest answer for most of the 54.
+  **LANG-03 cannot move past Southern Africa until that shape exists.**
+
+  Also: `countries/README.md` gains a **How a researched file is laid out** section (summary sections
+  → verbatim report → sources), `_TEMPLATE.md` points at it, the "all 54 are scaffolds" line is true
+  again (51), and Botswana's own claim about its sources was corrected — 12 Wikipedia entries and a
+  Wikibooks, not 11. No app code touched, and no research done for any other country.
 
 - **2026-08-30** — **KTR-02: a clean solve is finally worth more than a corrected one. PWA-06: a
   13 MB film asks before it spends someone's airtime. And ElevenLabs becomes the narration voice —
