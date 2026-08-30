@@ -446,12 +446,16 @@ export default function App() {
   // lookup. Matching them against the Route union instead makes tsc walk the whole union per call
   // and blows its stack (the same recursion this file already guards elsewhere). Keep it as strings.
   //
-  // "own"       — the route scrolls itself (its own ScrollView or SideIndexScroll two-pane layout).
-  // "immersive" — no chrome: the Reader, a film, a dot-story fill the viewport.
-  // "page"      — the shell scrolls it and appends the footer. Everything else.
+  // "own"  — the route scrolls itself (its own ScrollView or SideIndexScroll two-pane layout).
+  // "page"  — the shell scrolls it and appends the footer. Everything else.
+  // Whether the chrome is visible is a SEPARATE flag (`immersive`), deliberately — see AppShell.
   const name = routeName;
-  const shellMode: ShellMode =
-    name === "reader" ? "immersive" : OWN_SCROLL.has(name) ? "own" : "page";
+  // Layout is a property of the ROUTE and must not change while you are standing on it — the shell
+  // remounts the whole route when the tree shape moves, which is what made the hero's map open and
+  // shut in a loop. The Reader scrolls itself, so it is "own" that happens to want no chrome.
+  const shellMode: ShellMode = name === "reader" || OWN_SCROLL.has(name) ? "own" : "page";
+  // Chrome out of the way: the Reader always, and anything playing a full-screen film or dot-story.
+  const immersive = storyActive || name === "reader";
 
   // Which nav item to mark. The Atlas rooms all belong to Atlas; the Trust screens to Archive;
   // a single film's page belongs to Watch.
@@ -480,7 +484,8 @@ export default function App() {
         <View style={styles.frame}>
           {ready && (
             <AppShell
-              mode={storyActive ? "immersive" : shellMode}
+              mode={shellMode}
+              immersive={immersive}
               lang={lang}
               onLangChange={chooseLang}
               country={country}

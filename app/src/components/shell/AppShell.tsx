@@ -20,11 +20,16 @@ import { WIDE_MIN, type NavId } from "./nav";
 // The Home hero is full-bleed, so its header sits transparently ON the hero (`overHero`) rather than
 // pushing it down — the hero already reserves 90px of top padding, which the two tiers fit inside.
 
-export type ShellMode = "page" | "own" | "immersive";
+/**
+ * How the route lays itself out. This is a property of the ROUTE and does not change while you are
+ * on it — which matters more than it looks: see the note on `immersive` below.
+ */
+export type ShellMode = "page" | "own";
 
 export function AppShell({
   children,
   mode,
+  immersive = false,
   lang,
   onLangChange,
   country,
@@ -38,6 +43,18 @@ export function AppShell({
 }: {
   children: React.ReactNode;
   mode: ShellMode;
+  /**
+   * A film, a dot-story or the Reader is filling the viewport, so the chrome gets out of the way.
+   *
+   * This is a MODIFIER, never a mode, and that distinction is load-bearing. It used to be a third
+   * `mode` with an early `return` of a different tree — and because `children` then sat at a
+   * different position under a different parent, flipping it UNMOUNTED the whole route. On Home that
+   * was fatal: tapping "Start the journey" set the flag, the shell restructured, `HomeGallery`
+   * remounted, `useHomeJourney` lost its state, `mapOpen` went back to false, the flag cleared, and
+   * the shell restructured again. The map opened and shut in a loop. Keeping the tree shape fixed and
+   * only hiding chrome is what makes the walk survive its own opening.
+   */
+  immersive?: boolean;
   lang: Lang;
   onLangChange: (l: Lang) => void;
   country: string;
@@ -52,10 +69,9 @@ export function AppShell({
   const { width } = useWindowDimensions();
   const wide = width >= WIDE_MIN;
 
-  // Films, dot-stories and the Reader take the whole viewport — no header, no tabs, no footer.
-  if (mode === "immersive") return <View style={styles.root}>{children}</View>;
-
-  const header = (
+  // Films, dot-stories and the Reader take the whole viewport — no header, no tabs, no footer. The
+  // chrome is hidden in place; the tree around `children` is deliberately identical either way.
+  const header = immersive ? null : (
     <SiteHeader
       lang={lang}
       onLangChange={onLangChange}
@@ -81,14 +97,14 @@ export function AppShell({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.pageInner}>{children}</View>
-          <SiteFooter lang={lang} onAbout={onAbout} onHeritage={onHeritage} />
+          {immersive ? null : <SiteFooter lang={lang} onAbout={onAbout} onHeritage={onHeritage} />}
         </ScrollView>
       ) : (
         <View style={styles.flex}>{children}</View>
       )}
 
       {overHero ? header : null}
-      {!wide ? <MobileTabBar lang={lang} active={active} onNavigate={onNavigate} /> : null}
+      {!wide && !immersive ? <MobileTabBar lang={lang} active={active} onNavigate={onNavigate} /> : null}
     </View>
   );
 }

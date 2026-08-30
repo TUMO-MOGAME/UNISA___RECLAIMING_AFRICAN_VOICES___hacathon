@@ -40,6 +40,7 @@
     "web": "expo start --web --port 8081",
     "web:fresh": "node scripts/web-fresh.mjs",
     "build:web": "expo export --platform web && node scripts/build-web.mjs",
+    "serve:web": "node scripts/serve-dist.mjs",
     "typecheck": "node --stack-size=8000 ./node_modules/typescript/lib/tsc.js --noEmit",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\"",
     "ingest": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ingest.mjs",
