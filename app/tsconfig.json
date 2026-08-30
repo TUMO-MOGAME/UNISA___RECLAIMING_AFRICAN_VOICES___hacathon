@@ -2,7 +2,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // Lets a content module import another with an explicit `.ts` extension, which is what makes it
+    // loadable by `node --test` (the type-stripping loader will not resolve an extensionless path).
+    // Safe here: the project is `noEmit`, and Metro resolves the extension unchanged.
+    "allowImportingTsExtensions": true
   },
   "exclude": ["node_modules", "**/*.test.ts"]
 }

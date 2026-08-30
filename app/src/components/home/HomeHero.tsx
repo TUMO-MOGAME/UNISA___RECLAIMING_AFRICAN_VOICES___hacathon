@@ -7,7 +7,9 @@ import { sceneImageSource } from "../../content/images";
 import { t } from "../../i18n";
 import { SceneImage } from "../SceneImage";
 import { HistoryTrail, type HistoryTrailHandle } from "../HistoryTrail";
-import { historyTrailSource, historyTrail, type HistoryMilestone } from "../../content/history-trail";
+import { type HistoryMilestone } from "../../content/history-trail";
+import { trailToWalk } from "../../content/trails";
+import { countryByCode } from "../../content/anthems";
 import { JourneyStory } from "../JourneyStory";
 import { mediaFor, hasStory } from "../../content/journey-media";
 import { PressScale, Reveal } from "../Motion";
@@ -47,6 +49,10 @@ const UI = {
   },
   keepWalking: { en: "Keep walking", tn: "Tswelela pele", af: "Stap verder", zu: "Qhubeka uhambe", xh: "Qhubeka uhambe", nso: "Tšwela pele", st: "Tsoela pele", ss: "Chubeka uhambe", ts: "Famba emahlweni", nr: "Ragela phambili", ve: "Bvelani phanḓa" },
   journeyDone: { en: "Restart the journey", tn: "Simolola leeto gape", af: "Herbegin die reis", zu: "Qalisa kabusha uhambo", xh: "Qalisa kwakhona uhambo", nso: "Thoma leeto gape", st: "Qala leeto hape", ss: "Cala kabusha luhambo", ts: "Sungula nakambe riendzo", nr: "Thoma godu ikhambo", ve: "Thoma hafhu lwendo" },
+  roadComing: {
+    en: "%s's road is coming", tn: "Tsela ya %s e a tla", af: "%s se pad kom binnekort", zu: "Umgwaqo wase-%s uyeza", xh: "Indlela yase-%s iyeza",
+    nso: "Tsela ya %s e a tla", st: "Tsela ya %s e tla", ss: "Umgwaco wase-%s uyeta", ts: "Gondzo ra %s ra ta", nr: "Umgwaqo we-%s uyeza", ve: "Nḓila ya %s i khou ḓa",
+  },
   deeper: {
     en: "Go deeper", tn: "Tsena boteng", af: "Gaan dieper", zu: "Ngena ujule", xh: "Ngena nzulu",
     nso: "Tsena ka botebo", st: "Kena botebong", ss: "Ngena ujule", ts: "Nghena endzeni", nr: "Ngena ujule", ve: "Dzhenani nga vhukuma",
@@ -72,15 +78,22 @@ function heroSource(m: Module, w = 1200, h = 900) {
 // than the scroll content). Splitting it this way keeps both pieces byte-identical to the old
 // landing page — see docs/13-architecture-v2-plan.md §3.
 export function useHomeJourney({
+  country,
   onStoryActiveChange,
   onStartJourney,
 }: {
+  /** Which country's road to walk. See content/trails.ts — today only `za` has one. */
+  country: string;
   /** Notifies the app when the journey or a full-screen dot-story is active (hides the floating chatbot). */
   onStoryActiveChange?: (active: boolean) => void;
   /** Deliberately not passed by the app (D2, revised): the hero's walk is the free trailer and opens
    *  in place. Provide this only if the hero should hand off to the /journey page instead. */
   onStartJourney?: () => void;
 }) {
+  // The road for the selected country, or South Africa's with `isOwn: false` when that country has
+  // no researched trail yet. The UI has to SAY which of those it is (see the caption's road line).
+  const { trail, isOwn } = trailToWalk(country);
+  const milestones = trail.milestones;
   // History-trail "journey": the timeline sits dim behind the hero words by default; starting the
   // journey brings it forward (bright + tappable) and fades the big words back.
   const [mapOpen, setMapOpen] = useState(false);
@@ -107,14 +120,15 @@ export function useHomeJourney({
     }
     setMapOpen(true);
     animateTo(true).start();
-    // Right after starting the journey, open the opening milestone's story (1652: the arrival) —
-    // full-screen picture then film. Skipping returns to the walk.
-    const firstId = historyTrail[0]?.id;
-    if (firstId && hasStory(firstId)) setStoryId(firstId);
+    // Deliberately nothing else. This used to fire the 1652 story straight away, which threw a
+    // full-screen picture-then-film over the road before the reader had seen it — so "Start the
+    // journey" felt like being taken to another page, and the walk everybody came for was hidden
+    // behind a film they had to dismiss. The road opens, the walker stands on the first dot, and the
+    // story plays when the reader asks for it at a dot. Watching is offered, never forced.
   };
   const closeMap = () => { setMapOpen(false); setMilestone(null); setStoryId(null); animateTo(false).start(); };
 
-  const storyMilestone = storyId ? historyTrail.find((m) => m.id === storyId) ?? null : null;
+  const storyMilestone = storyId ? milestones.find((m) => m.id === storyId) ?? null : null;
   const storyMedia = storyId ? mediaFor(storyId) : undefined;
 
   // Hide the floating chatbot for the whole journey (walk + full-screen story) so it never crowds the
@@ -124,7 +138,7 @@ export function useHomeJourney({
     return () => onStoryActiveChange?.(false);
   }, [storyId, mapOpen]);
 
-  return { mapOpen, milestone, setMilestone, trailRef, walkState, setWalkState, storyId, setStoryId, trailOpacity, wordsOpacity, scrimOpacity, openMap, closeMap, storyMilestone, storyMedia };
+  return { mapOpen, milestone, setMilestone, trailRef, walkState, setWalkState, storyId, setStoryId, trailOpacity, wordsOpacity, scrimOpacity, openMap, closeMap, storyMilestone, storyMedia, milestones, trail, isOwn, country };
 }
 
 export type HomeJourney = ReturnType<typeof useHomeJourney>;
@@ -145,7 +159,10 @@ export function HomeHero({
   const { width, height } = useWindowDimensions();
   const wide = width >= 768;
   const heroH = Math.max(520, height); // full-viewport hero (like the reference's h-screen)
-  const { mapOpen, milestone, setMilestone, trailRef, walkState, setWalkState, storyId, setStoryId, trailOpacity, wordsOpacity, scrimOpacity, openMap, closeMap } = journey;
+  const { mapOpen, milestone, setMilestone, trailRef, walkState, setWalkState, storyId, setStoryId, trailOpacity, wordsOpacity, scrimOpacity, openMap, closeMap, milestones, trail, isOwn, country } = journey;
+  // Whose road is actually under the walker, and whose road the reader asked for.
+  const walkedName = countryByCode(trail.country).name;
+  const pickedName = countryByCode(country).name;
 
   return (
       <View style={[styles.hero, { height: heroH }]}>
@@ -168,6 +185,7 @@ export function HomeHero({
           <HistoryTrail
             ref={trailRef}
             active={mapOpen}
+            milestones={milestones}
             dimOpacity={trailOpacity}
             onSelect={setMilestone}
             selectedId={milestone?.id}
@@ -200,6 +218,12 @@ export function HomeHero({
               </PressScale>
               <View style={styles.mapTopText} pointerEvents="none">
                 <Text style={styles.mapKicker}>{t(UI.journeyTitle, lang)}</Text>
+                {/* Naming the road is not decoration. Before this the hero walked South Africa's
+                    trail under whatever flag was selected and said nothing about it. */}
+                <Text style={styles.mapRoad}>
+                  {walkedName} · {milestones[0]?.year}–{milestones[milestones.length - 1]?.year}
+                  {!isOwn ? ` · ${t(UI.roadComing, lang).replace("%s", pickedName)}` : ""}
+                </Text>
                 <Text style={styles.mapHint}>{t(UI.journeyHint, lang)}</Text>
               </View>
             </View>
@@ -268,7 +292,7 @@ export function HomeHero({
                 ) : null}
               </View>
             ) : (
-              <Text style={styles.mapSource} pointerEvents="none">{historyTrailSource}</Text>
+              <Text style={styles.mapSource} pointerEvents="none">{trail.sourceNote}</Text>
             )}
           </View>
         ) : null}
@@ -334,6 +358,7 @@ const styles = StyleSheet.create({
   mapTop: { flexDirection: "row", alignItems: "center", gap: spacing.md },
   mapTopText: { flex: 1 },
   mapKicker: { color: "#E8B45A", fontFamily: fonts.displaySemi, fontSize: 14, letterSpacing: 1, textTransform: "uppercase" },
+  mapRoad: { color: "#FFFFFF", fontFamily: fonts.bodySemi, fontSize: 12.5, marginTop: 3, letterSpacing: 0.2 },
   mapHint: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.body, fontSize: 12, marginTop: 3 },
   mapClose: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.12)", borderWidth: 1, borderColor: "rgba(255,255,255,0.28)", alignItems: "center", justifyContent: "center" },
   mapCaption: { alignSelf: "center", maxWidth: 560, width: "100%", backgroundColor: "rgba(10,7,3,0.72)", borderWidth: 1, borderColor: "rgba(232,180,90,0.4)", borderRadius: radius.md, padding: spacing.md },
