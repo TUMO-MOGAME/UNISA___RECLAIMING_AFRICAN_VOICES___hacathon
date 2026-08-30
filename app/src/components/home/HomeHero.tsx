@@ -309,6 +309,7 @@ export function HomeJourneyStory({ lang, journey }: { lang: Lang; journey: HomeJ
         <JourneyStory
           milestone={storyMilestone}
           media={storyMedia}
+          lang={lang}
           onClose={() => setStoryId(null)}
           labels={{
             skip: t(UI.storySkip, lang),

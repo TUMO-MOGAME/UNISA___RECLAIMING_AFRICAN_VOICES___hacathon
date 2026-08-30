@@ -5,12 +5,20 @@ import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, spacing, radius, fonts } from "../theme/tokens";
 import { Icon } from "../ui";
+import type { Lang } from "../content/types";
 import type { HistoryMilestone } from "../content/history-trail";
-import type { JourneyMedia } from "../content/journey-media";
+import { filmBytes, type JourneyMedia } from "../content/journey-media";
+import { DataGate } from "./DataGate";
+import { currentConnection, formatBytes, shouldAskBeforeDownload } from "../services/media/data-cost";
+import { isLargeMediaAllowed, setLargeMediaAllowed } from "../services/media/large-media-consent";
 
 // A full-screen "dot story" — opens on a picture, then plays the milestone's film. The user can skip
 // (back to the walk) at any time, and go back from the film to the picture. Rendered over the whole
 // app while a story is active.
+//
+// PWA-06: the films are 12–14 MB and 1816 plays two. The "Watch the film" button carries the real
+// size, and above ASK_ABOVE_BYTES a DataGate opens before the <video> is ever mounted — because
+// mounting it IS the download. Everything before that point costs a reader nothing.
 
 function videoUri(mod?: number): string | undefined {
   if (mod == null) return undefined;
@@ -24,11 +32,14 @@ function videoUri(mod?: number): string | undefined {
 export function JourneyStory({
   milestone,
   media,
+  lang,
   onClose,
   labels,
 }: {
   milestone: HistoryMilestone;
   media: JourneyMedia;
+  /** For the data gate's own strings (PWA-06); the rest of this screen is given `labels`. */
+  lang: Lang;
   onClose: () => void;
   labels: { skip: string; back: string; watch: string; interpretation: string };
 }) {
@@ -40,7 +51,32 @@ export function JourneyStory({
   const vUri = videoUri(clips[clipIndex]);
   const canPlayVideo = Platform.OS === "web" && clips.length > 0; // inline <video> is web-only for now
   const hasImage = media.image != null;
-  const [stage, setStage] = useState<"image" | "video">(hasImage ? "image" : "video");
+
+  // ── PWA-06: the data gate ──
+  // `ask()` is read at the moment of the decision rather than cached, because a reader can walk from
+  // Wi-Fi to the street between opening a story and pressing play.
+  const cost = filmBytes(media);
+  const ask = () =>
+    shouldAskBeforeDownload({
+      bytes: cost,
+      allowed: isLargeMediaAllowed(),
+      connection: currentConnection(),
+    });
+  // A story with no picture would otherwise open straight onto the film — so the one case with no
+  // button to press is the one case that never asks. Decided once, lazily, on mount.
+  const gateOnOpen = !hasImage && canPlayVideo && ask();
+  const [gateOpen, setGateOpen] = useState(() => gateOnOpen);
+  const [stage, setStage] = useState<"image" | "video">(() => (hasImage || gateOnOpen ? "image" : "video"));
+
+  const playFilm = () => {
+    setClipIndex(0);
+    setStage("video");
+  };
+  /** The single entry point to the film stage: nothing else may set `stage` to "video". */
+  const requestFilm = () => {
+    if (ask()) setGateOpen(true);
+    else playFilm();
+  };
 
   // When a film ends, roll on to the next one; after the last, close the story.
   const onFilmEnded = () => {
@@ -73,9 +109,16 @@ export function JourneyStory({
             <Text style={styles.note}>{milestone.note}</Text>
             <View style={styles.row}>
               {canPlayVideo ? (
-                <Pressable style={styles.primary} onPress={() => { setClipIndex(0); setStage("video"); }} accessibilityRole="button" accessibilityLabel={labels.watch}>
+                <Pressable
+                  style={styles.primary}
+                  onPress={requestFilm}
+                  accessibilityRole="button"
+                  accessibilityLabel={cost > 0 ? `${labels.watch} — ${formatBytes(cost)}` : labels.watch}
+                >
                   <Icon.Play size={17} color={colors.night} fill={colors.night} />
                   <Text style={styles.primaryText}>{labels.watch}</Text>
+                  {/* PWA-06: the price is on the button, whether or not the gate is silenced. */}
+                  {cost > 0 ? <Text style={styles.primarySize}>{formatBytes(cost)}</Text> : null}
                 </Pressable>
               ) : null}
               <Pressable style={styles.ghost} onPress={onClose} accessibilityRole="button" accessibilityLabel={labels.skip}>
@@ -122,6 +165,26 @@ export function JourneyStory({
           </View>
         </>
       ) : null}
+
+      {/* PWA-06 — nothing has been fetched at this point; the <video> above is not mounted. */}
+      {gateOpen ? (
+        <DataGate
+          lang={lang}
+          bytes={cost}
+          connection={currentConnection()}
+          onPlay={(remember) => {
+            if (remember) setLargeMediaAllowed(true);
+            setGateOpen(false);
+            playFilm();
+          }}
+          onCancel={() => {
+            setGateOpen(false);
+            // With no picture behind it there is nothing to fall back to, so declining closes the
+            // story rather than leaving the reader on a black screen.
+            if (!hasImage) onClose();
+          }}
+        />
+      ) : null}
     </View>
   );
 }
@@ -160,6 +223,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
   },
   primaryText: { color: colors.night, fontFamily: fonts.bodyBold, fontSize: 15, letterSpacing: 0.3 },
+  // PWA-06 — the size sits on the button itself, quieter than the label but never hidden.
+  primarySize: { color: "rgba(0,0,0,0.55)", fontFamily: fonts.bodySemi, fontSize: 12.5, letterSpacing: 0.2 },
   ghost: {
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.4)",

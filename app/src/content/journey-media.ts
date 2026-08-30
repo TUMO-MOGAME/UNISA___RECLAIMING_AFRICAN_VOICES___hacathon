@@ -15,7 +15,24 @@ export type JourneyMedia = {
   /** Ordered playlist of films to play back-to-back after the picture (require of bundled .mp4s).
    *  Takes precedence over `video` when present; the player advances through them in order. */
   videos?: number[];
+  /**
+   * PWA-06 — the measured byte size of `video`, and of each entry of `videos` in the same order.
+   *
+   * These are what the reader is shown before a film is fetched, so they are not decoration: a film
+   * swapped without updating its number would quote someone the wrong price for their airtime.
+   * `journey-media.test.ts` stats the real files and fails the build if any of these drifts.
+   */
+  videoBytes?: number;
+  videosBytes?: number[];
 };
+
+/** Everything a `Watch the film` press will actually pull down — the WHOLE playlist, because that
+ *  is what one press commits to. 1816 plays two films back to back and must say so. */
+export function filmBytes(m: JourneyMedia | undefined): number {
+  if (!m) return 0;
+  if (m.videos?.length) return (m.videosBytes ?? []).reduce((a, b) => a + b, 0);
+  return m.videoBytes ?? 0;
+}
 
 // Every "big dot" (top-level milestone in history-trail.ts) opens on a dignified AI interpretation of
 // its event (labelled as such). Films are added per-dot later as Tumo supplies them — until then a dot
@@ -27,6 +44,7 @@ export const journeyMedia: Record<string, JourneyMedia> = {
     image: require("../../assets/journey/y1652.webp"),
     imageIsAI: true,
     video: require("../../assets/journey/1652.mp4"),
+    videoBytes: 14_194_910,
   },
   y1779: { image: require("../../assets/journey/y1779.webp"), imageIsAI: true },
   y1806: { image: require("../../assets/journey/y1806.webp"), imageIsAI: true },
@@ -38,6 +56,7 @@ export const journeyMedia: Record<string, JourneyMedia> = {
       require("../../assets/journey/1816-we-are-growing.mp4"),
       require("../../assets/journey/1816-song-of-kings.mp4"),
     ],
+    videosBytes: [12_319_577, 12_930_585],
   },
   y1834: { image: require("../../assets/journey/y1834.webp"), imageIsAI: true },
   y1838: { image: require("../../assets/journey/y1838.webp"), imageIsAI: true },

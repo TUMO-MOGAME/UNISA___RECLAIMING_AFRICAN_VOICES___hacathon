@@ -29,6 +29,21 @@ export type Progress = {
   watched: Record<string, number>;
   /** stageId -> quiz tally. */
   quiz: Record<string, { correct: number; total: number }>;
+  /**
+   * KTR-02 — what solving is actually worth (docs/14-game-architecture.md §7).
+   *
+   * PRIVACY: every field here is a counter. Nothing identifies a person, nothing records *when*
+   * anything happened, and nothing leaves the device. The key allow-list in progress.test.ts was
+   * widened to admit `solve` DELIBERATELY, in this change, and it stays the gate on the next one.
+   */
+  solve: {
+    /** Stages answered perfectly first time — no correction taken on any question. */
+    firstTry: number;
+    /** The current unbroken run of such stages. A correction resets it; see `recordSolve`. */
+    run: number;
+    /** The longest run ever reached. Positive framing only: it never goes down. */
+    bestStreak: number;
+  };
 };
 
 /** Contract both platform stores implement. */
@@ -43,6 +58,15 @@ export type ProgressStore = {
 
 export const STARS_PER_STAGE = 50;
 
+/**
+ * Stars paid for each question answered correctly *without* taking a correction (KTR-02, D7).
+ *
+ * Deliberately small next to STARS_PER_STAGE: finishing a stage is what the journey is for, and
+ * solving it cleanly is a bonus on top. A wrong answer costs this bonus and nothing else — it is
+ * never subtracted, only not paid.
+ */
+export const BONUS_STARS_FIRST_TRY = 10;
+
 export function emptyProgress(country = "za"): Progress {
   return {
     country,
@@ -54,6 +78,7 @@ export function emptyProgress(country = "za"): Progress {
     stamps: [],
     watched: {},
     quiz: {},
+    solve: { firstTry: 0, run: 0, bestStreak: 0 },
   };
 }
 
@@ -79,6 +104,13 @@ export function normalise(raw: unknown, country = "za"): Progress {
     stamps: arr(r.stamps),
     watched: r.watched && typeof r.watched === "object" ? (r.watched as Record<string, number>) : {},
     quiz: r.quiz && typeof r.quiz === "object" ? (r.quiz as Record<string, { correct: number; total: number }>) : {},
+    // A blob written before KTR-02 has no `solve` at all — it reads back as zeroes rather than
+    // undefined, so an existing reader's Passport renders instead of crashing on a missing field.
+    solve: {
+      firstTry: num(r.solve?.firstTry),
+      run: num(r.solve?.run),
+      bestStreak: num(r.solve?.bestStreak),
+    },
   };
 }
 
@@ -114,6 +146,73 @@ export function recordQuiz(p: Progress, id: string, correct: number, total: numb
   // Keep the best attempt, so re-taking a quiz can never lower a score.
   if (prev && prev.correct >= correct) return p;
   return { ...p, quiz: { ...p.quiz, [id]: { correct, total } } };
+}
+
+/**
+ * The bonus owed for a stage, given how many questions were solved first-try this time and the best
+ * previously recorded for that same stage. Only the IMPROVEMENT pays, so re-walking a stage you
+ * already aced pays nothing and a shaky first pass can still be improved on later.
+ *
+ * Exported because StageScreen shows the reader this exact number on the reward card. One formula,
+ * one place — a screen that computed its own would eventually disagree with the store.
+ */
+export function firstTryBonus(previousBest: number, firstTry: number): number {
+  const before = Math.max(0, previousBest);
+  return Math.max(0, firstTry - before) * BONUS_STARS_FIRST_TRY;
+}
+
+/**
+ * KTR-02 — record a solved stage. This is what StageScreen calls when a stage finishes, and it
+ * replaces the bare `recordQuiz` call that KTR-01 wired.
+ *
+ * `firstTry` is the number of questions answered correctly WITHOUT taking a correction. It is the
+ * only score that means anything (D7): every question is eventually answered right, because a wrong
+ * answer hands the question back rather than failing you out, so `correct` on its own always ends at
+ * `total`.
+ *
+ * Four rules, none of them negotiable:
+ *
+ * 1. **Nothing is ever taken away.** Stars only go up, `bestStreak` only goes up, and the stored
+ *    tally keeps the best attempt.
+ * 2. **The bonus pays the improvement, once.** Re-visiting a stage you already solved cleanly pays
+ *    nothing the second time; solving it *better* pays only the difference.
+ * 3. **The run advances on a stage's first clean solve and on nothing else.** Otherwise re-opening
+ *    one easy stage seven times would "earn" a streak of seven.
+ * 4. **A stage with no authored questions is neither a win nor a break.** `total <= 0` returns
+ *    untouched: you cannot be credited for a question that does not exist, and you certainly cannot
+ *    lose a streak to one. Twelve of the 25 milestones are in exactly that state today.
+ */
+export function recordSolve(p: Progress, id: string, firstTry: number, total: number): Progress {
+  if (total <= 0) return p; // rule 4 — a milestone with no question decides nothing
+
+  const clean = firstTry >= total;
+  const prev = p.quiz[id];
+  const wasClean = !!prev && prev.total > 0 && prev.correct >= prev.total;
+
+  const bonus = firstTryBonus(prev?.correct ?? 0, firstTry);
+  const next = recordQuiz(p, id, firstTry, total);
+
+  let { firstTry: solvedClean, run, bestStreak } = p.solve;
+  if (clean && !wasClean) {
+    solvedClean += 1;
+    run += 1;
+    bestStreak = Math.max(bestStreak, run);
+  } else if (!clean && !wasClean) {
+    // A correction breaks the current run. The record of the best one stands — that is the whole
+    // reason `bestStreak` is stored separately, and why there is no "you lost your streak" anywhere
+    // in the UI. A stage already solved cleanly is not un-solved by a sloppier re-visit.
+    run = 0;
+  }
+
+  const solveChanged =
+    solvedClean !== p.solve.firstTry || run !== p.solve.run || bestStreak !== p.solve.bestStreak;
+  if (next === p && !bonus && !solveChanged) return p; // nothing moved — let `apply` skip the write
+
+  return {
+    ...next,
+    stars: next.stars + bonus,
+    solve: solveChanged ? { firstTry: solvedClean, run, bestStreak } : p.solve,
+  };
 }
 
 /**

@@ -6,7 +6,7 @@ import {
   awardCard,
   stampCountry,
   setWatched,
-  recordQuiz,
+  recordSolve,
   touchStreak,
   todayISO,
   type Progress,
@@ -29,7 +29,12 @@ export type ProgressApi = {
   awardCard: (cardId: string) => void;
   stampCountry: (code: string) => void;
   setWatched: (moduleId: string, fraction: number) => void;
-  recordQuiz: (id: string, correct: number, total: number) => void;
+  /**
+   * KTR-02 — a stage was solved. `firstTry` is how many of its `total` questions were answered
+   * right without taking a correction; it keeps the best attempt, pays the first-try bonus on the
+   * improvement, and moves the streak. Replaces the raw `recordQuiz` this API used to expose.
+   */
+  recordSolve: (id: string, firstTry: number, total: number) => void;
   /** Count today towards the streak. Safe to call repeatedly. */
   touchToday: () => void;
   /** Erasure — forget everything on this device. */
@@ -81,7 +86,7 @@ export function useProgress(): ProgressApi {
     awardCard: useCallback((cardId) => apply((p) => awardCard(p, cardId)), [apply]),
     stampCountry: useCallback((code) => apply((p) => stampCountry(p, code)), [apply]),
     setWatched: useCallback((m, f) => apply((p) => setWatched(p, m, f)), [apply]),
-    recordQuiz: useCallback((id, c, t) => apply((p) => recordQuiz(p, id, c, t)), [apply]),
+    recordSolve: useCallback((id, f, t) => apply((p) => recordSolve(p, id, f, t)), [apply]),
     touchToday: useCallback(() => apply((p) => touchStreak(p, todayISO())), [apply]),
     reset: useCallback(() => {
       const fresh = emptyProgress();

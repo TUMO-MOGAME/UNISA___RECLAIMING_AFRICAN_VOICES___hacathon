@@ -129,13 +129,17 @@ function StageRoute({
       lang={lang}
       stageNumber={n}
       alreadyDone={progress.progress.stagesDone.includes(sid)}
-      onComplete={(cardId, quiz) => {
+      // KTR-02: what the stage already scored, so the reward card can show the bonus this visit
+      // actually earns rather than re-announcing one that was paid the first time round.
+      bestFirstTry={progress.progress.quiz[sid]?.correct ?? 0}
+      onComplete={(cardId, solve) => {
         progress.completeStage(sid);
         if (cardId) progress.awardCard(cardId);
-        // KTR-01: the solve is finally recorded. Safe to call on a re-visit — completeStage and
-        // awardCard are idempotent, and recordQuiz keeps the best attempt, so coming back and
-        // solving a stage cleanly can raise the score but never lower it.
-        if (quiz) progress.recordQuiz(sid, quiz.correct, quiz.total);
+        // KTR-01/02: the solve is finally recorded, and it is finally worth something. Safe to call
+        // on a re-visit — every reducer behind this is idempotent, recordSolve keeps the best
+        // attempt and pays only the improvement, so coming back and solving a stage cleanly can
+        // raise the score but never lower it.
+        if (solve) progress.recordSolve(sid, solve.firstTry, solve.total);
         progress.touchToday();
       }}
       onBack={onBack}

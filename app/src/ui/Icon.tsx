@@ -59,4 +59,6 @@ export const Icon = {
   Crown: L.Crown, // Presidents
   Award: L.Award, // Heroes
   PawPrint: L.PawPrint, // Totems & clans
+  // ── Know the Road (Phase 6) ──
+  Target: L.Target, // first-try solves — the score that means something
 };
