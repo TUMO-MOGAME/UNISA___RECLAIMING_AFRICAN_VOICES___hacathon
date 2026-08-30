@@ -5,6 +5,11 @@
 
 > Delete any section you have nothing sourced for. An empty section is better than a filled one that
 > guesses. Mark anything you believe but cannot yet cite as `[NEEDS SOURCE]`.
+>
+> Pasting in a long-form research report? Keep it verbatim at the bottom under
+> `## The full research report` and build these sections from it — see
+> **[How a researched file is laid out](README.md#how-a-researched-file-is-laid-out)**, and
+> [`bw-botswana.md`](bw-botswana.md) / [`bf-burkina-faso.md`](bf-burkina-faso.md) for the shape.
 
 ---
 

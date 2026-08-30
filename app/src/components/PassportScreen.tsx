@@ -37,6 +37,10 @@ const UI = {
   levelLbl: { en: "Level", tn: "Legato", af: "Vlak", zu: "Izinga", xh: "Inqanaba", nso: "Legato", st: "Boemo", ss: "Lizinga", ts: "Xiyimo", nr: "Izinga", ve: "Vhuimo" },
   stars: { en: "stars", tn: "dinaledi", af: "sterre", zu: "izinkanyezi", xh: "iinkwenkwezi", nso: "dinaledi", st: "dinaledi", ss: "tinkhanyeti", ts: "tinyeleti", nr: "iinkwekwezi", ve: "ṋaledzi" },
   streak: { en: "day streak", tn: "malatsi a a latelanang", af: "dae agtereen", zu: "izinsuku zilandelana", xh: "iintsuku zilandelelana", nso: "matšatši a latelanago", st: "matsatsi a latelanang", ss: "emalanga alandzelanako", ts: "masiku yo landzelelana", nr: "amalanga alandelanako", ve: "maḓuvha a tevhekanaho" },
+  // KTR-02. Two counters, and nothing in this room ever shows a run being lost: `bestRun` is the
+  // best ever reached, so the number a reader sees here only goes up.
+  solvedClean: { en: "solved first try", tn: "e rarabolotswe ka maiteko a ntlha", af: "eerste keer reg", zu: "kuxazululwe ngomzamo wokuqala", xh: "kucombululwe ngolinge lokuqala", nso: "e rarollotšwe ka maiteko a mathomo", st: "e rarollotswe ka boiteko ba pele", ss: "kucatululwe ngemzamo wekucala", ts: "swi tlhantlhiwile hi ku ringeta ko sungula", nr: "kurarululwe ngomzamo wokuthoma", ve: "zwo tandululwa nga u lingedza hu thomaho" },
+  bestRun: { en: "best run", tn: "tatelano e e gaisang", af: "beste reeks", zu: "ukulandelana okungcono", xh: "ulandelelwano olugqwesileyo", nso: "tatelano ye kaone", st: "tatellano e molemo", ss: "kulandzelana lokuncono", ts: "ku landzelelana lokunene", nr: "ukulandelana okungcono", ve: "u tevhekana hu khwineaho" },
   journey: {
     en: "The journey", tn: "Leeto", af: "Die reis", zu: "Uhambo", xh: "Uhambo",
     nso: "Leeto", st: "Leeto", ss: "Luhambo", ts: "Riendzo", nr: "Ikhambo", ve: "Lwendo",
@@ -148,6 +152,14 @@ export function PassportScreen({
           </Text>
           <Stat icon={<Icon.Sparkles size={14} color={colors.dsBlue} />} value={progress.stars} label={t(UI.stars, lang)} />
           <Stat icon={<Icon.Clock size={14} color={colors.dsBlue} />} value={progress.streak.count} label={t(UI.streak, lang)} />
+          {/* KTR-02 — what solving is worth. Shown only once there is something to show, so a new
+              reader's passport is not a wall of zeroes telling them what they have not done. */}
+          {progress.solve.firstTry > 0 ? (
+            <Stat icon={<Icon.Target size={14} color={colors.dsBlue} />} value={progress.solve.firstTry} label={t(UI.solvedClean, lang)} />
+          ) : null}
+          {progress.solve.bestStreak > 1 ? (
+            <Stat icon={<Icon.Sparkles size={14} color={colors.dsBlue} />} value={progress.solve.bestStreak} label={t(UI.bestRun, lang)} />
+          ) : null}
         </View>
         <Text style={styles.lede}>{t(UI.lede, lang)}</Text>
       </View>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, Image, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Lang } from "../content/types";
@@ -11,7 +11,7 @@ import { historyTrail, historyTrailSource } from "../content/history-trail";
 import { journeyMedia, hasStory } from "../content/journey-media";
 import { quizFor, quizSource, shuffledOptionOrder, type QuizQuestion } from "../content/quiz";
 import { totems } from "../content/totems";
-import { STARS_PER_STAGE } from "../services/progress/progress";
+import { STARS_PER_STAGE, firstTryBonus } from "../services/progress/progress";
 
 // One stage of the Journey (v2 V2-18, wireframe 2e): WATCH → SOLVE → REWARD.
 //
@@ -66,6 +66,10 @@ const UI = {
     en: "first try", tn: "maiteko a ntlha", af: "eerste probeerslag", zu: "ngomzamo wokuqala", xh: "ngolinge lokuqala",
     nso: "maiteko a mathomo", st: "boiteko ba pele", ss: "ngemzamo wekucala", ts: "eka ku ringeta ko sungula", nr: "ngomzamo wokuthoma", ve: "kha u lingedza hu thomaho",
   },
+  bonus: {
+    en: "first-try bonus", tn: "moputso wa maiteko a ntlha", af: "eerste-probeerslag bonus", zu: "ibhonasi yomzamo wokuqala", xh: "ibhonasi yolinge lokuqala",
+    nso: "moputso wa maiteko a mathomo", st: "moputso wa boiteko ba pele", ss: "libhonasi yemzamo wekucala", ts: "bonasi ya ku ringeta ko sungula", nr: "ibhonasi yomzamo wokuthoma", ve: "bonasi ya u lingedza hu thomaho",
+  },
   earned: {
     en: "Stage complete", tn: "Kgato e fedile", af: "Fase voltooi", zu: "Isinyathelo siqediwe", xh: "Inyathelo ligqityiwe",
     nso: "Kgato e feditšwe", st: "Mohato o phethilwe", ss: "Sinyatselo sicedziwe", ts: "Goza ri hetiwile", nr: "Igadango liqediwe", ve: "Ḽiga ḽo fhela",
@@ -116,6 +120,7 @@ export function StageScreen({
   lang,
   stageNumber,
   alreadyDone,
+  bestFirstTry = 0,
   onComplete,
   onBack,
 }: {
@@ -124,12 +129,20 @@ export function StageScreen({
   stageNumber: number;
   alreadyDone: boolean;
   /**
-   * Fired once the stage is finished: award stars + the card, and record the solve.
-   * `quiz` is null for a milestone that has no authored questions yet. Fired on a re-visit too —
-   * every progress reducer behind it is idempotent, and `recordQuiz` keeps the best attempt, so
-   * coming back and solving it cleanly is allowed to improve the score.
+   * KTR-02 — the best first-try count this stage has already recorded. The reward card pays and
+   * shows only the improvement on it, so a re-walk of a stage you already aced does not announce a
+   * bonus it is not paying. Read once, on mount: it changes the instant `onComplete` fires.
    */
-  onComplete: (cardId: string, quiz: { correct: number; total: number } | null) => void;
+  bestFirstTry?: number;
+  /**
+   * Fired once the stage is finished: award stars + the card, and record the solve.
+   * `solve` is null for a milestone that has no authored questions yet. `firstTry` counts only the
+   * questions answered right WITHOUT a correction — `correct` on its own would always equal `total`,
+   * because a wrong answer hands the question back rather than failing you out.
+   * Fired on a re-visit too — every progress reducer behind it is idempotent, and `recordSolve`
+   * keeps the best attempt, so coming back and solving it cleanly is allowed to improve the score.
+   */
+  onComplete: (cardId: string, solve: { firstTry: number; total: number } | null) => void;
   onBack: () => void;
 }) {
   const { width } = useWindowDimensions();
@@ -149,6 +162,9 @@ export function StageScreen({
   const [retries, setRetries] = useState(0);
   /** Option display order. null = authored order; set to a shuffle on each retry. */
   const [order, setOrder] = useState<number[] | null>(null);
+  // The score this stage held when we walked in. Frozen on mount, because `onComplete` updates the
+  // store before the reward step renders and a live prop would show a bonus of zero every time.
+  const priorBest = useRef(bestFirstTry).current;
 
   if (!milestone) return null;
 
@@ -159,8 +175,11 @@ export function StageScreen({
   /** True once the reader has checked an answer and it was the right one. */
   const solved = checked && picked !== null && !!q?.options[picked]?.correct;
 
-  const finish = (correct: number) => {
-    onComplete(card.id, questions.length ? { correct, total: questions.length } : null);
+  /** The bonus this visit earns — the same formula the store pays out, imported, not re-derived. */
+  const bonusNow = questions.length ? firstTryBonus(priorBest, firstTryCount) : 0;
+
+  const finish = (firstTry: number) => {
+    onComplete(card.id, questions.length ? { firstTry, total: questions.length } : null);
     setStep("reward");
   };
 
@@ -360,6 +379,15 @@ export function StageScreen({
               ) : null}
             </View>
 
+            {/* KTR-02: the bonus this visit actually earns. Only the improvement on the stage's
+                previous best pays, so a re-walk of a stage already aced shows nothing here rather
+                than announcing stars that are not being awarded. */}
+            {bonusNow > 0 ? (
+              <Text style={styles.rewardBonus}>
+                +{bonusNow} ★ {t(UI.bonus, lang)}
+              </Text>
+            ) : null}
+
             <View style={styles.cardPlate}>
               <Image source={card.image} style={styles.cardArt} resizeMode="cover" accessibilityLabel={card.animal} />
               <View style={styles.cardInfo}>
@@ -395,6 +423,7 @@ export function StageScreen({
         <JourneyStory
           milestone={milestone}
           media={media!}
+          lang={lang}
           onClose={() => setStoryOpen(false)}
           labels={{ skip: "Skip", back: "Back", watch: "Watch the film", interpretation: "Artistic interpretation" }}
         />
@@ -489,6 +518,7 @@ const styles = StyleSheet.create({
   rewardTitle: { color: "#FFFFFF", fontFamily: fonts.display, fontSize: 34, lineHeight: 36, letterSpacing: -0.8 },
   rewardStars: { color: colors.dsBlue, fontFamily: fonts.bodyBold, fontSize: 17 },
   rewardScore: { color: "rgba(255,255,255,0.6)", fontFamily: fonts.bodySemi, fontSize: 15 },
+  rewardBonus: { color: colors.live, fontFamily: fonts.bodyBold, fontSize: 14.5, letterSpacing: 0.2 },
 
   cardPlate: {
     flexDirection: "row",
