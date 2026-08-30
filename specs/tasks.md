@@ -235,3 +235,45 @@ Warm African-British**.
       proxy behind `EXPO_PUBLIC_ELEVENLABS_BASE_URL` rather than a shipped key
 - [ ] EL-07 Pre-render the fixed narration (T031's cinematic intro) at author time instead of live,
       so the demo never depends on quota or a network at all
+
+### Later — the voice fits the story, and the tone carries the feeling (planned 30 Aug, not started)
+
+Tumo's ask: **the voice that speaks should suit the story and its theme, and the tone should carry
+the emotion.** Today one voice — Amara — reads everything in English, at the API's default settings,
+so *Mhudi*'s war-and-exile chapters and a Kids-mode heritage card are delivered in exactly the same
+register. Deferred on purpose; this is polish, and it lands after the game layer.
+
+**Three things make this harder than picking voices, and each is a task below:** the cache key does
+not currently include the delivery settings, so two tones of one voice would collide; **none of the
+nine indigenous languages can be given a tone at all** (Botlhale takes no voice parameter and
+ElevenLabs must never speak them — EL-03); and re-casting a module invalidates every clip already
+paid for out of a 40 000-character month.
+
+- [ ] VOICE-01 **Cast the voices with Tumo — and write down why.** The account carries four South
+      African voices (Amara, Declan – SA News, Andreas, Travis) plus instant voice cloning. Which
+      voice reads Mqhayi's courtroom, which reads Mutwa's oral epic, which reads Vilakazi's poetry,
+      which reads Kids mode. **Casting is an interpretive act on someone else's literature**, so it
+      is a decision recorded with its reasoning, not a constant chosen quietly in a service file
+- [ ] VOICE-02 `content/narration-voice.ts` — the cast as **data**: `moduleId → { voiceId, settings,
+      why }`, with Amara as the default so an uncast module sounds exactly as it does today
+- [ ] VOICE-03 Delivery settings per cast entry — `voice_settings` (`stability`, `similarity_boost`,
+      `style`, `use_speaker_boost`) on the request body, and `eleven_v3` audio tags where the model
+      supports them. **Verify both against the live API before shipping either**, the way EL-02
+      verified language support against `GET /v1/models` — the docs are not the contract
+- [ ] VOICE-04 **`narrationKey` must include the delivery settings — and this lands *before* any tone
+      varies.** [cache-key.ts](../app/src/services/tts/cache-key.ts) hashes provider + lang + voice +
+      text. Two tones of the *same* voice on the *same* passage produce the same key, so the reader
+      would hear whichever was rendered first, forever, and a re-cast would look like a no-op. One
+      field and one test
+- [ ] VOICE-05 **The nine indigenous languages get no tone, and the UI must not imply they do.**
+      Botlhale takes no voice parameter at all, and ElevenLabs is never routed to them (EL-03). If a
+      "voice" or "mood" control appears anywhere, it must be absent or visibly unavailable in those
+      languages rather than present and inert — a Setswana reader should not be shown a promise the
+      app cannot keep
+- [ ] VOICE-06 **Budget the re-synthesis.** Extra voices cost no extra characters, but changing a
+      module's cast invalidates its cached clips and re-spends them out of 40 000/month — the four
+      literary modules are ~15 700 characters of English prose. Cast changes are batched and dated,
+      not tuned live
+- [ ] VOICE-07 **Listen and judge**, as with EL-05: no test in this repo can hear a performance. One
+      passage per cast voice, and an honest answer to whether the emotion helps the text or acts on
+      top of it

@@ -127,6 +127,15 @@ Then:
    questions before those stages feel finished.
 5. **Locked chapters on `/journey`** — the free/paid split Tumo described. The hero trailer is free
    and stays free; the gating mechanism itself is not built.
+6. **The voice should fit the story, and the tone should carry the emotion** — Tumo's ask on
+   30 Aug, **deliberately deferred** to after the game layer. One voice (Amara) currently reads
+   everything in English at default settings, so *Mhudi*'s exile chapters and a Kids heritage card
+   arrive in the same register. Seven tasks, **VOICE-01–07** in [specs/tasks.md](specs/tasks.md).
+   Three things there are not obvious: `narrationKey` does **not** hash the delivery settings, so two
+   tones of one voice would collide and the first rendering would win forever (VOICE-04, and it must
+   land first); **the nine indigenous languages cannot be given a tone at all** — Botlhale takes no
+   voice parameter and ElevenLabs must never speak them (EL-03), so no mood control may appear and
+   sit inert in Setswana; and a re-cast re-spends a module's clips out of 40 000 characters a month.
 
 ### The narration voice — what ElevenLabs can and cannot do (30 Aug)
 
@@ -264,6 +273,14 @@ without the cache the Listen button would stop working around the 12th.
   anchoring to Atlas heritage is a safe additive follow-up (won't touch the live devnet tx).
 
 ## 🗒️ Log
+
+- **2026-08-30 (planning)** — **Voice-per-story and emotional tone added to the backlog as VOICE-01–07,
+  not built.** Tumo asked that the narrating voice suit the story and its theme, and that the tone
+  carry the emotion — and asked for it to be planned rather than built now. Written up in
+  [specs/tasks.md](specs/tasks.md) with the three non-obvious constraints stated up front: the
+  narration cache key does not hash delivery settings (so tone changes would silently collide),
+  the nine indigenous languages cannot be given a tone at all, and every re-cast re-spends
+  characters out of a 40 000/month quota. Nothing in `services/tts/` changed.
 
 - **2026-08-30 (later still)** — **All 54 country files researched. No scaffolds left in `countries/`.**
 
