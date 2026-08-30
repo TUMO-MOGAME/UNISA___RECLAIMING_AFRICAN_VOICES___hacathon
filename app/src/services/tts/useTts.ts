@@ -141,8 +141,17 @@ export function useTts(): UseTts {
           if (stale()) return;
           await playUri(uri, provider);
           return;
-        } catch {
+        } catch (err) {
           // Quota exhausted, offline, bad key, unsupported language — try the next rung down.
+          //
+          // Silence here is right for a READER (the Listen button just works, one rung lower) and
+          // wrong for a DEVELOPER: "it fell back to the device voice" and "it never tried" look
+          // identical from the outside, and that cost real debugging time the day this shipped.
+          // So in dev, and only in dev, the rung says why it gave up.
+          if (__DEV__) {
+            // eslint-disable-next-line no-console
+            console.warn(`[tts] ${provider} failed for "${lang}", falling to the next engine:`, err);
+          }
         }
       }
     },
